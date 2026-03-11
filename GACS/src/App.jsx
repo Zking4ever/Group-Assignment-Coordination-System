@@ -1,35 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route } from 'react-router-dom'
+import LandingPage from './001LandingPage/001LandingPage.jsx'
+import LoginPage from './002LoginPage/002LoginPage.jsx'
+import RegisterPage from './003RegisterPage/003RegisterPage.jsx'
+import ConfirmationPage from './004ConfirmationPage/004ConfirmationPage.jsx'
+import HomePage from './005HomePage/005HomePage.jsx'
+import GroupPage from './006GroupPage/006GroupPage.jsx'
+import ProfileEdit from './007ProfileEdit/007ProfileEdit.jsx'
+import AddTaskPage from './012AddTaskPage/012AddTaskPage.jsx'
+import TaskDetail from './012AddTaskPage/TaskDetail.jsx'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Routes>
+        <Route path="/" element={<LandingPage/>}/>
+        <Route path="/login" element={<LoginPage/>}/>
+        <Route path="/register" element={<RegisterPage/>}/>
+        <Route path="/confirm" element={<ConfirmationPage/>}/>
+        <Route path="/home" element={<HomePage/>}/>
+        <Route path="/group" element={<GroupPage/>}/>
+        <Route path="/profileEdit" element={<ProfileEdit/>}/>
+        <Route path="/addTask" element={<AddTaskPage/>}/>
+        <Route path="/taskDetail" element={<TaskDetail/>}/>
+      </Routes>
     </>
-  )
+  );
+
 }
 
 export default App

@@ -1,0 +1,17 @@
+.container{
+    text-align: center;
+    height: 100vh;
+    border: 1px solid;
+}
+
+.description{
+    margin-top: 5em;
+}
+
+.CTA{
+    margin: 7em;
+    border-radius: 7px;
+    border: none;
+    border-style: outset;
+    padding: 0.27em 0.75em;
+}
