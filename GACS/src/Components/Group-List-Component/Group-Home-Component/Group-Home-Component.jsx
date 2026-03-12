@@ -67,9 +67,14 @@ function HomeContent(){
                             <div onClick={() => handleClick(group)}>
                                 <GroupCard title={group.groupName} description={group.groupDescription}/>
                             </div>
-                            <div className={styles.trash} onClick={() => handleDelete(group.id)}>
-                                <FontAwesomeIcon icon={faTrash} />
-                            </div>
+                            {group.creatorId === JSON.parse(localStorage.getItem("currentUser"))?.id &&
+                            (
+                                <>
+                                    <div className={styles.trash} onClick={() => handleDelete(group.id)}>
+                                        <FontAwesomeIcon icon={faTrash} />
+                                    </div>
+                                </>
+                            )}
                             </div>
                         </>
                     )))}

@@ -112,7 +112,7 @@ function CreateTask({ setPage }){
                 </div>
                 <div className={styles.taskName}>
                     <label>Deadline: </label>
-                   <input type="date" name="deadLine" value={taskDetail.deadLine} onChange={handleChange} required/>
+                   <input type="date" name="deadLine" value={taskDetail.deadLine} min={new Date().toISOString().split("T")[0]} onChange={handleChange} required/>
                 </div>
                 
 

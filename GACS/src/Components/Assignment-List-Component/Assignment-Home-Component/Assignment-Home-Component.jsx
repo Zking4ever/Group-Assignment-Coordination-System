@@ -72,9 +72,15 @@ function HomeContent(){
                                 <div onClick={() => handleClick(assignment)}>
                                     <AssignmentCard title={assignment.assignmentName} description={assignment.assignmentDescription} groupId={assignment.id}/>
                                 </div>
-                                <div className={styles.trash} onClick={() => handleDelete(assignment.id)}>
-                                    <FontAwesomeIcon icon={faTrash} />
-                                </div>
+                                {assignment.creatorId === JSON.parse(localStorage.getItem("currentUser"))?.id &&
+                                    (
+                                    
+                                     <div className={styles.trash} onClick={() => handleDelete(assignment.id)}>
+                                         <FontAwesomeIcon icon={faTrash} />
+                                     </div>
+                                        
+                                    )
+                                }
                             </div>
                         </>
                     )))}

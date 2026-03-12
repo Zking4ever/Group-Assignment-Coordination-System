@@ -41,7 +41,7 @@ function TaskDetail() {
                 const { response: assignmentResponse, data: assignmentData } = await fetchAssignments();
                 if(!assignmentResponse.ok) return;
 
-                const assignment = assignmentData.find(a => a.creatorId === currentUser.id);
+                const assignment = assignmentData.find(a => a.id === currentAssignment.id);
 
                 if(!assignment) return;
 

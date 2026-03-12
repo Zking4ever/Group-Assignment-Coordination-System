@@ -108,9 +108,13 @@ function HomeContent(){
                                     <div onClick={() => goToDetail(task)}>
                                         <TaskCard passedTask={task} user={users.find(u => u.id === task.responsibleMember)} leader={leader}/>
                                     </div>
-                                    <div className={styles.trash} onClick={() => handleDelete(task.id)}>
-                                        <FontAwesomeIcon icon={faTrash}/>
-                                    </div>
+                                    {leader?.id === JSON.parse(localStorage.getItem("currentUser"))?.id &&
+                                            (
+                                             <div className={styles.trash} onClick={() => handleDelete(task.id)}>
+                                                <FontAwesomeIcon icon={faTrash} />
+                                             </div>
+                                            )
+                                    }
                                 </div>
                             
                                 )))
@@ -128,11 +132,15 @@ function HomeContent(){
                             
                                 <div key={task.id}>
                                     <div onClick={() => goToDetail(task)}>
-                                        <TaskCard passedTask={task} user={users.find(u => u.id === task.responsibleMember)}/>
+                                        <TaskCard passedTask={task} user={users.find(u => u.id === task.responsibleMember)} leader={leader}/>
                                     </div>
-                                    <div className={styles.trash} onClick={() => handleDelete(task.id)}>
-                                        <FontAwesomeIcon icon={faTrash} />
-                                    </div>
+                                    {leader?.id === JSON.parse(localStorage.getItem("currentUser"))?.id &&
+                                            (
+                                             <div className={styles.trash} onClick={() => handleDelete(task.id)}>
+                                                <FontAwesomeIcon icon={faTrash} />
+                                             </div>
+                                            )
+                                    }
                                 </div>
                             
                         )))
