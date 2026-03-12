@@ -1,62 +1,75 @@
 {
   "users": [
     {
-      "firstName": "beh",
-      "lastName": "hag",
-      "email": "b@h",
+      "firstName": "a",
+      "lastName": "b",
+      "email": "a@b",
       "password": "111111",
-      "username": "behhag",
-      "id": "behhag1773315014912"
+      "username": "aaabbb",
+      "id": "aaabbb1773329056340"
     },
     {
-      "firstName": "bes",
-      "lastName": "dej",
-      "email": "b@d",
+      "firstName": "c",
+      "lastName": "d",
+      "email": "c@d",
       "password": "111111",
-      "username": "besdej",
-      "id": "besdej1773315098840"
+      "username": "cccddd",
+      "id": "cccddd1773329304284"
     }
   ],
   "groups": [
     {
-      "groupName": "beh g 1",
-      "groupDescription": "",
-      "creator": "behhag",
-      "creatorId": "behhag1773315014912",
-      "id": "behhag1773315026332",
+      "groupName": "ab g 1",
+      "groupDescription": "this is description for user ab group 1",
+      "creator": "aaabbb",
+      "creatorId": "aaabbb1773329056340",
+      "id": "aaabbb1773329097041",
       "members": [
-        "behhag1773315014912",
-        "besdej1773315098840"
+        "aaabbb1773329056340",
+        "cccddd1773329304284"
       ]
     },
     {
-      "groupName": "beh g 2",
-      "groupDescription": "",
-      "creator": "behhag",
-      "creatorId": "behhag1773315014912",
-      "id": "behhag1773315036667",
+      "groupName": "ab g 2",
+      "groupDescription": "this is also description for group created by user ab and the group is second group",
+      "creator": "aaabbb",
+      "creatorId": "aaabbb1773329056340",
+      "id": "aaabbb1773329152215",
       "members": [
-        "behhag1773315014912"
+        "aaabbb1773329056340"
+      ]
+    },
+    {
+      "groupName": "user cd group",
+      "groupDescription": "this group is created by user cd",
+      "creator": "cccddd",
+      "creatorId": "cccddd1773329304284",
+      "id": "cccddd1773329342771",
+      "members": [
+        "cccddd1773329304284"
       ]
     }
   ],
   "assignments": [
     {
-      "assignmentName": "beh g 1 a 1",
-      "assignmentDescription": "",
-      "creator": "behhag",
-      "creatorId": "behhag1773315014912",
-      "parentGroup": "behhag1773315026332",
-      "id": "behhag17733150263321773315047085"
-    },
-    {
-      "assignmentName": "bes g 1 a 2",
-      "assignmentDescription": "",
-      "creator": "besdej",
-      "creatorId": "besdej1773315098840",
-      "parentGroup": "behhag1773315026332",
-      "id": "behhag17733150263321773315150490"
+      "assignmentName": "ab g 1 a 1",
+      "assignmentDescription": "this is decription for the assignment created by user ab in the first group\n",
+      "creator": "aaabbb",
+      "creatorId": "aaabbb1773329056340",
+      "parentGroup": "aaabbb1773329097041",
+      "id": "aaabbb17733290970411773329200629"
     }
   ],
-  "tasks": []
+  "tasks": [
+    {
+      "taskName": "task 1 ",
+      "taskDescription": "task 1 for user ab",
+      "responsibleMember": "aaabbb1773329056340",
+      "startDate": "2026-03-12",
+      "deadLine": "2026-03-19",
+      "parentAssignment": "aaabbb17733290970411773329200629",
+      "state": "YET",
+      "id": "aaabbb177332909704117733292006291773329260882"
+    }
+  ]
 }
