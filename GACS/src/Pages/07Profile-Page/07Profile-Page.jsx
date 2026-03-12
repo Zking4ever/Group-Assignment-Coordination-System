@@ -1,5 +1,5 @@
 import styles from './07Profile-Page.module.css'
-import { fetchUsers, editProfile } from '../services/authService'
+import { fetchUsers, editProfile } from '../../services/authService'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 

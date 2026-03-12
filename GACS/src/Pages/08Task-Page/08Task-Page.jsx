@@ -1,12 +1,12 @@
 import styles from './08Task-Page.module.css'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser, faHouse, faPlus } from "@fortawesome/free-solid-svg-icons";
-import MembersPage from '../006GroupPage/MembersContent.jsx'
+import MembersPage from '../../Components/Assignment-List-Component/Member-List-Component/Member-List-Component.jsx'
 import React, { useState, useEffect } from 'react'
-import Home from './HomeContent.jsx'
-import AssignTask from './CreateTask.jsx'
-import { fetchAssignments } from '../services/authService.js'
-import Header from '../000Header/000Header.jsx'
+import Home from '../../Components/Task-Component/Task-Home-Component/Task-Home-Component.jsx'
+import AssignTask from '../../Components/Task-Component/Task-Create-Component/Task-Create-Component.jsx'
+import { fetchAssignments } from '../../services/authService.js'
+import Header from '../../Components/Header-Component/Header-Component.jsx'
 
 function AddTaskPage(){
 
@@ -16,24 +16,8 @@ function AddTaskPage(){
    useEffect(() => {
            const loadData = async () => {
                try {
-                  //  const { response: groupRes, data: groups } = await fetchGroups();
-                     
-                  //  if(groupRes.ok){
-                  //      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
-                  //      const currentGroup = JSON.parse(localStorage.getItem("currentGroup"));
-   
-                  //     const group = groups.find(g => g.id === currentGroup.id);
-   
-                  //     if(currentUser.id === ggg.creatorId){
-                  //      setOwner(true);
-                  //     }
-                  //     else{
-                  //      setOwner(false);
-                  //     }
-                  //  }
-
                   const { response: assignmentRes, data: assignments } = await fetchAssignments();
+
                      
                    if(assignmentRes.ok){
                        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -54,13 +38,14 @@ function AddTaskPage(){
                    console.error(error);
                }
            };
-   
            loadData();
        }, []);
 
+
    const handleChange = (e) => {
       setPage(e.target.value);
-   }
+   };
+
 
    return (
       <>
@@ -71,7 +56,7 @@ function AddTaskPage(){
                <label htmlFor="home">Tasks list
                   <FontAwesomeIcon icon={faHouse} />
                </label> 
-            {/* home icon and nothing in mind for now */}
+
 
             {
             isOwner && (
@@ -101,24 +86,3 @@ function AddTaskPage(){
 }
 
 export default AddTaskPage
-
-
-
-
-
-{/* <nav className={styles.topNav}>
-                           <input type="radio" name="bar" value="home" id="home" className={styles.homeIcon} checked={selectedPage === "home"} onChange={handleChange}/>
-                              <label htmlFor="home">
-                                 <FontAwesomeIcon icon={faHouse} />
-                              </label> 
-                           {/* home icon and nothing in mind for now */}
-                          
-            //                <input type="radio" name="bar" value="createAssignment" id="createAssignment" className={styles.createAssignment} checked={selectedPage === "createAssignment"} onChange={handleChange}/>
-            //                   <label htmlFor="createAssignment">
-            //                      <FontAwesomeIcon icon={faPlus} />
-            //                   </label>
-            //                 <input type="radio" name="bar" value="members" id="members" className={styles.homeIcon} checked={selectedPage === "members"} onChange={handleChange}/>
-            //                   <label htmlFor="members">
-            //                      <FontAwesomeIcon icon={faCircleUser} />
-            //                   </label>
-            // </nav> */}

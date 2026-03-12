@@ -2,10 +2,10 @@ import styles from './06Assignment-List-Page.module.css'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser, faHouse, faPlus } from "@fortawesome/free-solid-svg-icons";
 import React, { useState } from 'react'
-import HomeContent from './HomeContent.jsx'
-import MembersContent from './MembersContent.jsx'
-import CreateContent from './CreateContent.jsx'
-import Header from '../000Header/000Header.jsx'
+import HomeContent from '../../Components/Assignment-List-Component/Assignment-Home-Component/Assignment-Home-Component.jsx'
+import MembersContent from '../../Components/Assignment-List-Component/Member-List-Component/Member-List-Component.jsx'
+import CreateContent from '../../Components/Assignment-List-Component/Assignment-Create-Component/Assignment-Create-Component.jsx'
+import Header from '../../Components/Header-Component/Header-Component.jsx'
 
 function GroupPage(){
 
@@ -14,8 +14,6 @@ function GroupPage(){
     const handleChange = (e) => {
         setPage(e.target.value);
     }
-
-
 
     return(
         <>

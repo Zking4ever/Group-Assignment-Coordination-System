@@ -1,0 +1,62 @@
+{
+  "users": [
+    {
+      "firstName": "beh",
+      "lastName": "hag",
+      "email": "b@h",
+      "password": "111111",
+      "username": "behhag",
+      "id": "behhag1773315014912"
+    },
+    {
+      "firstName": "bes",
+      "lastName": "dej",
+      "email": "b@d",
+      "password": "111111",
+      "username": "besdej",
+      "id": "besdej1773315098840"
+    }
+  ],
+  "groups": [
+    {
+      "groupName": "beh g 1",
+      "groupDescription": "",
+      "creator": "behhag",
+      "creatorId": "behhag1773315014912",
+      "id": "behhag1773315026332",
+      "members": [
+        "behhag1773315014912",
+        "besdej1773315098840"
+      ]
+    },
+    {
+      "groupName": "beh g 2",
+      "groupDescription": "",
+      "creator": "behhag",
+      "creatorId": "behhag1773315014912",
+      "id": "behhag1773315036667",
+      "members": [
+        "behhag1773315014912"
+      ]
+    }
+  ],
+  "assignments": [
+    {
+      "assignmentName": "beh g 1 a 1",
+      "assignmentDescription": "",
+      "creator": "behhag",
+      "creatorId": "behhag1773315014912",
+      "parentGroup": "behhag1773315026332",
+      "id": "behhag17733150263321773315047085"
+    },
+    {
+      "assignmentName": "bes g 1 a 2",
+      "assignmentDescription": "",
+      "creator": "besdej",
+      "creatorId": "besdej1773315098840",
+      "parentGroup": "behhag1773315026332",
+      "id": "behhag17733150263321773315150490"
+    }
+  ],
+  "tasks": []
+}

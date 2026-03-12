@@ -1,7 +1,7 @@
 import styles from './09Task-Detail-Page.module.css'
 import React, { useEffect, useState } from 'react'
-import { fetchAssignments, fetchTasks, fetchUsers, updateTask } from '../services/authService'
-import Header from '../000Header/000Header.jsx'
+import { fetchAssignments, fetchTasks, fetchUsers, updateTask } from '../../services/authService'
+import Header from '../../Components/Header-Component/Header-Component.jsx'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
@@ -13,6 +13,7 @@ function TaskDetail() {
     const [isLeader, setLeader] = useState(false);
     const [hasRequest, setRequest] = useState(false);
     const [expired, setexpired] = useState(false);
+
 
     useEffect(() => {
         const loadTasks = async () => {
@@ -63,6 +64,7 @@ function TaskDetail() {
         }; loadTasks();
     }, []);
 
+
      useEffect(() => {
             const loadUser = async () => {
                 try{
@@ -104,6 +106,7 @@ function TaskDetail() {
             }
         };
 
+
         const approve = async () => {
 
             const updatedTask = {
@@ -111,7 +114,6 @@ function TaskDetail() {
                 state: "DONE",
             };
             setTask(updatedTask);
-            
             
             try{
                 const { response, data } = await updateTask(task.id, updatedTask);
@@ -127,6 +129,7 @@ function TaskDetail() {
                 alert(error.message);
             }
         };
+
 
         const decline = async () => {
             
@@ -150,6 +153,7 @@ function TaskDetail() {
                 alert(error.message);
             }
         };
+        
 
     return (
         <>

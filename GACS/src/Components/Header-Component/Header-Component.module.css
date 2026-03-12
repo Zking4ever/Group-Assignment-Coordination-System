@@ -1,0 +1,12 @@
+
+.topContainer{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+button {
+    padding: 0px;
+    font-size: 3em;
+}

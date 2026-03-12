@@ -1,7 +1,7 @@
 import styles from './02Login-Page.module.css'
 import { useNavigate, Link } from 'react-router-dom'
 import React, { useState } from 'react'
-import { checkAcc } from '../services/authService'
+import { checkAcc } from '../../services/authService'
 
 function LoginPage(){
 

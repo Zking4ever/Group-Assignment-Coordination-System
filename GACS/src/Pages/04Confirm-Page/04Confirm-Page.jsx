@@ -1,7 +1,6 @@
 import styles from './04Confirm-Page.module.css'
 import React, { useState, useEffect } from 'react';
-import { fetchUsername  } from '../services/authService'
-import { createUsername } from '../services/authService'
+import { fetchUsername, createUsername  } from '../../services/authService'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 function ConfirmationPage(){

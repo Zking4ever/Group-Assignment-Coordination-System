@@ -2,10 +2,10 @@ import styles from './05Group-List-Page.module.css'
 import React, { useState } from 'react'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faPlus } from "@fortawesome/free-solid-svg-icons";
-import HomeContent from './HomeContent.jsx'
-import JoinContent from './JoinContent.jsx'
-import CreateContent from './CreateContent.jsx'
-import Header from '../000Header/000Header.jsx'
+import HomeContent from '../../Components/Group-List-Component/Group-Home-Component/Group-Home-Component.jsx'
+import JoinContent from '../../Components/Group-List-Component/Group-Join-Component/Group-Join-Component.jsx'
+import CreateContent from '../../Components/Group-List-Component/Group-Create-Component/Group-Create-Component.jsx'
+import Header from '../../Components/Header-Component/Header-Component.jsx'
 
 
 
