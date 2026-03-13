@@ -6,12 +6,17 @@ function LandingPage(){
 
     return(
         <>
-         <div className={styles.container}>
-            <h1 className={styles.welcome}>Welcome</h1>
-                <div className={styles.description}>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quo vel consequuntur nostrum repellat, ea non praesentium, natus ab delectus odio quod officiis, atque ad in fugiat beatae architecto? Quas, velit?</div>
+         <div className={styles.landingBody}>
+            <div className={styles.landingContainer}>
+                <h1 className={styles.landingWelcome}>Welcome</h1>
+                <div className={styles.landingDescription}>
+                    From group projects to team assignments, GACS keeps everyone accountable and on schedule.<br/>
+                    Create your group, assign responsibilities, and know exactly who's doing what and by when. <br/>
+                    No more "I thought you were doing that part."</div>
                 <Link to="/login">
-                    <button className={styles.CTA}>Get Started</button>
+                    <button className={styles.landingCTA}>Get Started</button>
                 </Link>
+         </div>
          </div>
         </>
     );
