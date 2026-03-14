@@ -157,46 +157,58 @@ function TaskDetail() {
 
     return (
         <>
-            <Header/>
-            <h1 className={styles.myh1}>Task Detail</h1>
-            <div className={styles.detailPart}>
-                <p>Task Name: {task?.taskName}</p>
-                <p>Description: {task?.taskDescription}</p>
-                <p>Assigned to:{user?.firstName} {user?.lastName}</p>
-                <p> User username: {user?.username} </p>
-                <p>DeadLine: {task?.deadLine}</p>
-                <p>Task state: {task?.state}</p>
-                { isLeader && hasRequest && (
-                    <>
-                        <div className={styles.request}>
-                            <h3>The reponsible member claims that he/she has completed this task. Do you approve or not?</h3>
-                            <button className={styles.approve} onClick={approve}>Approve</button>
-                            <button className={styles.decline} onClick={decline}>NOT YET</button>
+            <div className={styles.taskDetailBody}>
+                <Header/>
+                <div className={styles.taskDetailContainer}>
+                    <div className={styles.taskDetailDetailsContainer}>
+                        <h1 className={styles.taskDetailTitleHeader}>Task Detail</h1>
+                        <div className={styles.taskDetailDetails}>
+                            <p className={styles.taskDetailDetailsText}>Task Name: {task?.taskName}</p>
+                            <p className={styles.taskDetailDetailsText}>Description: {task?.taskDescription}</p>
+                            <p className={styles.taskDetailDetailsText}>Assigned to:{user?.firstName} {user?.lastName}</p>
+                            <p className={styles.taskDetailDetailsText}> User username: {user?.username} </p>
+                            <p className={styles.taskDetailDetailsText}>Start Date: {task?.startDate}</p>
+                            <p className={styles.taskDetailDetailsText}>DeadLine: {task?.deadLine}</p>
+                            <p className={styles.taskDetailDetailsText}>Task state: {task?.state}</p>
+                            { isLeader && hasRequest && (
+                                <>
+                                    <div className={styles.taskDetailRequestResponder}>
+                                        <div className={styles.taskDetailRequestResponderLbl}>The reponsible member claims that he/she has completed this task. Do you approve or not?</div>
+                                        <div className={styles.taskDetailBtnContainer}>
+                                            <button className={styles.taskDetailApproveBtn} onClick={approve}>Approve</button>
+                                            <button className={styles.taskDetailDeclineBtn} onClick={decline}>NOT YET</button>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                            
                         </div>
-                    </>
-                )}
-                
-            </div>
-            {
-                expired && (
-                    <>
-                        <h3>This task has passed it's submission date</h3>
-                    </>
-                )
-            }
-            { isResponsible && task?.state !== "DONE" && (
-                <><div className={styles.submitTask} onClick={submitTask}>
-                    <FontAwesomeIcon icon={faCheck}/>
+
+                        {
+                            task?.state === "DONE" && (
+                                <>
+                                    <h3 className={styles.taskDetailCompletedTask}>This task is completed!</h3>
+                                </>
+                            )
+                        }
+
+                        {
+                            expired && (
+                                <>
+                                    <div className={styles.taskDetailExpiredText}>This task has expired!!!</div>
+                                </>
+                            )
+                        }
+                        { isResponsible && task?.state !== "DONE" && task?.state !== "REQUESTED" && (
+                            <><div className={styles.taskDetailTickIcon} onClick={submitTask}>
+                                <FontAwesomeIcon icon={faCheck}/>
+                            </div>
+                            </>
+                        )}
+                        
+                    </div>
                 </div>
-                </>
-            )}
-            {
-                task?.state === "DONE" && (
-                    <>
-                        <h3 className={styles.completedTask}>This task is completed!</h3>
-                    </>
-                )
-            }
+            </div>
         </>
     );
 }

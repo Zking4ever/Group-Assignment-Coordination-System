@@ -19,32 +19,48 @@ function HomePage(){
 
      return(
         <>
-            <Header/>
-            <nav className={styles.topNav}>
-               <input type="radio" name="bar" value="home" id="home" className={styles.homeIcon} checked={selectedPage === "home"} onChange={handleChange}/>
-                  <label htmlFor="home"> Home
-                     <FontAwesomeIcon icon={faHouse} />
-                  </label> 
-              
-               <input type="radio" name="bar" value="join" id="join" className={styles.joinAss} checked={selectedPage === "join"} onChange={handleChange}/>
-                  <label htmlFor="join">Join group
-                     <FontAwesomeIcon icon={faPlus} />
-                  </label>              
-            
-               <input type="radio" name="bar" value="create" id="create" className={styles.createAss} checked={selectedPage === "create"} onChange={handleChange}/>
-                  <label htmlFor="create">Create new group
-                     <FontAwesomeIcon icon={faPlus} />
-                  </label>
-               
-            </nav>
+            <div className={styles.groupListBody}>
+               <div className={styles.groupListTopFixedBarAll}>
+                  <div className={styles.groupListHeader}>
+                     <Header/>
+                  </div>
+                  <div className={styles.groupListNavContainerDiv}>
+                     <nav className={styles.groupListNavContainer}>
+                        <div className={styles.groupListIcon}>
+                           <input type="radio" name="bar" value="home" id="home" className={styles.groupListHomeIcon} checked={selectedPage === "home"} onChange={handleChange}/>
+                           <label htmlFor="home">
+                              <FontAwesomeIcon icon={faHouse}/>
+                              <div className={styles.groupListIconLabel}>Home</div>
+                           </label>
+                        </div>
+      
+                        <div className={styles.groupListIcon}>
+                           <input type="radio" name="bar" value="join" id="join" className={styles.groupListJoinIcon} checked={selectedPage === "join"} onChange={handleChange}/>
+                           <label htmlFor="join">
+                              <FontAwesomeIcon icon={faPlus} />
+                              <div className={styles.groupListIconLabel}>Join group</div>
+                           </label>   
+                        </div>           
+                     
+                        <div className={styles.groupListIcon}>
+                           <input type="radio" name="bar" value="create" id="create" className={styles.groupListCreateIcon} checked={selectedPage === "create"} onChange={handleChange}/>
+                           <label htmlFor="create">
+                              <FontAwesomeIcon icon={faPlus} />
+                              <div className={styles.groupListIconLabel}>Create new group</div>
+                           </label>
+                        </div>
+                     </nav>
+                  </div>
+               </div>
 
             <main>
-               <div>
+               <div className={styles.groupListBodyBox}>
                   {selectedPage === "home" && <HomeContent/>}
                   {selectedPage === "join" && <JoinContent setPage={setPage}/>}
                   {selectedPage === "create" && <CreateContent setPage={setPage}/>}
                </div>
             </main>
+            </div>
         </>
      );
 }

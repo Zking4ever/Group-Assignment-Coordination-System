@@ -93,11 +93,13 @@ function ConfirmationPage(){
 
     return(
         <>
-            <div className={styles.container}>
-                <p>Set up your username</p>
-                <input value={username} className={`${styles.inp} ${isTaken ? styles.error : ""}`} placeholder="Enter a username" onChange={handleChange}/>
-                {isTaken && <p style={{color:"red"}}>Username already taken</p>}
-                <button className={styles.confirmBtn} onClick={confirmBtn}>Confirm</button>
+            <div className={styles.confirmBody}>
+                <div className={styles.confirmContainer}>
+                    <div>Set up your username</div>
+                    <input value={username} className={`${styles.confirmInput} ${isTaken ? styles.confirmIsTaken : ""}`} placeholder="Enter a username" onChange={handleChange}/>
+                    {isTaken && <div style={{color:"red"}}> <small>Username already taken, try another!</small></div>}
+                    <button className={styles.confirmBtn} onClick={confirmBtn}>Confirm</button>
+                </div>
             </div>
         </>
     );

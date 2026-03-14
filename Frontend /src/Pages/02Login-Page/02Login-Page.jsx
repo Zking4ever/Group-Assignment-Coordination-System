@@ -59,19 +59,25 @@ function LoginPage(){
 
     return(
         <>
-            <div className={styles.container}>
-                <h1 className={styles.welcome}>Login Page</h1>
-                <form className={styles.formContainer} onSubmit={login}>
-                    <label className={styles.lbl}>Email:</label>
-                    <input type="email" value={email} placeholder="Enter your email" className={styles.inp} onChange={handleEmail} required/>
-                    <label className={styles.lbl}>Password:</label>
-                    <input type="password" value={password} placeholder="Enter your password" className={styles.inp} onChange={handlePassword} required/>
-                    <button type="submit" className={styles.loginBtn}>
-                        Login
-                    </button>
-                </form>
-                <Link to="/register" className={styles.linkText}>Forgot password?</Link>
-                <Link to="/register" className={styles.linkText}>Create new account</Link>
+            <div className={styles.loginBody}>
+                <div className={styles.loginContainer}>
+                    <h1 className={styles.welcome}>Login Page</h1>
+                    <form className={styles.loginFormContainer} onSubmit={login}>
+                        <div className={styles.inpSpace}>
+                            <label className={styles.lbl}>Email: </label>
+                            <input type="email" value={email} placeholder="Enter your email" className={styles.inp} onChange={handleEmail} required/>
+                        </div>
+                        <div className={styles.inpSpace}>
+                            <label className={styles.lbl}>Password: </label>
+                            <input type="password" value={password} placeholder="Enter your password" className={styles.inp} onChange={handlePassword} required/>
+                        </div>
+                        <button type="submit" className={styles.loginBtn}>
+                            Login
+                        </button>
+                    </form>
+                    {/* <Link to="/register" className={styles.linkText}>Forgot password?</Link> */}
+                    <Link to="/register" className={styles.linkText}>Create new account</Link>
+                </div>
             </div>
         </>
     );

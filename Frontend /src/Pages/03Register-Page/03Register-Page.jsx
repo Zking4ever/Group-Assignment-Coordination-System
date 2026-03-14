@@ -56,25 +56,38 @@ function RegisterPage(){
 
      return(
         <>
-            
-            <form className={styles.container} onSubmit={addPerson}>
-                <h1 className={styles.welcome}>Create new account</h1>
-                <label className={styles.lbl}>First name:</label>
-                <input type="text" value={fname} placeholder='Enter first name' className={styles.inp} onChange={handleFname} required/>
-                <label className={styles.lbl}>Last name:</label>
-                <input type="text" value={lname} placeholder='Enter last name' className={styles.inp} onChange={handleLname} required/>
-                <label className={styles.lbl}>Email:</label>
-                <input type="email" value={email} placeholder="Enter email" className={styles.inp} onChange={handleEmail} required/>
-                <label className={styles.lbl}>Password:</label>
-                <input type="password" value={password} placeholder="Enter password" className={styles.inp} onChange={handlePassword} required/>
-                <label className={styles.lbl}>Confirm Password:</label>
-                <input type="password" value={confirmPass} placeholder="Enter password" className={styles.inp} onChange={confirmPassword} required/>
-                <button type="submit" className={styles.submitBtn} disabled={loading}>
-                    {loading ? "Creating..." : "Create account"}
-                </button>
-            </form>
+            <div className={styles.createNewAccountBody}>
+                <div className={styles.createNewAccountContainer}>
+                    <form className={styles.createNewAccountFormContainer} onSubmit={addPerson}>
+                        <h1 className={styles.createNewAccountTitle}>Create new account</h1>
+                        <div className={styles.createNewAccountInpSpace}>
+                            <label className={styles.createNewAccountLabel}>First name:</label>
+                            <input type="text" value={fname} placeholder='Enter first name' className={styles.createNewAccountInp} onChange={handleFname} required/>
+                        </div>
+                        <div className={styles.createNewAccountInpSpace}>
+                            <label className={styles.createNewAccountLabel}>Last name:</label>
+                            <input type="text" value={lname} placeholder='Enter last name' className={styles.createNewAccountInp} onChange={handleLname} required/>
+                        </div>
+                        <div className={styles.createNewAccountInpSpace}>
+                            <label className={styles.createNewAccountLabel}>Email:</label>
+                            <input type="email" value={email} placeholder="Enter email" className={styles.createNewAccountInp} onChange={handleEmail} required/>
+                        </div>
+                        <div className={styles.createNewAccountInpSpace}>
+                            <label className={styles.createNewAccountLabel}>Password:</label>
+                            <input type="password" value={password} placeholder="Enter password" className={styles.createNewAccountInp} onChange={handlePassword} required/>
+                        </div>
+                        <div className={styles.createNewAccountInpSpace}>
+                            <label className={styles.createNewAccountLabel}>Confirm Password:</label>
+                            <input type="password" value={confirmPass} placeholder="Enter password" className={styles.createNewAccountInp} onChange={confirmPassword} required/>
+                        </div>
+                        <button type="submit" className={styles.createNewAccountBtn} disabled={loading}>
+                            {loading ? "Creating..." : "Create account"}
+                        </button>
+                    </form>
 
-            <Link to="/login" className={styles.textLink}>Already have an account?</Link>
+                <Link to="/login" className={styles.textLink}>Already have an account?</Link>
+                </div>
+            </div>
         </>
     );
 

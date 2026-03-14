@@ -49,38 +49,53 @@ function AddTaskPage(){
 
    return (
       <>
-          <Header/>
-         
-         <nav className={styles.topNav}>
-            <input type="radio" name="bar" value="home" id="home" className={styles.homeIcon} checked={selectedPage === "home"} onChange={handleChange}/>
-               <label htmlFor="home">Tasks list
-                  <FontAwesomeIcon icon={faHouse} />
-               </label> 
+         <div className={styles.taskPageBody}>
+            <div className={styles.taskPageTopFixedBarAll}>
+               <div className={styles.taskPageHeader}>
+                  <Header/>
+               </div>
+               
+               <div className={styles.assignmentListNavContainerDiv}>
+                  <nav className={styles.assignmentListNavContainer}>
+                     <div className={styles.taskPageIcon}>
+                        <input type="radio" name="bar" value="home" id="home" className={styles.homeIcon} checked={selectedPage === "home"} onChange={handleChange}/>
+                           <label htmlFor="home">
+                              <FontAwesomeIcon icon={faHouse} />
+                              <div className={styles.taskPageIconLabel}>Tasks list</div>
+                           </label> 
+                     </div>
 
 
-            {
-            isOwner && (
-                 <>
-                  <input type="radio" name="bar" value="assignTask" id="assignTask" className={styles.createAssignment} checked={selectedPage === "assignTask"} onChange={handleChange}/>
-                  <label htmlFor="assignTask">Create new task
-                     <FontAwesomeIcon icon={faPlus} />
-                  </label>
-                 </>
-            )
-           }
+                     {
+                     isOwner && (
+                        <div className={styles.taskPageIcon}>
+                           <input type="radio" name="bar" value="assignTask" id="assignTask" className={styles.createAssignment} checked={selectedPage === "assignTask"} onChange={handleChange}/>
+                              <label htmlFor="assignTask">
+                                 <FontAwesomeIcon icon={faPlus} />
+                                 <div className={styles.taskPageIconLabel}>Create task</div>
+                              </label>
+                        </div>
+                     )
+                  }
+                     <div className={styles.taskPageIcon}>
+                        <input type="radio" name="bar" value="members" id="members" className={styles.homeIcon} checked={selectedPage === "members"} onChange={handleChange}/>
+                           <label htmlFor="members">
+                              <FontAwesomeIcon icon={faCircleUser} />
+                              <div className={styles.taskPageIconLabel}>Members</div>
+                           </label>
+                     </div>
+                  </nav>
+               </div>
+            </div>
 
-            
-             <input type="radio" name="bar" value="members" id="members" className={styles.homeIcon} checked={selectedPage === "members"} onChange={handleChange}/>
-               <label htmlFor="members">Members
-                  <FontAwesomeIcon icon={faCircleUser} />
-               </label>
-         </nav>
-
-         <main className={styles.mainContainer}>
-            {selectedPage === "home" && <Home />}
-            {selectedPage === "assignTask" && <AssignTask setPage={setPage}/>}
-            {selectedPage === "members" && <MembersPage setPage={setPage}/>}
-         </main>
+            <main>
+               <div className={styles.taskPageBodyBox}>
+                  {selectedPage === "home" && <Home />}
+                  {selectedPage === "assignTask" && <AssignTask setPage={setPage}/>}
+                  {selectedPage === "members" && <MembersPage setPage={setPage}/>}
+               </div>
+            </main>
+         </div>
       </>
    );
 }

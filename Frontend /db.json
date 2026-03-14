@@ -15,6 +15,14 @@
       "password": "111111",
       "username": "cccddd",
       "id": "cccddd1773329304284"
+    },
+    {
+      "firstName": "a",
+      "lastName": "b",
+      "email": "c@d",
+      "password": "111111",
+      "username": "aaaaaa",
+      "id": "aaaaaa1773514264015"
     }
   ],
   "groups": [
@@ -48,6 +56,16 @@
       "members": [
         "cccddd1773329304284"
       ]
+    },
+    {
+      "groupName": "hsdvjf",
+      "groupDescription": "",
+      "creator": "aaaaaa",
+      "creatorId": "aaaaaa1773514264015",
+      "id": "aaaaaa1773514271854",
+      "members": [
+        "aaaaaa1773514264015"
+      ]
     }
   ],
   "assignments": [
@@ -58,6 +76,14 @@
       "creatorId": "aaabbb1773329056340",
       "parentGroup": "aaabbb1773329097041",
       "id": "aaabbb17733290970411773329200629"
+    },
+    {
+      "assignmentName": "asdjfhavd",
+      "assignmentDescription": "",
+      "creator": "aaaaaa",
+      "creatorId": "aaaaaa1773514264015",
+      "parentGroup": "aaaaaa1773514271854",
+      "id": "aaaaaa17735142718541773514282105"
     }
   ],
   "tasks": [
@@ -70,6 +96,16 @@
       "parentAssignment": "aaabbb17733290970411773329200629",
       "state": "YET",
       "id": "aaabbb177332909704117733292006291773329260882"
+    },
+    {
+      "taskName": "smbjfzgf",
+      "taskDescription": "sfjvhbsv",
+      "responsibleMember": "aaaaaa1773514264015",
+      "startDate": "2026-03-16",
+      "deadLine": "2026-03-21",
+      "parentAssignment": "aaaaaa17735142718541773514282105",
+      "state": "DONE",
+      "id": "aaaaaa177351427185417735142821051773514306176"
     }
   ]
 }
