@@ -12,21 +12,25 @@ function Header(){
    }
 
    return(
-      <header className={styles.topContainer}>
+      <>
+         <div className={styles.headerComponentTopBar}>
+            <header className={styles.topContainer}>
 
-         <div className={styles.title}>
-            Group Assignment Coordination
+               <div className={styles.headerComponentTitleLbl}>
+                  Group Assignment Coordination
+               </div>
+
+               <div className={styles.headerComponentProfileIcon} onClick={goToProfile}>
+                  <FontAwesomeIcon icon={faCircleUser} />
+               </div>
+
+               {/* <button className={styles.headerComponentBarsIcon}>
+                  <FontAwesomeIcon icon={faBars} />
+               </button> */}
+
+            </header>
          </div>
-
-          <button className={styles.profileEdit} onClick={goToProfile}>
-            <FontAwesomeIcon icon={faCircleUser} />
-         </button>
-
-         {/* <button className={styles.setting}>
-            <FontAwesomeIcon icon={faBars} />
-         </button> */}
-
-      </header>
+      </>
    );
 }
 

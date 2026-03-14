@@ -1,12 +1,16 @@
-
-.topContainer{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-between;
+.headerComponentTopBar{
+    text-align: center;
+    backdrop-filter: blur(3px);
 }
 
-button {
-    padding: 0px;
-    font-size: 3em;
+.headerComponentTitleLbl{
+    font-size: 1.9em;
+}
+
+.headerComponentProfileIcon{
+    font-size: 1.9em;
+    float: right;
+    position: absolute;
+    top: 7px;
+    cursor: pointer;
 }
