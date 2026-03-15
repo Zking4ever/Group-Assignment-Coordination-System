@@ -1,0 +1,20 @@
+.container{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+}
+
+.inp{
+    padding: 0.34em;
+    font-weight: bolder;
+    font-size: 1em;
+    border-style: outset;
+}
+
+.btn{
+    padding: 0.27em 0.7em;
+    border-style: outset;
+}

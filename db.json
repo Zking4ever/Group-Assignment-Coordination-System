@@ -1,0 +1,111 @@
+{
+  "users": [
+    {
+      "firstName": "ab",
+      "lastName": "cd",
+      "email": "a@b",
+      "password": "111111",
+      "username": "ababa",
+      "id": "ababa1773565827505"
+    },
+    {
+      "firstName": "qq",
+      "lastName": "ww",
+      "email": "q@w",
+      "password": "111111",
+      "username": "qwqwq",
+      "id": "qwqwq1773566051311"
+    }
+  ],
+  "groups": [
+    {
+      "groupName": "abcd group 1",
+      "groupDescription": "this is decription of group\n",
+      "creator": "ababa",
+      "creatorId": "ababa1773565827505",
+      "id": "ababa1773565852687",
+      "members": [
+        "ababa1773565827505",
+        "qwqwq1773566051311"
+      ]
+    },
+    {
+      "groupName": "abcd group 2",
+      "groupDescription": "this is another description",
+      "creator": "ababa",
+      "creatorId": "ababa1773565827505",
+      "id": "ababa1773565871879",
+      "members": [
+        "ababa1773565827505"
+      ]
+    },
+    {
+      "groupName": "new accout group",
+      "groupDescription": "this is group description of some group\n\n",
+      "creator": "qwqwq",
+      "creatorId": "qwqwq1773566051311",
+      "id": "qwqwq1773567043263",
+      "members": [
+        "qwqwq1773566051311"
+      ]
+    }
+  ],
+  "assignments": [
+    {
+      "assignmentName": "assignment 1",
+      "assignmentDescription": "this is assignment descrotpiton for first assignment\n",
+      "creator": "ababa",
+      "creatorId": "ababa1773565827505",
+      "parentGroup": "ababa1773565852687",
+      "id": "ababa17735658526871773565912995"
+    },
+    {
+      "assignmentName": "assignment 2",
+      "assignmentDescription": "this is assignmment two ",
+      "creator": "ababa",
+      "creatorId": "ababa1773565827505",
+      "parentGroup": "ababa1773565852687",
+      "id": "ababa17735658526871773565931757"
+    },
+    {
+      "assignmentName": "assignmet 1",
+      "assignmentDescription": "this is assignment description\n",
+      "creator": "qwqwq",
+      "creatorId": "qwqwq1773566051311",
+      "parentGroup": "qwqwq1773567043263",
+      "id": "qwqwq17735670432631773567067684"
+    }
+  ],
+  "tasks": [
+    {
+      "taskName": "task 1 ",
+      "taskDescription": "this is task description",
+      "responsibleMember": "ababa1773565827505",
+      "startDate": "2026-03-16",
+      "deadLine": "2026-03-21",
+      "parentAssignment": "ababa17735658526871773565912995",
+      "state": "DONE",
+      "id": "ababa177356585268717735659129951773565965681"
+    },
+    {
+      "taskName": "task 2",
+      "taskDescription": "this is task 2 description",
+      "responsibleMember": "ababa1773565827505",
+      "startDate": "2026-03-16",
+      "deadLine": "2026-03-21",
+      "parentAssignment": "ababa17735658526871773565912995",
+      "state": "YET",
+      "id": "ababa177356585268717735659129951773566003737"
+    },
+    {
+      "taskName": "third task",
+      "taskDescription": "this is task description",
+      "responsibleMember": "qwqwq1773566051311",
+      "startDate": "2026-03-23",
+      "deadLine": "2026-04-11",
+      "parentAssignment": "ababa17735658526871773565912995",
+      "state": "YET",
+      "id": "ababa177356585268717735659129951773567177472"
+    }
+  ]
+}
