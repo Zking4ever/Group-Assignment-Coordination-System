@@ -1,10 +1,12 @@
 import styles from './Group-Join-Component.module.css'
 import React, { useState, useEffect } from 'react'
-import { fetchGroups, joinGroup } from '../../../services/authService'
+import { joinGroupByCode } from '../../../services/authService'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
 
 function JoinContent({ setView }) {
+    const navigate = useNavigate();
     const [classCode, setClassCode] = useState("");
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -15,33 +17,18 @@ function JoinContent({ setView }) {
     }, []);
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
+        if (!classCode.trim()) return;
+        
         setLoading(true);
-
         try {
-            const { response, data } = await fetchGroups();
+            const { response, data } = await joinGroupByCode(classCode, currentUser.id);
 
             if (response.ok) {
-                // In our new backend, inviteCode is what we should use for joining
-                const group = data.find(g => g.inviteCode === classCode || g.id === classCode);
-
-                if (!group) {
-                    alert("No Group found with that code.");
-                    return;
-                }
-
-                if (group.members.includes(currentUser.id)) {
-                    alert("You are already a member of this Group.");
-                    setView("home");
-                    return;
-                }
-
-                const updatedMembers = [...group.members, currentUser.id];
-                const result = await joinGroup(group.id, updatedMembers);
-
-                if (result.response.ok) {
-                    setView("home");
-                }
+                // Successfully joined, navigate to the new group page
+                navigate(`/group/${data.groupId}`);
+            } else {
+                alert(data.error || "Failed to join group. Please check the code.");
             }
         } catch (error) {
             alert(error.message);
@@ -58,9 +45,9 @@ function JoinContent({ setView }) {
                         <FontAwesomeIcon icon={faTimes} />
                     </button>
                     <h2>Join Group</h2>
-                    <button
-                        className={styles.joinBtn}
-                        onClick={handleSubmit}
+                    <button 
+                        className={styles.joinBtn} 
+                        onClick={handleSubmit} 
                         disabled={loading || !classCode}
                     >
                         Join
@@ -76,18 +63,18 @@ function JoinContent({ setView }) {
                                 <strong>{currentUser?.firstName} {currentUser?.lastName}</strong>
                                 <span>{currentUser?.email}</span>
                             </div>
-                            <button className={styles.switchBtn}>Switch account</button>
+                            <button className={styles.switchBtn} onClick={() => navigate('/login')}>Switch account</button>
                         </div>
                     </div>
 
                     <div className={styles.codeCard}>
                         <h3>Group code</h3>
                         <p>Ask your fellows for the group code, then enter it here.</p>
-                        <input
-                            type="text"
-                            value={classCode}
-                            placeholder="Group code"
-                            className={styles.input}
+                        <input 
+                            type="text" 
+                            value={classCode} 
+                            placeholder="Group code" 
+                            className={styles.input} 
                             onChange={(e) => setClassCode(e.target.value)}
                         />
                     </div>

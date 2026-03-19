@@ -13,17 +13,7 @@ function StreamContent() {
         <div className={styles.inputPlaceholder}>Announce something to your class</div>
       </div>
 
-      <div className={styles.updates}>
-        <div className={styles.updateCard}>
-          <div className={styles.updateIcon}>
-            <FontAwesomeIcon icon={faClipboardList} />
-          </div>
-          <div className={styles.updateText}>
-            <p>Welcome to <strong>{currentGroup?.name || 'the class'}</strong>!</p>
-            <span className={styles.date}>Just now</span>
-          </div>
-        </div>
-      </div>
+
     </div>
   );
 }

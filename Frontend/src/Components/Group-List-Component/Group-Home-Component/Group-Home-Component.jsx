@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { fetchGroups, deleteGroup, fetchUsers } from '../../../services/authService'
 import styles from './Group-Home-Component.module.css'
-import { useNavigate  } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import GroupCard from '../Group-Card-Component/Group-Card-Component.jsx'
 
 function HomeContent() {
@@ -32,11 +32,6 @@ function HomeContent() {
         loadData();
     }, []);
 
-    const handleClick = (group) => {
-        localStorage.setItem("currentGroup", JSON.stringify({ id: group.id, name: group.groupName }));
-        navigate("/group");
-    }
-
     const handleDelete = async (groupId) => {
         if (!window.confirm("Are you sure you want to delete this group?")) return;
         try {
@@ -66,11 +61,11 @@ function HomeContent() {
             ) : (
                 <div className={styles.grid}>
                     {groups.map((group) => (
-                        <GroupCard 
+                        <GroupCard
                             key={group.id}
+                            id={group.id}
                             title={group.groupName}
                             creator={getCreatorName(group.creatorId)}
-                            onClick={() => handleClick(group)}
                             onDelete={() => handleDelete(group.id)}
                             isCreator={group.creatorId === JSON.parse(localStorage.getItem("currentUser"))?.id}
                         />

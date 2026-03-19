@@ -1,14 +1,16 @@
 import styles from './Task-Create-Component.module.css'
-import { fetchUsers, createNewTask, fetchGroups } from '../../../services/authService';
+import { fetchUsers, createNewTask, fetchGroups, createNewAss, fetchGroupMembers } from '../../../services/authService';
 import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faAlignLeft, faUserCircle, faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-function CreateTask() {
+function CreateTask({ type = "task" }) {
     const navigate = useNavigate();
+    const { groupId, assignmentId } = useParams();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
     const [taskDetail, setDetail] = useState({
         taskName: "",
         taskDescription: "",
@@ -19,22 +21,20 @@ function CreateTask() {
     });
 
     useEffect(() => {
-        const loadMembers = async () => {
-            const currentGroup = JSON.parse(localStorage.getItem("currentGroup"));
-            if (!currentGroup) return;
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+        setCurrentUser(user);
 
+        const loadMembers = async () => {
+            if (!groupId) return;
             try {
-                const { data: groupsData } = await fetchGroups();
-                const curGroup = groupsData.find(g => g.id === currentGroup.id);
-                const { data: usersData } = await fetchUsers();
-                const groupMembers = usersData.filter(u => curGroup?.members.includes(u.id));
-                setUsers(groupMembers);
+                const { data: members } = await fetchGroupMembers(groupId);
+                setUsers(members);
             } catch (error) {
                 console.error(error);
             }
-        }; 
+        };
         loadMembers();
-    }, []);
+    }, [groupId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -45,23 +45,32 @@ function CreateTask() {
         e.preventDefault();
         if (loading) return;
 
-        const currentAssignment = JSON.parse(localStorage.getItem("currentAssignment"));
-        if (!currentAssignment) {
-            alert("No assignment context found.");
-            return;
-        }
-
         setLoading(true);
         try {
-            const newTask = {
-                ...taskDetail,
-                parentAssignment: currentAssignment.id
-            };
-            const { response } = await createNewTask(newTask);
-            if (response.ok) {
-                navigate(-1); // Go back to group page
+            if (type === "assignment") {
+                const newAss = {
+                    assignmentName: taskDetail.taskName,
+                    assignmentDescription: taskDetail.taskDescription,
+                    parentGroup: groupId,
+                    creatorId: currentUser.id
+                };
+                const { response } = await createNewAss(newAss);
+                if (response.ok) {
+                    navigate(`/group/${groupId}`);
+                } else {
+                    alert("Failed to create assignment.");
+                }
             } else {
-                alert("Failed to create task.");
+                const newTask = {
+                    ...taskDetail,
+                    parentAssignment: assignmentId
+                };
+                const { response } = await createNewTask(newTask);
+                if (response.ok) {
+                    navigate(-1);
+                } else {
+                    alert("Failed to create task.");
+                }
             }
         } catch (error) {
             alert(error.message);
@@ -70,6 +79,8 @@ function CreateTask() {
         }
     }
 
+    const isAssignment = type === "assignment";
+
     return (
         <div className={styles.page}>
             <header className={styles.header}>
@@ -77,24 +88,24 @@ function CreateTask() {
                     <button className={styles.closeBtn} onClick={() => navigate(-1)}>
                         <FontAwesomeIcon icon={faTimes} />
                     </button>
-                    <h2>Assignment detail</h2>
+                    <h2>{isAssignment ? 'Create Assignment' : 'Create Task'}</h2>
                 </div>
-                <button 
-                    className={styles.assignBtn} 
+                <button
+                    className={styles.assignBtn}
                     onClick={handleSubmit}
-                    disabled={loading || !taskDetail.taskName || !taskDetail.responsibleMember}
+                    disabled={loading || !taskDetail.taskName || (!isAssignment && !taskDetail.responsibleMember)}
                 >
-                    {loading ? 'Assigning...' : 'Assign'}
+                    {loading ? 'Processing...' : (isAssignment ? 'Create' : 'Assign')}
                 </button>
             </header>
 
             <form className={styles.form} onSubmit={handleSubmit}>
                 <div className={styles.mainColumn}>
                     <div className={styles.inputGroup}>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             name="taskName"
-                            placeholder="Title" 
+                            placeholder={isAssignment ? "Assignment title" : "Task title"}
                             className={styles.titleInput}
                             value={taskDetail.taskName}
                             onChange={handleChange}
@@ -104,11 +115,11 @@ function CreateTask() {
                     <div className={styles.inputGroup}>
                         <div className={styles.iconLabel}>
                             <FontAwesomeIcon icon={faAlignLeft} />
-                            <span>Instructions (optional)</span>
+                            <span>{isAssignment ? "Description" : "Instructions"} (optional)</span>
                         </div>
-                        <textarea 
+                        <textarea
                             name="taskDescription"
-                            placeholder="Add instructions" 
+                            placeholder={isAssignment ? "Add a description for this assignment" : "Add instructions for this task"}
                             className={styles.descriptionInput}
                             value={taskDetail.taskDescription}
                             onChange={handleChange}
@@ -116,56 +127,58 @@ function CreateTask() {
                     </div>
                 </div>
 
-                <div className={styles.sideColumn}>
-                    <div className={styles.settingsGroup}>
-                        <div className={styles.setting}>
-                            <label>For</label>
-                            <div className={styles.selector}>All students</div>
-                        </div>
-                        
-                        <div className={styles.setting}>
-                            <label>Assignee</label>
-                            <select 
-                                name="responsibleMember" 
-                                value={taskDetail.responsibleMember} 
-                                onChange={handleChange} 
-                                className={styles.select}
-                                required
-                            >
-                                <option value="">Select member</option>
-                                {users.map(u => (
-                                    <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>
-                                ))}
-                            </select>
-                        </div>
+                {!isAssignment && (
+                    <div className={styles.sideColumn}>
+                        <div className={styles.settingsGroup}>
+                            <div className={styles.setting}>
+                                <label>For</label>
+                                <div className={styles.selector}>All students</div>
+                            </div>
 
-                        <div className={styles.setting}>
-                            <label>Due</label>
-                            <input 
-                                type="date" 
-                                name="deadLine"
-                                className={styles.dateInput}
-                                value={taskDetail.deadLine}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
+                            <div className={styles.setting}>
+                                <label>Assignee</label>
+                                <select
+                                    name="responsibleMember"
+                                    value={taskDetail.responsibleMember}
+                                    onChange={handleChange}
+                                    className={styles.select}
+                                    required
+                                >
+                                    <option value="">Select member</option>
+                                    {users.map(u => (
+                                        <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>
+                                    ))}
+                                </select>
+                            </div>
 
-                        <div className={styles.setting}>
-                            <label>Status</label>
-                            <select 
-                                name="state" 
-                                value={taskDetail.state} 
-                                onChange={handleChange} 
-                                className={styles.select}
-                            >
-                                <option value="YET">Yet to start</option>
-                                <option value="WORKING">Working</option>
-                                <option value="DONE">Done</option>
-                            </select>
+                            <div className={styles.setting}>
+                                <label>Due</label>
+                                <input
+                                    type="date"
+                                    name="deadLine"
+                                    className={styles.dateInput}
+                                    value={taskDetail.deadLine}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+
+                            <div className={styles.setting}>
+                                <label>Status</label>
+                                <select
+                                    name="state"
+                                    value={taskDetail.state}
+                                    onChange={handleChange}
+                                    className={styles.select}
+                                >
+                                    <option value="YET">Yet to start</option>
+                                    <option value="WORKING">Working</option>
+                                    <option value="DONE">Done</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </form>
         </div>
     );

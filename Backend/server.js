@@ -42,10 +42,21 @@ app.patch('/users/:id', (req, res) => {
   const keys = Object.keys(updates);
   const setClause = keys.map(key => `${key} = ?`).join(', ');
   const values = keys.map(key => updates[key]);
-  
+
   try {
     db.prepare(`UPDATE users SET ${setClause} WHERE id = ?`).run(...values, id);
     res.json({ message: 'User updated' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/users/:id', (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+    delete user.password;
+    res.json(user);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -76,13 +87,33 @@ app.post('/groups', (req, res) => {
   }
 });
 
+app.get('/groups/:id', (req, res) => {
+  const { id } = req.params;
+  try {
+    const group = db.prepare('SELECT * FROM groups WHERE id = ?').get(id);
+    res.json(group);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/groups/members/:id', (req, res) => {
+  const { id } = req.params;
+  try {
+    const members = db.prepare('SELECT id,firstName,lastName,email,username FROM users JOIN group_members ON users.id = group_members.userId WHERE group_members.groupId = ?').all(id);
+    res.json(members);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+
 app.patch('/groups/:id', (req, res) => {
   const { id } = req.params;
   const { members } = req.body; // Array of user IDs
-  
+
   try {
     // For simplicity, we'll just insert new members. 
-    // In a real app, we'd sync them.
     const insertMember = db.prepare('INSERT OR IGNORE INTO group_members (groupId, userId) VALUES (?, ?)');
     members.forEach(userId => insertMember.run(id, userId));
     res.json({ message: 'Members updated' });
@@ -101,6 +132,21 @@ app.delete('/groups/:id', (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+app.post('/groups/join', (req, res) => {
+  const { inviteCode, userId } = req.body;
+  try {
+    const group = db.prepare('SELECT id FROM groups WHERE inviteCode = ?').get(inviteCode);
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found' });
+    }
+    db.prepare('INSERT OR IGNORE INTO group_members (groupId, userId) VALUES (?, ?)').run(group.id, userId);
+    res.json({ message: 'Joined group successfully', groupId: group.id });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 
 // --- Assignments ---
 app.get('/assignments', (req, res) => {
@@ -135,10 +181,10 @@ app.delete('/assignments/:id', (req, res) => {
 app.get('/tasks', (req, res) => {
   const tasks = db.prepare('SELECT * FROM tasks').all();
   // Map back to parentAssignment and responsibleMember for frontend compatibility
-  res.json(tasks.map(t => ({ 
-    ...t, 
-    parentAssignment: t.parentAssignmentId, 
-    responsibleMember: t.responsibleMemberId 
+  res.json(tasks.map(t => ({
+    ...t,
+    parentAssignment: t.parentAssignmentId,
+    responsibleMember: t.responsibleMemberId
   })));
 });
 

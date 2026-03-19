@@ -11,6 +11,7 @@ import AddTaskPage from './Pages/08Task-Page/08Task-Page.jsx'
 import TaskDetail from './Pages/09Task-Detail-Page/09Task-Detail-Page.jsx'
 import Header from './Components/Header-Component/Header-Component.jsx'
 import Sidebar from './Components/Sidebar/Sidebar.jsx'
+import AssignmentDetailPage from './Pages/10Assignment-Detail-Page/AssignmentDetailPage.jsx'
 
 function Layout({ children, setDashboardView }) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -42,13 +43,30 @@ function App() {
   return (
     <Layout setDashboardView={setDashboardView}>
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/confirm" element={<ConfirmationPage />} />
+
+        {/* Home/Dashboard */}
         <Route path="/home" element={<HomePage view={dashboardView} setView={setDashboardView} />} />
-        <Route path="/group" element={<GroupPage />} />
+        
+        {/* Profile */}
         <Route path="/profileEdit" element={<ProfileEdit />} />
+
+        {/* Group Routes */}
+        <Route path="/group/:groupId" element={<GroupPage />} />
+        <Route path="/group/:groupId/createAssignment" element={<AddTaskPage type="assignment" />} />
+        
+        {/* Assignment Routes within a Group */}
+        <Route path="/group/:groupId/assignment/:assignmentId" element={<AssignmentDetailPage />} />
+        <Route path="/group/:groupId/assignment/:assignmentId/addTask" element={<AddTaskPage type="task" />} />
+        
+        {/* Task Detail */}
+        <Route path="/group/:groupId/assignment/:assignmentId/task/:taskId" element={<TaskDetail />} />
+        
+        {/* Fallback/Legacy (Optional, but good for safety during migration) */}
         <Route path="/addTask" element={<AddTaskPage />} />
         <Route path="/taskDetail" element={<TaskDetail />} />
       </Routes>

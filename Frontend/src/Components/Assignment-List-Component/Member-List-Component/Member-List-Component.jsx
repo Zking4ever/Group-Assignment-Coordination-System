@@ -1,41 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { fetchUsers, fetchGroups } from '../../../services/authService';
+import { fetchUsers, fetchGroups, fetchGroupMembers, fetchUserData } from '../../../services/authService';
 import styles from './Member-List-Component.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCircle, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { faUserPlus, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
-function MemberList() {
+function PeopleContent({ groupId }) {
   const [teachers, setTeachers] = useState([]);
   const [students, setStudents] = useState([]);
-  const [group, setGroup] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadMembers = async () => {
-      const currentGroup = JSON.parse(localStorage.getItem("currentGroup"));
-      const { data: allUsers } = await fetchUsers();
-      const { data: allGroups } = await fetchGroups();
+    const loadPeople = async () => {
+      try {
+        const { data: groupData } = await fetchGroups(groupId);
+        const { data: members } = await fetchGroupMembers(groupId);
 
-      const groupData = allGroups.find(g => g.id === currentGroup.id);
-      if (groupData) {
-        setGroup(groupData);
-        const creator = allUsers.find(u => u.id === groupData.creatorId);
-        const members = allUsers.filter(u =>
-          groupData.members.includes(u.id) && u.id !== groupData.creatorId
-        );
-
-        setTeachers(creator ? [creator] : []);
-        setStudents(members);
+        if (groupData) {
+          const creator = await fetchUserData(groupData?.creatorId);
+          setTeachers(creator ? [creator] : []);
+          setStudents(members.filter(m => m.id != groupData?.creatorId));
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
-    loadMembers();
-  }, []);
+    loadPeople();
+  }, [groupId]);
 
-  const UserItem = ({ user }) => (
-    <div className={styles.userItem}>
-      <FontAwesomeIcon icon={faUserCircle} className={styles.userIcon} />
-      <span>{user.firstName} {user.lastName}</span>
-    </div>
-  );
+  if (loading) return <div>Loading people...</div>;
 
   return (
     <div className={styles.peopleContainer}>
@@ -45,26 +39,37 @@ function MemberList() {
           <FontAwesomeIcon icon={faUserPlus} className={styles.addIcon} />
         </div>
         <div className={styles.divider} />
-        {teachers.map(u => <UserItem key={u.id} user={u} />)}
+        <div className={styles.personList}>
+          {teachers.map(t => (
+            <div key={t.id} className={styles.personRow}>
+              <FontAwesomeIcon icon={faUserCircle} className={styles.avatarIcon} />
+              <span>{t.firstName} {t.lastName} (Owner)</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2>Students</h2>
-          <div className={styles.studentStats}>
-            <span>{students.length} students</span>
-            <FontAwesomeIcon icon={faUserPlus} className={styles.addIcon} />
-          </div>
+          <h2>Fellows</h2>
+          <FontAwesomeIcon icon={faUserPlus} className={styles.addIcon} />
         </div>
         <div className={styles.divider} />
-        {students.length === 0 ? (
-          <p className={styles.empty}>No students joined yet.</p>
-        ) : (
-          students.map(u => <UserItem key={u.id} user={u} />)
-        )}
+        <div className={styles.personList}>
+          {students.length === 0 ? (
+            <p className={styles.empty}>No fellows joined yet.</p>
+          ) : (
+            students.map(s => (
+              <div key={s.id} className={styles.personRow}>
+                <FontAwesomeIcon icon={faUserCircle} className={styles.avatarIcon} />
+                <span>{s.firstName} {s.lastName}</span>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-export default MemberList;
+export default PeopleContent;

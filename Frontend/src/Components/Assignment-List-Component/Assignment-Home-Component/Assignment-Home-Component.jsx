@@ -1,27 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { fetchAssignments, fetchTasks, deleteAssignment } from '../../../services/authService';
+import { fetchAssignments, deleteAssignment } from '../../../services/authService';
 import styles from './Assignment-Home-Component.module.css';
 import AssignmentCard from '../Assignment-Card-Component/Assignment-Card-Component.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
-function GroupworkContent() {
+function GroupworkContent({ groupId, isOwner }) {
     const [assignments, setAssignments] = useState([]);
-    const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
         const loadData = async () => {
             try {
-                const currentGroup = JSON.parse(localStorage.getItem("currentGroup"));
                 const { data: assData } = await fetchAssignments();
-                const { data: taskData } = await fetchTasks();
-
-                const groupAssignments = assData.filter(a => a.parentGroup === currentGroup.id);
+                const groupAssignments = assData.filter(a => a.parentGroup === groupId);
                 setAssignments(groupAssignments);
-                setTasks(taskData);
             } catch (error) {
                 console.error("Error loading groupwork:", error);
             } finally {
@@ -29,7 +24,7 @@ function GroupworkContent() {
             }
         };
         loadData();
-    }, []);
+    }, [groupId]);
 
     const handleDelete = async (id) => {
         if (!window.confirm("Delete assignment and all its tasks?")) return;
@@ -45,12 +40,17 @@ function GroupworkContent() {
 
     return (
         <div className={styles.classwork}>
-            <div className={styles.actionBar}>
-                <button className={styles.createButton} onClick={() => navigate('/addTask')}>
-                    <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
+            {isOwner && (
+                <div className={styles.actionBar}>
+                    <button 
+                        className={styles.createButton} 
+                        onClick={() => navigate(`/group/${groupId}/createAssignment`)}
+                    >
+                        <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
                     Create
-                </button>
-            </div>
+                    </button>
+                </div>
+            )}
 
             <div className={styles.assignmentList}>
                 {assignments.length === 0 ? (
@@ -60,8 +60,9 @@ function GroupworkContent() {
                         <AssignmentCard
                             key={ass.id}
                             assignment={ass}
-                            tasks={tasks.filter(t => t.parentAssignment === ass.id)}
-                            onDelete={() => handleDelete(ass.id)}
+                            // We don't render tasks here anymore; clicking the card goes to detail
+                            onClick={() => navigate(`/group/${groupId}/assignment/${ass.id}`)}
+                            onDelete={isOwner ? () => handleDelete(ass.id) : null}
                         />
                     ))
                 )}

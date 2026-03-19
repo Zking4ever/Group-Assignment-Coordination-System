@@ -39,18 +39,17 @@ export const createNewGroup = async (newGroupData) => {
 
 
 //Get method for home page
-export const fetchGroups = async () => {
-  const response = await fetch(`${BASE_URL}/groups`, {
+export const fetchGroups = async (groupId = null) => {
+  const url = groupId ? `${BASE_URL}/groups/${groupId}` : `${BASE_URL}/groups`;
+  const response = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
     }
-  }
-  );
+  });
   const data = await response.json();
-
   return { response, data };
-}
+};
 
 
 // set up username
@@ -89,6 +88,17 @@ export const fetchUsername = async () => {
   return { response, data };
 };
 
+export const fetchUserData = async (id) => {
+  const response = await fetch(`${BASE_URL}/users/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  }
+  );
+  return await response.json();
+}
+
 
 //assignment create
 export const createNewAss = async (newAssData) => {
@@ -113,18 +123,17 @@ export const createNewAss = async (newAssData) => {
 
 
 //fetch assignments
-export const fetchAssignments = async () => {
-  const response = await fetch(`${BASE_URL}/assignments`, {
+export const fetchAssignments = async (assignmentId = null) => {
+  const url = assignmentId ? `${BASE_URL}/assignments/${assignmentId}` : `${BASE_URL}/assignments`;
+  const response = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
     }
-  }
-  );
+  });
   const data = await response.json();
-
   return { response, data };
-}
+};
 
 
 // join group
@@ -141,6 +150,28 @@ export const joinGroup = async (groupId, members) => {
   return { response, data };
 };
 
+export const joinGroupByCode = async (inviteCode, userId) => {
+  const response = await fetch(`${BASE_URL}/groups/join`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ inviteCode, userId })
+  });
+  const data = await response.json();
+  return { response, data };
+};
+
+export const fetchGroupMembers = async (groupId) => {
+  const response = await fetch(`${BASE_URL}/groups/members/${groupId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+  const data = await response.json();
+  return { response, data };
+};
 
 export const fetchUsers = async () => {
   const response = await fetch(`${BASE_URL}/users`);

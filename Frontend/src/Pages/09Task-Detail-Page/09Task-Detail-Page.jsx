@@ -1,161 +1,109 @@
-import React, { useEffect, useState } from 'react'
-import { fetchAssignments, fetchTasks, fetchUsers, updateTask } from '../../services/authService'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClipboardList, faUserCircle, faHistory, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import styles from './09Task-Detail-Page.module.css'
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { fetchTasks, updateTask } from '../../services/authService'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faCheckCircle, faClock, faUserCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 
 function TaskDetail() {
+    const { groupId, assignmentId, taskId } = useParams();
     const navigate = useNavigate();
     const [task, setTask] = useState(null);
-    const [assignee, setAssignee] = useState(null);
-    const [isResponsible, setIsResponsible] = useState(false);
-    const [isLeader, setIsLeader] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [currentUser, setCurrentUser] = useState(null);
 
     useEffect(() => {
-        const loadData = async () => {
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+        setCurrentUser(user);
+
+        const loadTask = async () => {
             try {
-                const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-                const currentTask = JSON.parse(localStorage.getItem("currentTask"));
-                const currentAssignment = JSON.parse(localStorage.getItem("currentAssignment"));
-
-                if (!currentUser || !currentTask) {
-                    navigate('/home');
-                    return;
-                }
-
-                const { data: taskData } = await fetchTasks();
-                const freshTask = taskData.find(t => t.id === currentTask.id);
-                if (!freshTask) return;
-                setTask(freshTask);
-
-                const { data: userData } = await fetchUsers();
-                const responsible = userData.find(u => u.id === freshTask.responsibleMember);
-                setAssignee(responsible);
-
-                setIsResponsible(currentUser.id === freshTask.responsibleMember);
-
-                const { data: assData } = await fetchAssignments();
-                const assignment = assData.find(a => a.id === freshTask.parentAssignment);
-                setIsLeader(assignment?.creatorId === currentUser.id);
-
+                // For now we fetch all and find, but in production we'd have GET /tasks/:id
+                const { data: allTasks } = await fetchTasks();
+                const currentTask = allTasks.find(t => t.id === taskId);
+                setTask(currentTask);
             } catch (error) {
                 console.error(error);
             } finally {
                 setLoading(false);
             }
         };
-        loadData();
-    }, [navigate]);
+        loadTask();
+    }, [taskId]);
 
     const handleStatusUpdate = async (newState) => {
-        const updatedTask = { ...task, state: newState };
         try {
-            const { response } = await updateTask(task.id, updatedTask);
+            const { response } = await updateTask(taskId, { state: newState });
             if (response.ok) {
-                setTask(updatedTask);
+                setTask(prev => ({ ...prev, state: newState }));
             }
         } catch (error) {
-            alert("Failed to update status: " + error.message);
+            alert(error.message);
         }
     };
 
     if (loading) return <div className={styles.loading}>Loading task details...</div>;
+    if (!task) return <div className={styles.error}>Task not found</div>;
 
-    const isDone = task.state === 'DONE';
-    const isWorking = task.state === 'WORKING';
-    const isRequested = task.state === 'REQUESTED';
+    const isResponsible = task.responsibleMember === currentUser?.id;
+    const isOwner = task.creatorId === currentUser?.id; // Note: creatorId might need to be passed or fetched
 
     return (
         <div className={styles.page}>
-            <div className={styles.container}>
-                <div className={styles.mainContent}>
-                    <div className={styles.taskHeader}>
-                        <div className={styles.iconCircle}>
-                            <FontAwesomeIcon icon={faClipboardList} />
-                        </div>
-                        <div className={styles.titleArea}>
-                            <h1>{task.taskName}</h1>
-                            <div className={styles.meta}>
-                                <span>{assignee ? `${assignee.firstName} ${assignee.lastName}` : 'Unassigned'}</span>
-                                <span className={styles.dot}>•</span>
-                                <span>Due {task.deadLine}</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className={styles.divider} />
-                    
-                    <div className={styles.description}>
-                        <p>{task.taskDescription || 'No instructions provided.'}</p>
-                    </div>
-
-                    <div className={styles.divider} />
-
-                    <div className={styles.commentsSection}>
-                        <h3>Class comments</h3>
-                        <div className={styles.addComment}>
-                            <FontAwesomeIcon icon={faUserCircle} className={styles.avatar} />
-                            <input type="text" placeholder="Add a class comment..." />
-                        </div>
+            <header className={styles.header}>
+                <button className={styles.backBtn} onClick={() => navigate(-1)}>
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                </button>
+                <div className={styles.titleSection}>
+                    <h1>{task.taskName}</h1>
+                    <div className={styles.meta}>
+                        <span>{task.responsibleMemberName || 'Assigned member'}</span>
+                        <span className={styles.separator}>•</span>
+                        <span>Due {new Date(task.deadLine).toLocaleDateString()}</span>
                     </div>
                 </div>
+            </header>
 
-                <div className={styles.sideContent}>
+            <main className={styles.content}>
+                <div className={styles.mainCol}>
+                    <section className={styles.description}>
+                        <div className={styles.sectionTitle}>
+                            <FontAwesomeIcon icon={faExclamationCircle} />
+                            Instructions
+                        </div>
+                        <p>{task.taskDescription || "No instructions provided."}</p>
+                    </section>
+                </div>
+
+                <div className={styles.sideCol}>
                     <div className={styles.workCard}>
                         <div className={styles.workHeader}>
-                            <h2>Your work</h2>
+                            <h3>Your work</h3>
                             <span className={`${styles.statusBadge} ${styles[task.state.toLowerCase()]}`}>
                                 {task.state}
                             </span>
                         </div>
 
-                        {isResponsible && !isDone && (
-                            <div className={styles.actions}>
-                                {!isRequested ? (
-                                    <button 
-                                        className={styles.primaryBtn} 
-                                        onClick={() => handleStatusUpdate('REQUESTED')}
-                                    >
-                                        Mark as done
-                                    </button>
-                                ) : (
-                                    <p className={styles.infoText}>Submission pending approval</p>
-                                )}
-                            </div>
-                        )}
-
-                        {isLeader && isRequested && (
-                            <div className={styles.actions}>
+                        <div className={styles.actions}>
+                            {task.state === 'YET' && isResponsible && (
+                                <button className={styles.primaryBtn} onClick={() => handleStatusUpdate('WORKING')}>
+                                    Start working
+                                </button>
+                            )}
+                            {task.state === 'WORKING' && isResponsible && (
                                 <button className={styles.primaryBtn} onClick={() => handleStatusUpdate('DONE')}>
-                                    Approve
+                                    Mark as done
                                 </button>
-                                <button className={styles.secondaryBtn} onClick={() => handleStatusUpdate('YET')}>
-                                    Return to student
+                            )}
+                            {task.state === 'DONE' && isResponsible && (
+                                <button className={styles.secondaryBtn} onClick={() => handleStatusUpdate('WORKING')}>
+                                    Unsubmit
                                 </button>
-                            </div>
-                        )}
-
-                        {isDone && (
-                            <div className={styles.doneState}>
-                                <FontAwesomeIcon icon={faCheckCircle} className={styles.doneIcon} />
-                                <p>Work completed</p>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className={styles.privateComments}>
-                        <div className={styles.pcHeader}>
-                            <FontAwesomeIcon icon={faHistory} />
-                            <span>Private comments</span>
-                        </div>
-                        <div className={styles.addPc}>
-                            <input type="text" placeholder="Add private comment..." />
+                            )}
                         </div>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
     );
 }
