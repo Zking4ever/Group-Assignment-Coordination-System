@@ -1,0 +1,151 @@
+.page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: white;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  height: 64px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.closeBtn {
+  font-size: 20px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.header h2 {
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.assignBtn {
+  background: var(--primary-color);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+.assignBtn:disabled {
+  background: #e0e0e0;
+  color: #9e9e9e;
+  cursor: not-allowed;
+}
+
+.form {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.mainColumn {
+  flex: 1;
+  padding: 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+}
+
+.sideColumn {
+  width: 320px;
+  border-left: 1px solid var(--border-color);
+  padding: 24px;
+  background: #f8f9fa;
+  overflow-y: auto;
+}
+
+.titleInput {
+  width: 100%;
+  padding: 16px;
+  font-size: 24px;
+  background: #f1f3f4;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 4px 4px 0 0;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.titleInput:focus {
+  outline: none;
+  background: #e8eaed;
+  border-bottom-color: var(--primary-color);
+}
+
+.iconLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.descriptionInput {
+  width: 100%;
+  height: 200px;
+  padding: 16px;
+  background: #f1f3f4;
+  border: none;
+  border-radius: 4px;
+  resize: vertical;
+  font-size: 14px;
+}
+
+.descriptionInput:focus {
+  outline: none;
+  background: #e8eaed;
+}
+
+.settingsGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.setting label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.select, .dateInput {
+  width: 100%;
+  padding: 12px;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.select:focus, .dateInput:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  border-width: 2px;
+  padding: 11px;
+}
