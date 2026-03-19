@@ -4,10 +4,14 @@ const db = require('./database');
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
-const PORT = 3001;
+const PORT = 5000;
 
 app.use(cors());
 app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.send('GACS server is running');
+});
 
 // --- Users ---
 app.get('/users', (req, res) => {

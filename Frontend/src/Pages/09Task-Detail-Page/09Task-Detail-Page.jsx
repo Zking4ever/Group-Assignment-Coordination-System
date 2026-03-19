@@ -1,216 +1,163 @@
-import styles from './09Task-Detail-Page.module.css'
 import React, { useEffect, useState } from 'react'
 import { fetchAssignments, fetchTasks, fetchUsers, updateTask } from '../../services/authService'
-import Header from '../../Components/Header-Component/Header-Component.jsx'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faClipboardList, faUserCircle, faHistory, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import styles from './09Task-Detail-Page.module.css'
+import { useNavigate } from 'react-router-dom';
 
 function TaskDetail() {
-
+    const navigate = useNavigate();
     const [task, setTask] = useState(null);
-    const [user, setUser] = useState(null);
-    const [isResponsible, setResponsible] = useState(false);
-    const [isLeader, setLeader] = useState(false);
-    const [hasRequest, setRequest] = useState(false);
-    const [expired, setexpired] = useState(false);
-
+    const [assignee, setAssignee] = useState(null);
+    const [isResponsible, setIsResponsible] = useState(false);
+    const [isLeader, setIsLeader] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const loadTasks = async () => {
-            try{
+        const loadData = async () => {
+            try {
                 const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-                if(!currentUser) return;
                 const currentTask = JSON.parse(localStorage.getItem("currentTask"));
-                if(!currentTask) return;
                 const currentAssignment = JSON.parse(localStorage.getItem("currentAssignment"));
-                if(!currentAssignment) return;
 
-                const { response: taskResponse, data: taskData } = await fetchTasks();
-                if(!taskResponse.ok) return;
-
-                const newTask = taskData.find(t => t.id === currentTask.id);
-
-                if(!newTask) return;
-
-                setTask(newTask);
-
-                if(currentUser.id === newTask.responsibleMember){
-                    setResponsible(true);
+                if (!currentUser || !currentTask) {
+                    navigate('/home');
+                    return;
                 }
 
-                const { response: assignmentResponse, data: assignmentData } = await fetchAssignments();
-                if(!assignmentResponse.ok) return;
+                const { data: taskData } = await fetchTasks();
+                const freshTask = taskData.find(t => t.id === currentTask.id);
+                if (!freshTask) return;
+                setTask(freshTask);
 
-                const assignment = assignmentData.find(a => a.id === currentAssignment.id);
+                const { data: userData } = await fetchUsers();
+                const responsible = userData.find(u => u.id === freshTask.responsibleMember);
+                setAssignee(responsible);
 
-                if(!assignment) return;
+                setIsResponsible(currentUser.id === freshTask.responsibleMember);
 
-                if(assignment.creatorId === currentUser.id){
-                    setLeader(true);
-                }
+                const { data: assData } = await fetchAssignments();
+                const assignment = assData.find(a => a.id === freshTask.parentAssignment);
+                setIsLeader(assignment?.creatorId === currentUser.id);
 
-                if(newTask.state === "REQUESTED"){
-                    setRequest(true);
-                }
-
-                if(new Date().toISOString().split("T")[0] > newTask.deadLine)
-                {
-                    setexpired(true);
-                }
-            }
-            catch(error){
-                alert(error.message);
-            }
-        }; loadTasks();
-    }, []);
-
-
-     useEffect(() => {
-            const loadUser = async () => {
-                try{
-                    const { response, data } = await fetchUsers();
-                    if(!response.ok) return;
-                    if(!task) return;
-                    const responsible = data.find(u => u.id === task.responsibleMember);
-                    if (responsible){
-                        setUser(responsible);
-                    }
-                }
-                catch(error){
-                    alert(error.message);
-                }
-            }; loadUser();
-        }, [task]);
-
-
-        const submitTask = async () => {
-
-            const updatedTask = {
-                ...task,
-                state: "REQUESTED",
-            };
-            setTask(updatedTask);
-
-            try{
-                const { response, data } = await updateTask(task.id, updatedTask);
-
-                if(response.ok){
-                    alert("Task submission requested to the group leader");
-                }
-                else{
-                    alert(data.message);
-                }
-            }
-            catch(error){
-                alert("Submission request failed, pls try again!"+error.message);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
             }
         };
+        loadData();
+    }, [navigate]);
 
-
-        const approve = async () => {
-
-            const updatedTask = {
-                ...task,
-                state: "DONE",
-            };
-            setTask(updatedTask);
-            
-            try{
-                const { response, data } = await updateTask(task.id, updatedTask);
-                if(response.ok){
-                    alert("Task is completed!");
-                    setRequest(false);
-                }
-                else{
-                    alert(data.message || "UNKNOWN ERROR");
-                }
+    const handleStatusUpdate = async (newState) => {
+        const updatedTask = { ...task, state: newState };
+        try {
+            const { response } = await updateTask(task.id, updatedTask);
+            if (response.ok) {
+                setTask(updatedTask);
             }
-            catch(error){
-                alert(error.message);
-            }
-        };
+        } catch (error) {
+            alert("Failed to update status: " + error.message);
+        }
+    };
 
+    if (loading) return <div className={styles.loading}>Loading task details...</div>;
 
-        const decline = async () => {
-            
-            const updatedTask = {
-                ...task,
-                state: "YET",
-            };
-            setTask(updatedTask);
-            
-             try{
-                const { response, data } = await updateTask(task.id, updatedTask);
-                if(response.ok){
-                    alert("Task is not completed!");
-                    setRequest(false);
-                }
-                else{
-                    alert(data.message || "UNKNOWN ERROR");
-                }
-            }
-            catch(error){
-                alert(error.message);
-            }
-        };
-        
+    const isDone = task.state === 'DONE';
+    const isWorking = task.state === 'WORKING';
+    const isRequested = task.state === 'REQUESTED';
 
     return (
-        <>
-            <div className={styles.taskDetailBody}>
-                <Header/>
-                <div className={styles.taskDetailContainer}>
-                    <div className={styles.taskDetailDetailsContainer}>
-                        <h1 className={styles.taskDetailTitleHeader}>Task Detail</h1>
-                        <div className={styles.taskDetailDetails}>
-                            <p className={styles.taskDetailDetailsText}>Task Name: {task?.taskName}</p>
-                            <p className={styles.taskDetailDetailsText}>Description: {task?.taskDescription}</p>
-                            <p className={styles.taskDetailDetailsText}>Assigned to:{user?.firstName} {user?.lastName}</p>
-                            <p className={styles.taskDetailDetailsText}> User username: {user?.username} </p>
-                            <p className={styles.taskDetailDetailsText}>Start Date: {task?.startDate}</p>
-                            <p className={styles.taskDetailDetailsText}>DeadLine: {task?.deadLine}</p>
-                            <p className={styles.taskDetailDetailsText}>Task state: {task?.state}</p>
-                            { isLeader && hasRequest && (
-                                <>
-                                    <div className={styles.taskDetailRequestResponder}>
-                                        <div className={styles.taskDetailRequestResponderLbl}>The reponsible member claims that he/she has completed this task. Do you approve or not?</div>
-                                        <div className={styles.taskDetailBtnContainer}>
-                                            <button className={styles.taskDetailApproveBtn} onClick={approve}>Approve</button>
-                                            <button className={styles.taskDetailDeclineBtn} onClick={decline}>NOT YET</button>
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-                            
+        <div className={styles.page}>
+            <div className={styles.container}>
+                <div className={styles.mainContent}>
+                    <div className={styles.taskHeader}>
+                        <div className={styles.iconCircle}>
+                            <FontAwesomeIcon icon={faClipboardList} />
+                        </div>
+                        <div className={styles.titleArea}>
+                            <h1>{task.taskName}</h1>
+                            <div className={styles.meta}>
+                                <span>{assignee ? `${assignee.firstName} ${assignee.lastName}` : 'Unassigned'}</span>
+                                <span className={styles.dot}>•</span>
+                                <span>Due {task.deadLine}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className={styles.divider} />
+                    
+                    <div className={styles.description}>
+                        <p>{task.taskDescription || 'No instructions provided.'}</p>
+                    </div>
+
+                    <div className={styles.divider} />
+
+                    <div className={styles.commentsSection}>
+                        <h3>Class comments</h3>
+                        <div className={styles.addComment}>
+                            <FontAwesomeIcon icon={faUserCircle} className={styles.avatar} />
+                            <input type="text" placeholder="Add a class comment..." />
+                        </div>
+                    </div>
+                </div>
+
+                <div className={styles.sideContent}>
+                    <div className={styles.workCard}>
+                        <div className={styles.workHeader}>
+                            <h2>Your work</h2>
+                            <span className={`${styles.statusBadge} ${styles[task.state.toLowerCase()]}`}>
+                                {task.state}
+                            </span>
                         </div>
 
-                        {
-                            task?.state === "DONE" && (
-                                <>
-                                    <h3 className={styles.taskDetailCompletedTask}>This task is completed!</h3>
-                                </>
-                            )
-                        }
-
-                        {
-                            expired && (
-                                <>
-                                    <div className={styles.taskDetailExpiredText}>This task has expired!!!</div>
-                                </>
-                            )
-                        }
-                        { isResponsible && task?.state !== "DONE" && task?.state !== "REQUESTED" && (
-                            <><div className={styles.taskDetailTickIcon} onClick={submitTask}>
-                                <FontAwesomeIcon icon={faCheck}/>
+                        {isResponsible && !isDone && (
+                            <div className={styles.actions}>
+                                {!isRequested ? (
+                                    <button 
+                                        className={styles.primaryBtn} 
+                                        onClick={() => handleStatusUpdate('REQUESTED')}
+                                    >
+                                        Mark as done
+                                    </button>
+                                ) : (
+                                    <p className={styles.infoText}>Submission pending approval</p>
+                                )}
                             </div>
-                            </>
                         )}
-                        
+
+                        {isLeader && isRequested && (
+                            <div className={styles.actions}>
+                                <button className={styles.primaryBtn} onClick={() => handleStatusUpdate('DONE')}>
+                                    Approve
+                                </button>
+                                <button className={styles.secondaryBtn} onClick={() => handleStatusUpdate('YET')}>
+                                    Return to student
+                                </button>
+                            </div>
+                        )}
+
+                        {isDone && (
+                            <div className={styles.doneState}>
+                                <FontAwesomeIcon icon={faCheckCircle} className={styles.doneIcon} />
+                                <p>Work completed</p>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className={styles.privateComments}>
+                        <div className={styles.pcHeader}>
+                            <FontAwesomeIcon icon={faHistory} />
+                            <span>Private comments</span>
+                        </div>
+                        <div className={styles.addPc}>
+                            <input type="text" placeholder="Add private comment..." />
+                        </div>
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 
-export default TaskDetail
+export default TaskDetail;

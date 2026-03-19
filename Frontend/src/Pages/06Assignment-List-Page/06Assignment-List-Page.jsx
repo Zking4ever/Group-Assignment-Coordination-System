@@ -1,67 +1,56 @@
+import React, { useState, useEffect } from 'react'
 import styles from './06Assignment-List-Page.module.css'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleUser, faHouse, faPlus } from "@fortawesome/free-solid-svg-icons";
-import React, { useState } from 'react'
-import HomeContent from '../../Components/Assignment-List-Component/Assignment-Home-Component/Assignment-Home-Component.jsx'
-import MembersContent from '../../Components/Assignment-List-Component/Member-List-Component/Member-List-Component.jsx'
-import CreateContent from '../../Components/Assignment-List-Component/Assignment-Create-Component/Assignment-Create-Component.jsx'
-import Header from '../../Components/Header-Component/Header-Component.jsx'
+import GroupworkContent from '../../Components/Assignment-List-Component/Assignment-Home-Component/Assignment-Home-Component.jsx'
+import PeopleContent from '../../Components/Assignment-List-Component/Member-List-Component/Member-List-Component.jsx'
+import StreamContent from './StreamContent.jsx'; // We'll create this
 
-function GroupPage(){
+function GroupPage() {
+    const [activeTab, setActiveTab] = useState("stream");
+    const [groupName, setGroupName] = useState("Loading...");
 
-    const [selectedPage, setPage] = useState("home");
+    useEffect(() => {
+        const currentGroup = JSON.parse(localStorage.getItem("currentGroup"));
+        if (currentGroup) {
+            setGroupName(currentGroup.name || "Group View");
+        }
+    }, []);
 
-    const handleChange = (e) => {
-        setPage(e.target.value);
-    }
+    return (
+        <div className={styles.groupContainer}>
+            <div className={styles.groupHeader} style={{ backgroundColor: '#1a73e8' }}>
+                <div className={styles.groupHeaderContent}>
+                    <h1>{groupName}</h1>
+                </div>
+            </div>
 
-    return(
-        <>
-           <div className={styles.assignmentListBody}>
-             <div className={styles.assignmentListTopFixedBarAll}>
-               <div className={styles.groupListHeader}>
-                     <Header/>
-               </div>
+            <div className={styles.tabBar}>
+                <button
+                    className={`${styles.tab} ${activeTab === 'stream' ? styles.active : ''}`}
+                    onClick={() => setActiveTab('stream')}
+                >
+                    Stream
+                </button>
+                <button
+                    className={`${styles.tab} ${activeTab === 'groupwork' ? styles.active : ''}`}
+                    onClick={() => setActiveTab('groupwork')}
+                >
+                    Groupwork
+                </button>
+                <button
+                    className={`${styles.tab} ${activeTab === 'people' ? styles.active : ''}`}
+                    onClick={() => setActiveTab('people')}
+                >
+                    People
+                </button>
+            </div>
 
-               <div className={styles.assignmentListNavContainerDiv}>
-                  <nav className={styles.assignmentListNavContainer}>
-                     <div className={styles.assignmentListIcon}>
-                        <input type="radio" name="bar" value="home" id="home" className={styles.assignmentListHomeIcon} checked={selectedPage === "home"} onChange={handleChange}/>
-                           <label htmlFor="home">
-                              <FontAwesomeIcon icon={faHouse} />
-                              <div className={styles.assignmentListIconLabel}>Assignments list</div>
-                           </label>
-                     </div>
-
-                     <div className={styles.assignmentListIcon}>
-                        <input type="radio" name="bar" value="createAssignment" id="createAssignment" className={styles.assignmentListCreateIcon} checked={selectedPage === "createAssignment"} onChange={handleChange}/>
-                           <label htmlFor="createAssignment">
-                              <FontAwesomeIcon icon={faPlus} />
-                              <div className={styles.assignmentListIconLabel}>Create assignment</div>
-                           </label>
-                     </div>
-
-                     <div className={styles.assignmentListIcon}>
-                        <input type="radio" name="bar" value="members" id="members" className={styles.assignmentListMembersIcon} checked={selectedPage === "members"} onChange={handleChange}/>
-                           <label htmlFor="members">
-                              <FontAwesomeIcon icon={faCircleUser} />
-                              <div className={styles.assignmentListIconLabel}>Members</div>
-                           </label>
-                     </div>
-                  </nav>
-               </div>
-             </div>
-
-               <main>
-                  <div className={styles.assignmentListBodyBox}>
-                     {selectedPage === "home" && <HomeContent/>}
-                     {selectedPage === "createAssignment" && <CreateContent setPage={setPage}/>}
-                     {selectedPage === "members" && <MembersContent setPage={setPage} />}
-                  </div>
-               </main>
-           </div>
-        </>
+            <div className={styles.tabContent}>
+                {activeTab === 'stream' && <StreamContent />}
+                {activeTab === 'groupwork' && <GroupworkContent />}
+                {activeTab === 'people' && <PeopleContent />}
+            </div>
+        </div>
     );
 }
 
-export default GroupPage
+export default GroupPage;

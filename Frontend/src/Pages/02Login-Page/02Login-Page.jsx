@@ -1,87 +1,85 @@
 import styles from './02Login-Page.module.css'
-import { useNavigate, Link } from 'react-router-dom'
 import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { checkAcc } from '../../services/authService'
 
-function LoginPage(){
-
+function LoginPage() {
     const navigate = useNavigate();
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const handleEmail = (e) => {
-        setEmail(e.target.value);
-    }
-
-    const handlePassword = (e) => {
-        setPassword(e.target.value);
-    }
-
-    const login = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const loginInfo = {
-            email: email.trim().toLowerCase(),
-            password: password,
-        };
-
-        if(loading) return;
         setLoading(true);
 
-        try{
-            const { response, data } = await checkAcc(loginInfo);
-
-            if (response.ok) {
+        try {
+            const { response, data } = await checkAcc(email, password);
+            if (response.ok && data.length > 0) {
                 const user = data[0];
-
-                localStorage.setItem("currentUser", JSON.stringify({
-                    id: user.id,
-                    username: user.username,
-                    email: user.email
-                }));
-
+                localStorage.setItem("currentUser", JSON.stringify(user));
                 navigate("/home");
+            } else {
+                alert("Invalid email or password!");
             }
-
-            else{
-                alert(data.message || "Invalid email or password.");
-            }
-        }
-        catch(error){
-            alert("Couldn't login! " + error.message);
-        }
-        finally{
+        } catch (error) {
+            alert("Login failed: " + error.message);
+        } finally {
             setLoading(false);
         }
-    }
+    };
 
-    return(
-        <>
-            <div className={styles.loginBody}>
-                <div className={styles.loginContainer}>
-                    <h1 className={styles.welcome}>Login Page</h1>
-                    <form className={styles.loginFormContainer} onSubmit={login}>
-                        <div className={styles.inpSpace}>
-                            <label className={styles.lbl}>Email: </label>
-                            <input type="email" value={email} placeholder="Enter your email" className={styles.inp} onChange={handleEmail} required/>
-                        </div>
-                        <div className={styles.inpSpace}>
-                            <label className={styles.lbl}>Password: </label>
-                            <input type="password" value={password} placeholder="Enter your password" className={styles.inp} onChange={handlePassword} required/>
-                        </div>
-                        <button type="submit" className={styles.loginBtn}>
-                            Login
+    return (
+        <div className={styles.page}>
+            <div className={styles.card}>
+                <div className={styles.header}>
+                    <div className={styles.logo}>G</div>
+                    <h1>Sign in</h1>
+                    <p>Use your Coordination Account</p>
+                </div>
+
+                <form className={styles.form} onSubmit={handleSubmit}>
+                    <div className={styles.inputGroup}>
+                        <input
+                            type="email"
+                            required
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <div className={styles.inputGroup}>
+                        <input
+                            type="password"
+                            required
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
+
+                    <div className={styles.helpText}>
+                        <Link to="/register">Create account</Link>
+                    </div>
+
+                    <div className={styles.footer}>
+                        <button type="submit" className={styles.nextBtn} disabled={loading}>
+                            {loading ? 'Signing in...' : 'Sign in'}
                         </button>
-                    </form>
-                    {/* <Link to="/register" className={styles.linkText}>Forgot password?</Link> */}
-                    <Link to="/register" className={styles.linkText}>Create new account</Link>
+                    </div>
+                </form>
+            </div>
+
+            <div className={styles.bottomLinks}>
+                <span>English (United States)</span>
+                <div className={styles.extra}>
+                    <a href="#">Help</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
                 </div>
             </div>
-        </>
+        </div>
     );
-
 }
 
-export default LoginPage
+export default LoginPage;

@@ -2,58 +2,44 @@ import styles from './07Profile-Page.module.css'
 import { fetchUsers, editProfile } from '../../services/authService'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserCircle, faCamera } from '@fortawesome/free-solid-svg-icons';
 
-function ProfileEdit(){
-
+function ProfileEdit() {
     const navigate = useNavigate();
-
     const [user, setUser] = useState(null);
     const [confirmPass, setConfirm] = useState("");
     const [newPassword, setNewPassword] = useState("");
-    
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const loaduser = async () => {
             const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-            try{
-                const { response, data } = await fetchUsers();
-                if(!response.ok) return;
-
+            if (!currentUser) return;
+            try {
+                const { data } = await fetchUsers();
                 const userNow = data.find(d => d.id === currentUser.id);
-                
                 setUser(userNow);
+            } catch (error) {
+                console.error(error);
             }
-            catch(error){
-                alert(error.message);
-            }
-        }; loaduser();
-    },[]);
+        };
+        loaduser();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        setUser(u => ({...u,
-            [name]: value
-        }));
+        setUser(u => ({ ...u, [name]: value }));
     };
-
-    const handlePassword = (e) => {
-         setConfirm(e.target.value);
-    }
 
     const changeInfo = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
-        if (newPassword) {
-            if (newPassword.length < 6) {
-                alert("Password must be at least 6 characters!");
-                return;
-            }
-
-            if (newPassword !== confirmPass) {
-                alert("Passwords do not match!");
-                return;
-            }
+        if (newPassword && newPassword !== confirmPass) {
+            alert("Passwords do not match!");
+            setLoading(false);
+            return;
         }
 
         const updatedUser = {
@@ -61,70 +47,90 @@ function ProfileEdit(){
             password: newPassword ? newPassword : user.password
         };
 
-
-        try{
-            const { response, data } = await editProfile(user.id, updatedUser);
-
-            if(response.ok){
-                alert("Profile information changed successfully!");
+        try {
+            const { response } = await editProfile(user.id, updatedUser);
+            if (response.ok) {
+                localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+                alert("Profile updated successfully!");
                 navigate("/home");
             }
-            else{
-                alert(data.message || "Please try again!");
-            }
-        }
-        catch(error){
+        } catch (error) {
             alert(error.message);
+        } finally {
+            setLoading(false);
         }
     }
 
-    if (!user) {
-    return <p>Loading profile...</p>;
-}
+    if (!user) return <div className={styles.loading}>Loading profile...</div>;
 
-     return(
-        <>
-           <div className={styles.profilePageBody}>
-            <div className={styles.profilePageContainer}>
-                 <h1 className={styles.profilePageHeaderTitle}>Edit your profile</h1>
-                <form className={styles.profilePageFormContainer} onSubmit={changeInfo}>
-                    <div className={styles.profilePageInpSpace}>
-                        <label className={styles.profilePageInpLbl}>First Name:</label>
-                        <input type="text" name="firstName" value={user?.firstName} onChange={handleChange} className={styles.profilePageInp} required/>
+    return (
+        <div className={styles.page}>
+            <div className={styles.container}>
+                <div className={styles.header}>
+                    <div className={styles.avatarWrapper}>
+                        <FontAwesomeIcon icon={faUserCircle} className={styles.avatar} />
+                        <div className={styles.editAvatar}>
+                            <FontAwesomeIcon icon={faCamera} />
+                        </div>
                     </div>
+                    <h1>Personal info</h1>
+                    <p>Info about you and your preferences across Google Classroom services</p>
+                </div>
 
-                    <div className={styles.profilePageInpSpace}>
-                        <label className={styles.profilePageInpLbl}>Last Name</label>
-                        <input type="text" name="lastName" value={user?.lastName} onChange={handleChange} className={styles.profilePageInp} required/>
+                <form className={styles.form} onSubmit={changeInfo}>
+                    <section className={styles.section}>
+                        <h3>Basic info</h3>
+                        <div className={styles.row}>
+                            <label>First name</label>
+                            <input type="text" name="firstName" value={user.firstName} onChange={handleChange} required />
+                        </div>
+                        <div className={styles.row}>
+                            <label>Last name</label>
+                            <input type="text" name="lastName" value={user.lastName} onChange={handleChange} required />
+                        </div>
+                        <div className={styles.row}>
+                            <label>Username</label>
+                            <input type="text" value={user.username} readOnly className={styles.readOnly} />
+                        </div>
+                    </section>
+
+                    <section className={styles.section}>
+                        <h3>Contact info</h3>
+                        <div className={styles.row}>
+                            <label>Email</label>
+                            <input type="email" name="email" value={user.email} onChange={handleChange} required />
+                        </div>
+                    </section>
+
+                    <section className={styles.section}>
+                        <h3>Security</h3>
+                        <div className={styles.row}>
+                            <label>New password</label>
+                            <input
+                                type="password"
+                                placeholder="Leave blank to keep current"
+                                onChange={(e) => setNewPassword(e.target.value)}
+                            />
+                        </div>
+                        <div className={styles.row}>
+                            <label>Confirm password</label>
+                            <input
+                                type="password"
+                                onChange={(e) => setConfirm(e.target.value)}
+                            />
+                        </div>
+                    </section>
+
+                    <div className={styles.footer}>
+                        <button type="button" className={styles.cancelBtn} onClick={() => navigate(-1)}>Cancel</button>
+                        <button type="submit" className={styles.saveBtn} disabled={loading}>
+                            {loading ? 'Saving...' : 'Save changes'}
+                        </button>
                     </div>
-
-                    <div className={styles.profilePageInpSpace}>
-                        <label className={styles.profilePageInpLbl}>Username <br/> <small className={styles.smallLabel}>(CAN NOT BE EDITED)</small></label>
-                        <input type="text" name="username" value={user?.username} className={styles.profilePageInp} readOnly/>
-                    </div>
-
-                    <div className={styles.profilePageInpSpace}>
-                        <label className={styles.profilePageInpLbl}>Email address: </label>
-                        <input type="email" name="email" value={user?.email} onChange={handleChange} className={styles.profilePageInp} required/>
-                    </div>
-
-                    <div className={styles.profilePageInpSpace}>
-                        <label className={styles.profilePageInpLbl}>New password: </label>
-                        <input type="password" placeholder="enter new password" onChange={(e) => setNewPassword(e.target.value)} className={styles.profilePageInp}/>
-                    </div>
-
-                    <div className={styles.profilePageInpSpace}>
-                        <label className={styles.profilePageInpLbl}>Confirm password: </label>
-                        <input type="password" name="confirmpassword" placeholder="Confirm new password" onChange={handlePassword} className={styles.profilePageInp}/>
-                    </div>
-
-                    <button type="submit" className={styles.profilePageSubmitBtn}>Apply changes</button>
                 </form>
             </div>
-           </div>
-        </>
-     );
-
+        </div>
+    );
 }
 
-export default ProfileEdit
+export default ProfileEdit;

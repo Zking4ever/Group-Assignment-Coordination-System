@@ -1,0 +1,65 @@
+.stream {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.announceBox {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302);
+  cursor: pointer;
+}
+
+.avatar {
+  font-size: 32px;
+  color: var(--text-secondary);
+  margin-right: 16px;
+}
+
+.inputPlaceholder {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.updates {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.updateCard {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  gap: 16px;
+}
+
+.updateIcon {
+  width: 40px;
+  height: 40px;
+  background: #1a73e8;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.updateText p {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.date {
+  font-size: 12px;
+  color: var(--text-secondary);
+}

@@ -1,87 +1,94 @@
 import styles from './Group-Create-Component.module.css'
 import React, { useState } from 'react'
 import { createNewGroup } from '../../../services/authService'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
-function CreateContent({ setPage }){
-
-        const [groupName, setName] = useState("");
-        const [description, setDescription] = useState("");
-        const [loading, setLoading] = useState(false);
+function CreateContent({ setView }) {
+    const [groupName, setName] = useState("");
+    const [description, setDescription] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const createGroup = async (e) => {
         e.preventDefault();
-
         const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        if (!currentUser) {
-            alert("User not logged in!");
+
+        if (!groupName.trim()) {
+            alert("Group name is required.");
             return;
         }
 
-        if(groupName === ""){
-            alert("group name can not be empty!");
-            return;
-        }
-
-        if(loading) return;
         setLoading(true);
-
-        const newGroup = {
-            groupName: groupName,
-            groupDescription: description,
-            creator: currentUser.username,
-            creatorId: currentUser.id,
-            id: `${currentUser.username}${Date.now()}`,
-            members: [currentUser.id]
-        }
-
-        try{
-            const { response, data } = await createNewGroup(newGroup);
-            if(response.ok){
-              
-                alert("Group was created successfully");
-                setPage("home");
+        try {
+            const newGroup = {
+                groupName: groupName,
+                groupDescription: description,
+                creatorId: currentUser.id,
+                members: [currentUser.id]
+            };
+            const { response } = await createNewGroup(newGroup);
+            if (response.ok) {
+                setView("home");
+            } else {
+                alert("Failed to create group.");
             }
-            else{
-                alert(data.message || "Couldn't create a group");
-            }
-        }
-        catch(error){
+        } catch (error) {
             alert(error.message);
-        }
-        finally{
+        } finally {
             setLoading(false);
         }
-
-    }
-
-    const handleName = (e) => {
-        setName(e.target.value);
-    }
-
-    const handleDescription = (e) => {
-        setDescription(e.target.value);
-    }
+    };
 
     return (
-        <>
-            <h1>Create new group</h1>
-            <form className={styles.formContainer} onSubmit={createGroup}>
-                <div>
-                <label className={styles.lbl}>
-                    group name:
-                </label>
-                <input type="text" className={styles.inp} placeholder="Enter your new group name" onChange={handleName}/>
+        <div className={styles.overlay}>
+            <div className={styles.modal}>
+                <div className={styles.header}>
+                    <h2>Create Group</h2>
+                    <button className={styles.closeBtn} onClick={() => setView("home")}>
+                        <FontAwesomeIcon icon={faTimes} />
+                    </button>
+                </div>
+                <form className={styles.form} onSubmit={createGroup}>
+                    <div className={styles.inputGroup}>
+                        <input
+                            type="text"
+                            required
+                            placeholder="Group name (required)"
+                            className={styles.input}
+                            value={groupName}
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                    </div>
+                    <div className={styles.inputGroup}>
+                        <input
+                            type="text"
+                            placeholder="Section"
+                            className={styles.input}
+                        />
+                    </div>
+                    <div className={styles.inputGroup}>
+                        <input
+                            type="text"
+                            placeholder="Subject"
+                            className={styles.input}
+                        />
+                    </div>
+                    <div className={styles.inputGroup}>
+                        <textarea
+                            placeholder="Description"
+                            className={styles.textarea}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
+                    </div>
+                    <div className={styles.footer}>
+                        <button type="button" className={styles.cancelBtn} onClick={() => setView("home")}>Cancel</button>
+                        <button type="submit" className={styles.createBtn} disabled={loading || !groupName}>Create</button>
+                    </div>
+                </form>
             </div>
-            <div>
-                <label className={styles.lbl}>
-                    description:
-                </label>
-                <textarea type="text" placeholder="Enter your description" onChange={handleDescription}/>
-            </div>
-            <button type="submit" className={styles.btn}>Create group</button>
-            </form>
-        </>
+        </div>
     );
 }
 
-export default CreateContent
+export default CreateContent;

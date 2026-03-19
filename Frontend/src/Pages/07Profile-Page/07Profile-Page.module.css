@@ -1,80 +1,145 @@
-*{
-    box-sizing: border-box;
+.page {
+  padding: 48px 24px;
+  background-color: #f8f9fa;
+  min-height: 100%;
 }
 
-.profilePageBody{
-    min-height: 100vh;
-    background-color: rgb(219, 219, 219);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.container {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.profilePageContainer{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 27em;
-    background-color: rgb(0, 213, 255);
-    padding: 1em;
-    border-radius: 21px;
-    border-style: outset;
-    transition: 0.5s;
+.header {
+  text-align: center;
+  margin-bottom: 40px;
 }
 
-.profilePageContainer:hover{
-    scale: 1.1;
-    box-shadow: 3px 3px 21px rgb(0, 112, 135);
+.avatarWrapper {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 24px;
 }
 
-.profilePageFormContainer{
-    display: flex;
-    flex-direction: column;
-    gap: 0.7em;
+.avatar {
+  font-size: 96px;
+  color: var(--primary-color);
+  background: white;
+  border-radius: 50%;
 }
 
-.profilePageInpSpace{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.editAvatar {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  cursor: pointer;
 }
 
-.profilePageInp{
-    height: 1.6em;
-    text-align: center;
-    border-radius: 5px;
-    border: 1px solid black;
-    transition: 0.5s;
+.header h1 {
+  font-size: 28px;
+  font-weight: 400;
+  margin-bottom: 8px;
 }
 
-.profilePageInp:hover{
-    scale: 1.2;
-    box-shadow: 3px 3px 27px rgb(0, 112, 135);
-    background-color: rgb(136, 227, 245);
+.header p {
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
-.profilePageInp:focus{
-    scale: 1.15;
-    box-shadow: 3px 3px 27px rgb(0, 112, 135);
-    background-color: rgb(136, 227, 245);
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.smallLabel{
-    font-size: 0.5em;
+.section {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 24px;
 }
 
-.profilePageSubmitBtn{
-    font-size: 0.7em;
-    padding: 0px 1em;
-    margin: auto;
-    background-color: rgb(0, 112, 135);
-    color: white;
-    border-radius: 7px;
-    transition: 0.5s;
+.section h3 {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  color: var(--text-primary);
 }
 
-.profilePageSubmitBtn:hover{
-    scale: 1.1;
-    box-shadow: 3px 3px 21px rgb(0, 112, 135);
+.row {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  border-top: 1px solid #f1f3f4;
+}
+
+.section .row:first-of-type {
+  border-top: none;
+}
+
+.row label {
+  width: 200px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.row input {
+  flex: 1;
+  border: none;
+  font-size: 14px;
+  padding: 8px 0;
+  color: var(--text-primary);
+}
+
+.row input:focus {
+  outline: none;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 6px;
+}
+
+.row input.readOnly {
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.cancelBtn {
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding: 10px 24px;
+}
+
+.saveBtn {
+  background: var(--primary-color);
+  color: white;
+  padding: 10px 32px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.saveBtn:disabled {
+  background: #e0e0e0;
+}
+
+.loading {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-secondary);
 }

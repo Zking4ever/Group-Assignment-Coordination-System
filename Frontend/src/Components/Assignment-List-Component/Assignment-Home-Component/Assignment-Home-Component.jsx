@@ -1,93 +1,73 @@
-import AssignmentCard from '../Assignment-Card-Component/Assignment-Card-Component.jsx'
-import React, { useState, useEffect } from 'react'
-import { fetchAssignments, deleteAssignment } from '../../../services/authService'
-import styles from './Assignment-Home-Component.module.css'
-import { useNavigate } from 'react-router-dom'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import React, { useState, useEffect } from 'react';
+import { fetchAssignments, fetchTasks, deleteAssignment } from '../../../services/authService';
+import styles from './Assignment-Home-Component.module.css';
+import AssignmentCard from '../Assignment-Card-Component/Assignment-Card-Component.jsx';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
 
-function HomeContent(){
-
+function GroupworkContent() {
+    const [assignments, setAssignments] = useState([]);
+    const [tasks, setTasks] = useState([]);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    const [assignments, setGroups] = useState([]);
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const currentGroup = JSON.parse(localStorage.getItem("currentGroup"));
+                const { data: assData } = await fetchAssignments();
+                const { data: taskData } = await fetchTasks();
 
-    useEffect(
-        () => {
-            const loadGroups = async () => {
-                try{
-                    const { response, data } = await fetchAssignments();
-                   
-                    if(response.ok){
-                        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-                        const currentGroup = JSON.parse(localStorage.getItem("currentGroup"));
-                        if (!currentUser || !currentGroup) return;
-                        const userAssignments = data.filter(assignment => assignment.parentGroup === currentGroup.id);
-                        setGroups(userAssignments);
-                    }
-                }
-                catch (error){
-                    alert(error);
-                }
-            };
-
-            loadGroups();
-        }, []);
-
-        const handleClick = (assignment) => {
-            localStorage.setItem("currentAssignment", JSON.stringify({
-                assignmentName: assignment.assignmentName,
-                assignmentDescription: assignment.assignmentDescription,
-                id: assignment.id,
-                parentGroup: assignment.parentGroup
-            }));
-
-            navigate("/addTask");
-        }
-
-        const handleDelete = async (assignmentId) => {
-            try{
-                const { response, data } = await deleteAssignment(assignmentId);
-                if(response.ok){
-                    alert("assignment deleted successfully!");
-                    setGroups(prev => prev.filter(assignment => assignment.id !== assignmentId));
-                }
-                else{
-                    alert(data.message || "Failed to delete assignment");
-                }
-            }
-            catch(error){
-                alert(error.message);
+                const groupAssignments = assData.filter(a => a.parentGroup === currentGroup.id);
+                setAssignments(groupAssignments);
+                setTasks(taskData);
+            } catch (error) {
+                console.error("Error loading groupwork:", error);
+            } finally {
+                setLoading(false);
             }
         };
+        loadData();
+    }, []);
 
-    return(
-        <>
-            <div className={styles.container}>
-                {assignments.length === 0 ? 
-                    (<h2>No assignment yet</h2>) : 
-                    (assignments.map((assignment) => (
-                        <>
-                            <div key={assignment.id}>
-                                <div onClick={() => handleClick(assignment)}>
-                                    <AssignmentCard title={assignment.assignmentName} description={assignment.assignmentDescription} groupId={assignment.id}/>
-                                </div>
+    const handleDelete = async (id) => {
+        if (!window.confirm("Delete assignment and all its tasks?")) return;
+        try {
+            await deleteAssignment(id);
+            setAssignments(prev => prev.filter(a => a.id !== id));
+        } catch (error) {
+            alert(error.message);
+        }
+    };
 
-                                {assignment.creatorId === JSON.parse(localStorage.getItem("currentUser"))?.id &&
-                                    (
-                                    
-                                     <div className={styles.trash} onClick={() => handleDelete(assignment.id)}>
-                                         <FontAwesomeIcon icon={faTrash} />
-                                     </div>
-                                        
-                                    )
-                                }
-                            </div>
-                        </>
-                    )))}
+    if (loading) return <div>Loading groupwork...</div>;
+
+    return (
+        <div className={styles.classwork}>
+            <div className={styles.actionBar}>
+                <button className={styles.createButton} onClick={() => navigate('/addTask')}>
+                    <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
+                    Create
+                </button>
             </div>
-        </>
+
+            <div className={styles.assignmentList}>
+                {assignments.length === 0 ? (
+                    <div className={styles.empty}>No assignments yet</div>
+                ) : (
+                    assignments.map(ass => (
+                        <AssignmentCard
+                            key={ass.id}
+                            assignment={ass}
+                            tasks={tasks.filter(t => t.parentAssignment === ass.id)}
+                            onDelete={() => handleDelete(ass.id)}
+                        />
+                    ))
+                )}
+            </div>
+        </div>
     );
 }
 
-export default HomeContent
+export default GroupworkContent;

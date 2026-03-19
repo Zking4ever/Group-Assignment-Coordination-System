@@ -1,23 +1,59 @@
-body{
-    height: 100vh;
+.peopleContainer {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.addMember{
-    background-color: rgb(0, 115, 255);
-    border-radius: 12px;
-    height: 2.1em;
-    width: 2.1em;
-    padding: 0.3em;
+.section {
+  margin-bottom: 48px;
 }
 
-.urlbox{
-    display: flex;
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    align-items: center;
-    gap: 0.3em;
-    border: 1px solid black;
-    border-radius: 7px;
-    padding: 0 0.7em;
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.sectionHeader h2 {
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--primary-color);
+}
+
+.addIcon {
+  color: var(--primary-color);
+  cursor: pointer;
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--primary-color);
+  margin-bottom: 16px;
+}
+
+.userItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.userIcon {
+  font-size: 32px;
+  color: var(--text-secondary);
+  margin-right: 16px;
+}
+
+.studentStats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.empty {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--text-secondary);
 }

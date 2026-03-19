@@ -1,88 +1,84 @@
-import GroupCard from '../Group-Card-Component/Group-Card-Component.jsx'
 import React, { useState, useEffect } from 'react'
-import { fetchGroups, deleteGroup } from '../../../services/authService'
+import { fetchGroups, deleteGroup, fetchUsers } from '../../../services/authService'
 import styles from './Group-Home-Component.module.css'
 import { useNavigate  } from 'react-router-dom'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import GroupCard from '../Group-Card-Component/Group-Card-Component.jsx'
 
-
-function HomeContent(){
-
+function HomeContent() {
     const navigate = useNavigate();
-
     const [groups, setGroups] = useState([]);
-    // const[isCreator, setCreator] = useState(false);
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    useEffect(
-        () => {
-            const loadGroups = async () => {
-                try{
-                    const { response, data } = await fetchGroups();
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const { response: gResp, data: gData } = await fetchGroups();
+                const { response: uResp, data: uData } = await fetchUsers();
 
-                    if(response.ok){
-                        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-                        const userGroups = data.filter(group => group.members.includes(currentUser.id));
-                        setGroups(userGroups);
-                    }
+                if (gResp.ok && uResp.ok) {
+                    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+                    const userGroups = gData.filter(group => group.members.includes(currentUser.id));
+                    setGroups(userGroups);
+                    setUsers(uData);
                 }
-                catch (error){
-                    alert(error);
-                }
-            };
-
-            loadGroups();
-        }, []);
-
-        const handleClick = (group) => {
-           localStorage.setItem("currentGroup", JSON.stringify({
-                    id: group.id
-                }));
-        navigate("/group");
-    }
-
-        const handleDelete = async (groupId) => {
-            try{
-                const { response, data } = await deleteGroup(groupId);
-                if(response.ok){
-                    alert("Group deleted successfully!");
-                    setGroups(prev => prev.filter(group => group.id !== groupId));
-                }
-                else{
-                    alert(data.message || "Failed to delete group");
-                }
-            }
-            catch(error){
-                alert(error.message);
+            } catch (error) {
+                console.error("Failed to load dashboard data:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
-    return(
-        <>
-            <div className={styles.container}>
-                {groups.length === 0 ? 
-                    (<h2>No groups yet</h2>) : 
-                    (groups.map((group) => (
-                        
-                            <div key={group.id}>
-                            <div onClick={() => handleClick(group)}>
-                                <GroupCard title={group.groupName} description={group.groupDescription}/>
-                            </div>
-                            {group.creatorId === JSON.parse(localStorage.getItem("currentUser"))?.id &&
-                            (
-                                <>
-                                    <div className={styles.trash} onClick={() => handleDelete(group.id)}>
-                                        <FontAwesomeIcon icon={faTrash} />
-                                    </div>
-                                </>
-                            )}
-                            
-                            </div>
-                        
-                    )))}
-            </div>
-        </>
+        loadData();
+    }, []);
+
+    const handleClick = (group) => {
+        localStorage.setItem("currentGroup", JSON.stringify({ id: group.id, name: group.groupName }));
+        navigate("/group");
+    }
+
+    const handleDelete = async (groupId) => {
+        if (!window.confirm("Are you sure you want to delete this group?")) return;
+        try {
+            const { response } = await deleteGroup(groupId);
+            if (response.ok) {
+                setGroups(prev => prev.filter(group => group.id !== groupId));
+            }
+        } catch (error) {
+            alert("Error deleting group: " + error.message);
+        }
+    };
+
+    const getCreatorName = (creatorId) => {
+        const user = users.find(u => u.id === creatorId);
+        return user ? `${user.firstName} ${user.lastName}` : 'Unknown User';
+    };
+
+    if (loading) return <div className={styles.loading}>Loading classes...</div>;
+
+    return (
+        <div className={styles.gridContainer}>
+            {groups.length === 0 ? (
+                <div className={styles.emptyState}>
+                    <h2>No Groups here</h2>
+                    <p>Click the + button in the top right to create or join a class.</p>
+                </div>
+            ) : (
+                <div className={styles.grid}>
+                    {groups.map((group) => (
+                        <GroupCard 
+                            key={group.id}
+                            title={group.groupName}
+                            creator={getCreatorName(group.creatorId)}
+                            onClick={() => handleClick(group)}
+                            onDelete={() => handleDelete(group.id)}
+                            isCreator={group.creatorId === JSON.parse(localStorage.getItem("currentUser"))?.id}
+                        />
+                    ))}
+                </div>
+            )}
+        </div>
     );
 }
 
-export default HomeContent
+export default HomeContent;

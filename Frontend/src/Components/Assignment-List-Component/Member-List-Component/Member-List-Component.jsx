@@ -1,79 +1,70 @@
-import styles from './Member-List-Component.module.css'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons"
-import URLPage from '../URL-Page-Component/URL-Page-Component.jsx'
-import React, { useState, useEffect } from 'react'
-import MemberCard from '../Member-Card-Component/Member-Card-Component.jsx'
-import { fetchGroups, fetchUsers } from '../../../services/authService'
+import React, { useState, useEffect } from 'react';
+import { fetchUsers, fetchGroups } from '../../../services/authService';
+import styles from './Member-List-Component.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserCircle, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 
-function MembersContent(){
+function MemberList() {
+  const [teachers, setTeachers] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [group, setGroup] = useState(null);
 
-    const [toggleURL, setToggle] = useState(false);
-    const [members, setMembers] = useState([]);
-    const [allUsers, setAllUsers] = useState([]);
-    const [isOwner, setOwner] = useState(false);
-    
+  useEffect(() => {
+    const loadMembers = async () => {
+      const currentGroup = JSON.parse(localStorage.getItem("currentGroup"));
+      const { data: allUsers } = await fetchUsers();
+      const { data: allGroups } = await fetchGroups();
 
-    const addIcon = () => {
-        setToggle(!toggleURL);
-    }
+      const groupData = allGroups.find(g => g.id === currentGroup.id);
+      if (groupData) {
+        setGroup(groupData);
+        const creator = allUsers.find(u => u.id === groupData.creatorId);
+        const members = allUsers.filter(u =>
+          groupData.members.includes(u.id) && u.id !== groupData.creatorId
+        );
 
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                const { response: groupRes, data: groups } = await fetchGroups();
-                const { response: userRes, data: users } = await fetchUsers();
+        setTeachers(creator ? [creator] : []);
+        setStudents(members);
+      }
+    };
+    loadMembers();
+  }, []);
 
-                if(groupRes.ok && userRes.ok){
-                    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const UserItem = ({ user }) => (
+    <div className={styles.userItem}>
+      <FontAwesomeIcon icon={faUserCircle} className={styles.userIcon} />
+      <span>{user.firstName} {user.lastName}</span>
+    </div>
+  );
 
-                    const currentGroup = JSON.parse(localStorage.getItem("currentGroup"));
+  return (
+    <div className={styles.peopleContainer}>
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2>Group Owner</h2>
+          <FontAwesomeIcon icon={faUserPlus} className={styles.addIcon} />
+        </div>
+        <div className={styles.divider} />
+        {teachers.map(u => <UserItem key={u.id} user={u} />)}
+      </div>
 
-                   const group = groups.find(g => g.id === currentGroup.id);
-
-                   if(currentUser.id === group.creatorId){
-                    setOwner(true);
-                   }
-                   else{
-                    setOwner(false);
-                   }
-
-                    if(group){
-                        setMembers(group.members || []);
-                    }
-                }
-                setAllUsers(users);
-            } 
-            catch(error){
-                console.error(error);
-            }
-        };
-
-        loadData();
-    }, []);
-    
-
-    return (
-        <>
-            <div className={styles.container}>
-                {members.map(id => {
-                    const user = allUsers.find(u => u.id === id);
-
-                    if(!user) return null;
-
-                    return <MemberCard key={id} user={user}/>
-                })}
-            </div>
-           {
-            isOwner && (
-                 <div className={styles.urlbox}>
-                <FontAwesomeIcon icon={faPlus} className={styles.addMember} onClick={addIcon}/>
-                { toggleURL && <URLPage className={styles.urlbox}/> }
-            </div>
-            )
-           }
-        </>
-    );
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2>Students</h2>
+          <div className={styles.studentStats}>
+            <span>{students.length} students</span>
+            <FontAwesomeIcon icon={faUserPlus} className={styles.addIcon} />
+          </div>
+        </div>
+        <div className={styles.divider} />
+        {students.length === 0 ? (
+          <p className={styles.empty}>No students joined yet.</p>
+        ) : (
+          students.map(u => <UserItem key={u.id} user={u} />)
+        )}
+      </div>
+    </div>
+  );
 }
 
-export default MembersContent
+export default MemberList;
