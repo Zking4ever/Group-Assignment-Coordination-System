@@ -6,11 +6,6 @@ From classroom assignments to team projects, **Coordination (GACS)** helps every
 
 ---
 
-### ⭐ Show Your Support
-If you find this project helpful, please consider giving it a **Star** on GitHub! It helps more people discover the project.
-
----
-
 ## 🌟 Why GACS? (The Importance)
 
 In the world of collaborative work, coordination is often the biggest bottleneck. GACS was built to solve the "who's doing what?" problem. By providing a centralized platform for task delegation and progress tracking, GACS:
@@ -18,6 +13,12 @@ In the world of collaborative work, coordination is often the biggest bottleneck
 - **Reduces Chaos**: Centralizes communication and project details.
 - **Boosts Productivity**: Teams stay focused on high-priority tasks with clear visual progress.
 - **Simplifies Management**: Easy-to-use interface for creating groups and assignments.
+
+---
+
+**⭐ Show Your Support**
+
+If you find this project helpful, please consider giving it a **Star** on GitHub! It helps more people discover the project.
 
 ---
 
