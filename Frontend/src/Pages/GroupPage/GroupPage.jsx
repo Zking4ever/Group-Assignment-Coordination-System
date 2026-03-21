@@ -61,7 +61,7 @@ function GroupPage() {
                     className={`${styles.tab} ${activeTab === 'groupwork' ? styles.active : ''}`}
                     onClick={() => setActiveTab('groupwork')}
                 >
-                    Groupwork
+                    Assignments
                 </button>
                 <button
                     className={`${styles.tab} ${activeTab === 'people' ? styles.active : ''}`}

@@ -51,7 +51,7 @@ app.patch('/users/:id', (req, res) => {
   }
 });
 
-app.get('/users/:id', (req, res) => {
+app.get('/user/:id', (req, res) => {
   const { id } = req.params;
   try {
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);

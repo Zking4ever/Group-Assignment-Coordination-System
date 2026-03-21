@@ -89,7 +89,7 @@ export const fetchUsername = async () => {
 };
 
 export const fetchUserData = async (id) => {
-  const response = await fetch(`${BASE_URL}/users/${id}`, {
+  const response = await fetch(`${BASE_URL}/user/${id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"

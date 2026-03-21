@@ -1,5 +1,5 @@
 import styles from './RegisterPage.module.css'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { createUsername } from '../../services/authService'
 
@@ -47,7 +47,7 @@ function RegisterPage() {
             <div className={styles.card}>
                 <div className={styles.main}>
                     <div className={styles.header}>
-                        <div className={styles.logo}>G</div>
+                        <div className={styles.logo}>GACS</div>
                         <h1>Create your Account</h1>
                         <p>to continue to Coordination</p>
                     </div>

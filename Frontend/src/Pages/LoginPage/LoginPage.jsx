@@ -33,7 +33,7 @@ function LoginPage() {
         <div className={styles.page}>
             <div className={styles.card}>
                 <div className={styles.header}>
-                    <div className={styles.logo}>G</div>
+                    <div className={styles.logo}>GACS</div>
                     <h1>Sign in</h1>
                     <p>Use your Coordination Account</p>
                 </div>
