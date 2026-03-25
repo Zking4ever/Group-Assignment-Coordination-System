@@ -52,7 +52,7 @@ const insertTask = db.prepare(`
 `);
 
 data.tasks.forEach(task => {
-  insertTask.run(task.id, task.taskName, task.taskDescription, task.responsibleMemberId, task.startDate, task.deadLine, task.parentAssignment, task.state);
+  insertTask.run(task.id, task.taskName, task.taskDescription, task.responsibleMember, task.startDate, task.deadLine, task.parentAssignment, task.state);
 });
 
 console.log('Migration completed successfully!');

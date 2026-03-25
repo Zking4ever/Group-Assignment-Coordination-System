@@ -179,7 +179,11 @@ app.delete('/assignments/:id', (req, res) => {
 
 // --- Tasks ---
 app.get('/tasks', (req, res) => {
-  const tasks = db.prepare('SELECT * FROM tasks').all();
+  const tasks = db.prepare(`
+    SELECT tasks.*, users.firstName || ' ' || users.lastName as responsibleMemberName 
+    FROM tasks 
+    LEFT JOIN users ON tasks.responsibleMemberId = users.id
+  `).all();
   // Map back to parentAssignment and responsibleMember for frontend compatibility
   res.json(tasks.map(t => ({
     ...t,

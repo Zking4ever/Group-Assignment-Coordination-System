@@ -77,8 +77,8 @@ function TaskDetailPage() {
                     <div className={styles.workCard}>
                         <div className={styles.workHeader}>
                             <h3>Your work</h3>
-                            <span className={`${styles.statusBadge} ${styles[task.state.toLowerCase()]}`}>
-                                {task.state}
+                            <span className={`${styles.statusBadge} ${styles[task.state?.toLowerCase() || 'yet']}`}>
+                                {task.state || 'YET'}
                             </span>
                         </div>
                         
