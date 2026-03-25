@@ -10,8 +10,8 @@ import ProfilePage from './Pages/ProfilePage/ProfilePage.jsx'
 import TaskPage from './Pages/TaskPage/TaskPage.jsx'
 import TaskDetailPage from './Pages/TaskDetailPage/TaskDetailPage.jsx'
 import AssignmentDetailPage from './Pages/AssignmentDetailPage/AssignmentDetailPage.jsx'
-import Header from './Components/layout/Header/Header.jsx'
-import Sidebar from './Components/layout/Sidebar/Sidebar.jsx'
+import Header from './components/layout/Header/Header.jsx'
+import Sidebar from './components/layout/Sidebar/Sidebar.jsx'
 
 function Layout({ children, setDashboardView }) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);

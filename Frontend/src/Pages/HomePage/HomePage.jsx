@@ -1,4 +1,3 @@
-import React from 'react'
 import styles from './HomePage.module.css'
 import GroupList from '../../components/groups/GroupList/GroupList.jsx'
 import GroupJoin from '../../components/groups/GroupJoin/GroupJoin.jsx'
