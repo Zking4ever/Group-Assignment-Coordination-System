@@ -1,5 +1,5 @@
 import styles from './TaskCreate.module.css'
-import { fetchUsers, createNewTask, fetchGroups, createNewAss, fetchGroupMembers } from '../../../services/authService';
+import { fetchUsers, createNewTask, fetchGroups, createNewAss, fetchGroupMembers } from '@services/authService';
 import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faAlignLeft } from '@fortawesome/free-solid-svg-icons';
