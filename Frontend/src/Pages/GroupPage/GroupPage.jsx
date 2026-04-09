@@ -3,7 +3,7 @@ import styles from './GroupPage.module.css'
 import GroupworkContent from '../../components/assignments/AssignmentList/AssignmentList.jsx'
 import MemberList from '../../components/members/MemberList/MemberList.jsx'
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchGroups } from '../../services/authService';
+import { fetchGroups } from '../../services/authService.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClipboardList } from '@fortawesome/free-solid-svg-icons';
 
