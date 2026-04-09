@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchAssignments, fetchTasks, deleteTask } from '../../services/authService';
+import { fetchAssignments, fetchTasks } from '@services/authService';
 import styles from './AssignmentDetailPage.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faArrowLeft, faClipboardList, faChevronRight } from '@fortawesome/free-solid-svg-icons';

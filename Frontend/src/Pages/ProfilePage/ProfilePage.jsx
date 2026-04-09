@@ -1,6 +1,6 @@
 import styles from './ProfilePage.module.css'
-import { fetchUsers, editProfile } from '../../services/authService'
-import React, { useEffect, useState } from 'react'
+import { fetchUsers, editProfile } from '@services/authService'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle, faCamera } from '@fortawesome/free-solid-svg-icons';

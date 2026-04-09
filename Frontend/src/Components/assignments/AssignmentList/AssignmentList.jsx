@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { fetchAssignments, deleteAssignment } from '../../../services/authService';
+import { useState, useEffect } from 'react';
+import { fetchAssignments, deleteAssignment } from '@services/authService';
 import styles from './AssignmentList.module.css';
 import AssignmentCard from '../AssignmentCard/AssignmentCard.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

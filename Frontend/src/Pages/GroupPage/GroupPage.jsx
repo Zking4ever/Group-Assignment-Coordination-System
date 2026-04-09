@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'
-import styles from './GroupPage.module.css'
-import GroupworkContent from '../../components/assignments/AssignmentList/AssignmentList.jsx'
-import MemberList from '../../components/members/MemberList/MemberList.jsx'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchGroups } from '../../services/authService.js';
+import GroupworkContent from '@components/assignments/AssignmentList/AssignmentList.jsx'
+import MemberList from '@components/members/MemberList/MemberList.jsx'
+import { fetchGroups } from '@services/authService.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClipboardList } from '@fortawesome/free-solid-svg-icons';
+import styles from './GroupPage.module.css'
 
 function GroupPage() {
     const { groupId } = useParams();

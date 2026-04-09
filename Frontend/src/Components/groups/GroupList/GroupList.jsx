@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { fetchGroups, deleteGroup, fetchUsers } from '../../../services/authService'
+import { useState, useEffect } from 'react'
+import { fetchGroups, deleteGroup, fetchUsers } from '@services/authService.js'
 import styles from './GroupList.module.css'
 import { useNavigate } from 'react-router-dom'
 import GroupCard from '../GroupCard/GroupCard.jsx'

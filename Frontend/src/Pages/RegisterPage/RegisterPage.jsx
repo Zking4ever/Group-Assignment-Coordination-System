@@ -1,7 +1,7 @@
 import styles from './RegisterPage.module.css'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { createUsername } from '../../services/authService'
+import { createUsername } from '@services/authService'
 
 function RegisterPage() {
     const navigate = useNavigate();
