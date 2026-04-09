@@ -1,0 +1,138 @@
+.TaskDetailPage-page {
+  padding: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.TaskDetailPage-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 24px;
+}
+
+.TaskDetailPage-backBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.TaskDetailPage-backBtn:hover {
+  background: var(--hover-color);
+}
+
+.TaskDetailPage-titleSection h1 {
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--primary-color);
+  margin-bottom: 8px;
+}
+
+.TaskDetailPage-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.TaskDetailPage-separator {
+  font-weight: bold;
+}
+
+.TaskDetailPage-content {
+  display: flex;
+  gap: 32px;
+}
+
+.TaskDetailPage-mainCol {
+  flex: 1;
+}
+
+.TaskDetailPage-sideCol {
+  width: 300px;
+}
+
+.TaskDetailPage-sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.TaskDetailPage-description p {
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.TaskDetailPage-workCard {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302);
+}
+
+.TaskDetailPage-workHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.TaskDetailPage-statusBadge {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.TaskDetailPage-statusBadge.TaskDetailPage-done { color: var(--success-color); }
+.TaskDetailPage-statusBadge.TaskDetailPage-working { color: var(--primary-color); }
+.TaskDetailPage-statusBadge.TaskDetailPage-yet { color: var(--text-secondary); }
+
+.TaskDetailPage-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.TaskDetailPage-primaryBtn {
+  background: var(--primary-color);
+  color: white;
+  padding: 10px 0;
+  border-radius: 4px;
+  font-weight: 500;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+}
+
+.TaskDetailPage-secondaryBtn {
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--primary-color);
+  padding: 10px 0;
+  border-radius: 4px;
+  font-weight: 500;
+  width: 100%;
+  cursor: pointer;
+}
+
+.TaskDetailPage-loading, .TaskDetailPage-error {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-secondary);
+}

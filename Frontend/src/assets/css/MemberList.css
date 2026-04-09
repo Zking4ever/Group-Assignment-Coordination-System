@@ -1,0 +1,51 @@
+.MemberList-peopleContainer {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.MemberList-section {
+  margin-bottom: 48px;
+}
+
+.MemberList-sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.MemberList-sectionHeader h2 {
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--primary-color);
+}
+
+.MemberList-addIcon {
+  color: var(--primary-color);
+  cursor: pointer;
+}
+
+.MemberList-divider {
+  height: 1px;
+  background-color: var(--primary-color);
+  margin-bottom: 16px;
+}
+
+.MemberList-personRow {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+  gap: 16px;
+}
+
+.MemberList-avatarIcon {
+  font-size: 32px;
+  color: var(--text-secondary);
+}
+
+.MemberList-empty {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--text-secondary);
+}

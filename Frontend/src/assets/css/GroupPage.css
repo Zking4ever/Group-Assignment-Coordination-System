@@ -1,0 +1,128 @@
+.GroupPage-groupPage {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+.GroupPage-banner {
+  height: 240px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-end;
+  padding: 24px;
+  color: white;
+  background: var(--primary-color);
+}
+
+.GroupPage-bannerContent h1 {
+  font-size: 36px;
+  font-weight: 500;
+}
+
+.GroupPage-tabBar {
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 24px;
+}
+
+.GroupPage-tab {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.GroupPage-tab:hover {
+  background-color: var(--surface-color);
+  color: var(--primary-color);
+}
+
+.GroupPage-tab.GroupPage-active {
+  color: var(--primary-color);
+  border-bottom: 3px solid var(--primary-color);
+}
+
+.GroupPage-tabContent {
+  padding: 0 16px;
+}
+
+.GroupPage-inviteCode {
+  padding: 5px 20px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  font-family: monospace;
+}
+
+.GroupPage-stream {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.GroupPage-announcementBox {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302);
+  cursor: pointer;
+}
+
+.GroupPage-avatar {
+  width: 32px;
+  height: 32px;
+  background: #ccc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  font-weight: bold;
+}
+
+.GroupPage-updates {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.GroupPage-updateCard {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  gap: 16px;
+}
+
+.GroupPage-updateIcon {
+  width: 40px;
+  height: 40px;
+  background: #1a73e8;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.GroupPage-updateText p {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.GroupPage-date {
+  font-size: 12px;
+  color: var(--text-secondary);
+}

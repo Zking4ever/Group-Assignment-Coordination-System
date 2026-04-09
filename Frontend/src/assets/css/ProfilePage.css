@@ -1,0 +1,151 @@
+.ProfilePage-page {
+  padding: 48px 24px;
+  background-color: #f8f9fa;
+  min-height: 100%;
+}
+
+.ProfilePage-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.ProfilePage-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.ProfilePage-avatarWrapper {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 24px;
+}
+
+.ProfilePage-avatar {
+  font-size: 96px;
+  color: var(--primary-color);
+  background: white;
+  border-radius: 50%;
+}
+
+.ProfilePage-editAvatar {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  cursor: pointer;
+}
+
+.ProfilePage-header h1 {
+  font-size: 28px;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+.ProfilePage-header p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.ProfilePage-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ProfilePage-section {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.ProfilePage-section h3 {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  color: var(--text-primary);
+}
+
+.ProfilePage-row {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  border-top: 1px solid #f1f3f4;
+}
+
+.ProfilePage-section .ProfilePage-row:first-of-type {
+  border-top: none;
+}
+
+.ProfilePage-row label {
+  width: 200px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.ProfilePage-row input {
+  flex: 1;
+  border: none;
+  font-size: 14px;
+  padding: 8px 0;
+  color: var(--text-primary);
+}
+
+.ProfilePage-row input:focus {
+  outline: none;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 6px;
+}
+
+.ProfilePage-row input.ProfilePage-readOnly {
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.ProfilePage-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.ProfilePage-cancelBtn {
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding: 10px 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ProfilePage-saveBtn {
+  background: var(--primary-color);
+  color: white;
+  padding: 10px 32px;
+  border-radius: 4px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+.ProfilePage-saveBtn:disabled {
+  background: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.ProfilePage-loading {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-secondary);
+}

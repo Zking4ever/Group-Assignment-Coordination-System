@@ -1,0 +1,37 @@
+.AssignmentList-classwork {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.AssignmentList-actionBar {
+  margin-bottom: 8px;
+}
+
+.AssignmentList-createButton {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 24px;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  transition: box-shadow 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.AssignmentList-createButton:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.AssignmentList-assignmentList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.AssignmentList-empty {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-secondary);
+}

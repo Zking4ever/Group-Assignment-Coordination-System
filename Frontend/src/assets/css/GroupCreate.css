@@ -1,0 +1,107 @@
+.GroupCreate-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.GroupCreate-modal {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 8px;
+  box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14),0 3px 14px 2px rgba(0,0,0,0.12),0 5px 5px -3px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.GroupCreate-header {
+  height: 64px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.GroupCreate-header h2 {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.GroupCreate-closeBtn {
+  font-size: 20px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.GroupCreate-form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.GroupCreate-inputGroup {
+  width: 100%;
+}
+
+.GroupCreate-input, .GroupCreate-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #f1f3f4;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.GroupCreate-input:focus, .GroupCreate-textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  background-color: white;
+}
+
+.GroupCreate-textarea {
+  height: 100px;
+  resize: none;
+}
+
+.GroupCreate-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.GroupCreate-cancelBtn {
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.GroupCreate-createBtn {
+  color: var(--primary-color);
+  font-weight: 500;
+  padding: 8px 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.GroupCreate-createBtn:disabled {
+  color: #bdc1c6;
+  cursor: not-allowed;
+}
