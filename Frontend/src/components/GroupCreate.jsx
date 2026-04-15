@@ -60,12 +60,6 @@ function GroupCreate({ setView }) {
                         />
                     </div>
                     <div className={"GroupCreate-inputGroup"}>
-                        <input type="text" placeholder="Section" className={"GroupCreate-input"} />
-                    </div>
-                    <div className={"GroupCreate-inputGroup"}>
-                        <input type="text" placeholder="Subject" className={"GroupCreate-input"} />
-                    </div>
-                    <div className={"GroupCreate-inputGroup"}>
                         <textarea
                             placeholder="Description"
                             className={"GroupCreate-textarea"}
