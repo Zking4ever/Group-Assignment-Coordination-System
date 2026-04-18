@@ -2,30 +2,31 @@ import '../assets/css/LoginPage.css';
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { checkAcc } from '@services/authService'
-import toast from 'react-hot-toast';
 
 function LoginPage() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState({ type: '', text: '' });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+        setMessage({ type: '', text: '' });
 
         try {
             const { response, data } = await checkAcc(email, password);
             if (response.ok && data.length > 0) {
                 const user = data[0];
                 localStorage.setItem("currentUser", JSON.stringify(user));
-                toast.success("Welcome back, " + user.firstName + "!");
-                navigate("/home");
+                setMessage({ type: 'success', text: "Welcome back, " + user.firstName + "! Redirecting..." });
+                setTimeout(() => navigate("/home"), 1000);
             } else {
-                toast.error("Invalid email or password!");
+                setMessage({ type: 'error', text: "Invalid email or password!" });
             }
         } catch (error) {
-            toast.error("Login failed: " + error.message);
+            setMessage({ type: 'error', text: "Login failed: " + error.message });
         } finally {
             setLoading(false);
         }
@@ -39,6 +40,12 @@ function LoginPage() {
                     <h1>Sign in</h1>
                     <p>Use your Coordination Account</p>
                 </div>
+
+                {message.text && (
+                    <div className={`form-message form-message-${message.type}`}>
+                        {message.text}
+                    </div>
+                )}
 
                 <form className={"LoginPage-form"} onSubmit={handleSubmit}>
                     <div className={"LoginPage-inputGroup"}>

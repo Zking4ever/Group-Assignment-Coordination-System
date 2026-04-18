@@ -1,5 +1,6 @@
 import '../assets/css/TaskCreate.css';
-import { fetchUsers, createNewTask, fetchGroups, createNewAss, fetchGroupMembers } from '@services/authService';
+import { createNewAss, createNewTask, fetchGroupMembers } from '@services/authService';
+import toast from 'react-hot-toast';
 import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faAlignLeft } from '@fortawesome/free-solid-svg-icons';
@@ -58,7 +59,7 @@ function TaskCreate({ type = "task" }) {
                 if (response.ok) {
                     navigate(`/group/${groupId}`);
                 } else {
-                    alert("Failed to create assignment.");
+                    toast.error("Failed to create assignment.");
                 }
             } else {
                 const newTask = {
@@ -69,11 +70,11 @@ function TaskCreate({ type = "task" }) {
                 if (response.ok) {
                     navigate(-1);
                 } else {
-                    alert("Failed to create task.");
+                    toast.error("Failed to create task.");
                 }
             }
         } catch (error) {
-            alert(error.message);
+            toast.error(error.message);
         } finally {
             setLoading(false);
         }

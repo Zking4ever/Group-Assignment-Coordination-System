@@ -2,6 +2,7 @@ import '../assets/css/ConfirmationPage.css';
 import { useState, useEffect } from 'react';
 import { fetchUsername, createUsername  } from '@services/authService'
 import { useLocation, useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast';
 
 function ConfirmationPage(){
     const navigate = useNavigate();
@@ -34,29 +35,29 @@ function ConfirmationPage(){
 
     const confirmBtn = async () => {
         if (isTaken) {
-            alert("Username already taken!");
+            toast.error("Username already taken!");
             return;
         }
 
         if (!username) {
-            alert("Username cannot be empty");
+            toast.error("Username cannot be empty");
             return;
         }
 
         const isValid = sym.some(s => username[0] === s);
         if(isValid){
-            alert("The first character can not be number or symbol");
+            toast.error("The first character can not be number or symbol");
             return;
         }
 
         const hasIt = chars.some(c => username.includes(c));
         if(hasIt){
-            alert("Username can not contain special characters, use only numbers (0-9) and small letters (a-z)");
+            toast.error("Username can not contain special characters");
             return;
         }
 
         if(username.length < 5){
-           alert("Username must be at least 5 character!");
+           toast.error("Username must be at least 5 character!");
            return;
         }
 
@@ -70,15 +71,15 @@ function ConfirmationPage(){
                 username: username,
                 email: data.email
                 }));
-                alert("Account created! successfully!");
+                toast.success("Account created successfully!");
                 navigate("/home"); 
             } 
             else {
-                alert(data.message || "Could not create username");
+                toast.error(data.message || "Could not create username");
             }
          } 
         catch (error) {
-            alert(error.message);
+            toast.error(error.message);
         }
     };
 

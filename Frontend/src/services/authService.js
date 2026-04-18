@@ -1,5 +1,5 @@
-// const BASE_URL = "http://localhost:5000";
-const BASE_URL = "https://gacs.onrender.com";
+const BASE_URL = "http://localhost:5000";
+// const BASE_URL = "https://gacs.onrender.com";
 
 //LOGIN PAGE 
 export const checkAcc = async (email, password) => {
@@ -343,4 +343,48 @@ export const getAiBreakdown = async (assignmentName, assignmentDescription, memb
   });
   const data = await response.json();
   return { response, data };
-};
+};
+
+export const fetchNotifications = async (groupId) => {
+  const response = await fetch(`${BASE_URL}/notifications/${groupId}`);
+  const data = await response.json();
+  return { response, data };
+};
+
+export const updateAssignmentGuidelines = async (assignmentId, formData) => {
+  const response = await fetch(`${BASE_URL}/assignments/${assignmentId}/guidelines`, {
+    method: "PATCH",
+    body: formData
+  });
+  const data = await response.json();
+  return { response, data };
+};
+
+export const startTaskWork = async (taskId, userId) => {
+  const response = await fetch(`${BASE_URL}/tasks/${taskId}/start-work`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId })
+  });
+  const data = await response.json();
+  return { response, data };
+};
+
+export const submitTaskWork = async (taskId, formData) => {
+  const response = await fetch(`${BASE_URL}/tasks/${taskId}/submit-work`, {
+    method: "PATCH",
+    body: formData
+  });
+  const data = await response.json();
+  return { response, data };
+};
+
+export const verifyTaskSubmission = async (taskId, status, feedback) => {
+  const response = await fetch(`${BASE_URL}/tasks/${taskId}/verify-submission`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status, feedback })
+  });
+  const data = await response.json();
+  return { response, data };
+};

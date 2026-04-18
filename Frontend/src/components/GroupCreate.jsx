@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { createNewGroup } from '@services/authService'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import toast from 'react-hot-toast';
 
 function GroupCreate({ setView }) {
     const [groupName, setName] = useState("");
@@ -14,7 +15,7 @@ function GroupCreate({ setView }) {
         const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
         if (!groupName.trim()) {
-            alert("Group name is required.");
+            toast.error("Group name is required.");
             return;
         }
 
@@ -30,10 +31,10 @@ function GroupCreate({ setView }) {
             if (response.ok) {
                 setView("home");
             } else {
-                alert("Failed to create group.");
+                toast.error("Failed to create group.");
             }
         } catch (error) {
-            alert(error.message);
+            toast.error(error.message);
         } finally {
             setLoading(false);
         }

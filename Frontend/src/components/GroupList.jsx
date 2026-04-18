@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { fetchGroups, deleteGroup, fetchUsers } from '@services/authService.js'
+import toast from 'react-hot-toast';
 import '../assets/css/GroupList.css';
 import { useNavigate } from 'react-router-dom'
 import GroupCard from '@components/GroupCard.jsx'
@@ -37,9 +38,12 @@ function GroupList() {
             const { response } = await deleteGroup(groupId);
             if (response.ok) {
                 setGroups(prev => prev.filter(group => group.id !== groupId));
+                toast.success("Group deleted successfully");
+            } else {
+                toast.error("Failed to delete group");
             }
         } catch (error) {
-            alert("Error deleting group: " + error.message);
+            toast.error("Error deleting group: " + error.message);
         }
     };
 

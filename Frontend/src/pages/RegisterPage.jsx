@@ -2,7 +2,6 @@ import '../assets/css/RegisterPage.css';
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { createUsername } from '@services/authService'
-import toast from 'react-hot-toast';
 
 function RegisterPage() {
     const navigate = useNavigate();
@@ -15,15 +14,30 @@ function RegisterPage() {
         confirmPassword: ""
     });
     const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState({ type: '', text: '' });
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const validatePassword = (pass) => {
+        const hasNumber = /\d/.test(pass);
+        const hasUpper = /[A-Z]/.test(pass);
+        const isLongEnough = pass.length >= 8;
+        return hasNumber && hasUpper && isLongEnough;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setMessage({ type: '', text: '' });
+
+        if (!validatePassword(formData.password)) {
+            setMessage({ type: 'error', text: "Password must be at least 8 characters long and contain both numbers and uppercase letters." });
+            return;
+        }
+
         if (formData.password !== formData.confirmPassword) {
-            toast.error("Passwords do not match!");
+            setMessage({ type: 'error', text: "Passwords do not match!" });
             return;
         }
 
@@ -33,11 +47,14 @@ function RegisterPage() {
             const newUser = { ...userData, password };
             const { response } = await createUsername(newUser);
             if (response.ok) {
-                toast.success("Account created successfully!");
-                navigate("/login");
+                setMessage({ type: 'success', text: "Account created successfully! Redirecting to login..." });
+                setTimeout(() => navigate("/login"), 1500);
+            } else {
+                const data = await response.json();
+                setMessage({ type: 'error', text: data.error || "Registration failed" });
             }
         } catch (error) {
-            toast.error("Registration failed: " + error.message);
+            setMessage({ type: 'error', text: "Registration failed: " + error.message });
         } finally {
             setLoading(false);
         }
@@ -52,6 +69,12 @@ function RegisterPage() {
                         <h1>Create your Account</h1>
                         <p>to continue to Coordination</p>
                     </div>
+
+                    {message.text && (
+                        <div className={`form-message form-message-${message.type}`}>
+                            {message.text}
+                        </div>
+                    )}
 
                     <form className={"RegisterPage-form"} onSubmit={handleSubmit}>
                         <div className={"RegisterPage-row"}>

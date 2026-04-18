@@ -1,58 +1,51 @@
-const db = require('./database');
-const fs = require('fs');
+const Database = require('better-sqlite3');
 const path = require('path');
 
-const dbJsonPath = path.resolve(__dirname, 'db.json');
-const data = JSON.parse(fs.readFileSync(dbJsonPath, 'utf8'));
+const dbPath = path.resolve(__dirname, 'database.sqlite');
+const db = new Database(dbPath);
 
-// Migrate users
-const insertUser = db.prepare(`
-  INSERT OR IGNORE INTO users (id, firstName, lastName, email, password, username)
-  VALUES (?, ?, ?, ?, ?, ?)
+console.log('Running migrations...');
+
+const applyMigration = (tableName, columnName, definition) => {
+    try {
+        db.prepare(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`).run();
+        console.log(`Added column ${columnName} to ${tableName}`);
+    } catch (err) {
+        if (err.message.includes('duplicate column name')) {
+            console.log(`Column ${columnName} already exists in ${tableName}`);
+        } else {
+            console.error(`Error adding ${columnName} to ${tableName}:`, err.message);
+        }
+    }
+};
+
+// Assignments table
+applyMigration('assignments', 'guidelinesText', 'TEXT');
+applyMigration('assignments', 'guidelinesFile', 'TEXT');
+applyMigration('assignments', 'guidelinesLink', 'TEXT');
+
+// Tasks table
+applyMigration('tasks', 'workingUserId', 'TEXT');
+applyMigration('tasks', 'workStartTime', 'TEXT');
+applyMigration('tasks', 'workExpiryTime', 'TEXT');
+applyMigration('tasks', 'submissionReport', 'TEXT');
+applyMigration('tasks', 'submissionFile', 'TEXT');
+applyMigration('tasks', 'submissionLink', 'TEXT');
+applyMigration('tasks', 'submissionStatus', "TEXT DEFAULT 'PENDING'");
+
+// Create notifications table if not exists (handled by database.js as well, but being safe)
+db.exec(`
+  CREATE TABLE IF NOT EXISTS notifications (
+    id TEXT PRIMARY KEY,
+    groupId TEXT,
+    userId TEXT,
+    type TEXT,
+    message TEXT,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (groupId) REFERENCES groups(id),
+    FOREIGN KEY (userId) REFERENCES users(id)
+  );
 `);
 
-data.users.forEach(user => {
-  insertUser.run(user.id, user.firstName, user.lastName, user.email, user.password, user.username);
-});
-
-// Migrate groups
-const insertGroup = db.prepare(`
-  INSERT OR IGNORE INTO groups (id, groupName, groupDescription, creatorId, inviteCode)
-  VALUES (?, ?, ?, ?, ?)
-`);
-
-const insertMember = db.prepare(`
-  INSERT OR IGNORE INTO group_members (groupId, userId)
-  VALUES (?, ?)
-`);
-
-data.groups.forEach(group => {
-  const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-  insertGroup.run(group.id, group.groupName, group.groupDescription, group.creatorId, inviteCode);
-  
-  group.members.forEach(memberId => {
-    insertMember.run(group.id, memberId);
-  });
-});
-
-// Migrate assignments
-const insertAssignment = db.prepare(`
-  INSERT OR IGNORE INTO assignments (id, assignmentName, assignmentDescription, creatorId, groupId)
-  VALUES (?, ?, ?, ?, ?)
-`);
-
-data.assignments.forEach(ass => {
-  insertAssignment.run(ass.id, ass.assignmentName, ass.assignmentDescription, ass.creatorId, ass.parentGroup);
-});
-
-// Migrate tasks
-const insertTask = db.prepare(`
-  INSERT OR IGNORE INTO tasks (id, taskName, taskDescription, responsibleMemberId, startDate, deadLine, parentAssignmentId, state)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-`);
-
-data.tasks.forEach(task => {
-  insertTask.run(task.id, task.taskName, task.taskDescription, task.responsibleMember, task.startDate, task.deadLine, task.parentAssignment, task.state);
-});
-
-console.log('Migration completed successfully!');
+console.log('Migrations completed.');
+process.exit(0);

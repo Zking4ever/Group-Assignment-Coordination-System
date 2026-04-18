@@ -1,5 +1,6 @@
 import '../assets/css/ProfilePage.css';
 import { fetchUsers, editProfile } from '@services/authService'
+import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -37,7 +38,7 @@ function ProfilePage() {
         setLoading(true);
 
         if (newPassword && newPassword !== confirmPass) {
-            alert("Passwords do not match!");
+            toast.error("Passwords do not match!");
             setLoading(false);
             return;
         }
@@ -51,11 +52,11 @@ function ProfilePage() {
             const { response } = await editProfile(user.id, updatedUser);
             if (response.ok) {
                 localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-                alert("Profile updated successfully!");
+                toast.success("Profile updated successfully!");
                 navigate("/home");
             }
         } catch (error) {
-            alert(error.message);
+            toast.error(error.message);
         } finally {
             setLoading(false);
         }

@@ -4,6 +4,7 @@ import { joinGroupByCode } from '@services/authService'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 function GroupJoin({ setView }) {
     const navigate = useNavigate();
@@ -19,17 +20,17 @@ function GroupJoin({ setView }) {
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
         if (!classCode.trim()) return;
-        
+
         setLoading(true);
         try {
             const { response, data } = await joinGroupByCode(classCode, currentUser.id);
             if (response.ok) {
                 navigate(`/group/${data.groupId}`);
             } else {
-                alert(data.error || "Failed to join group. Please check the code.");
+                toast.error(data.error || "Failed to join group. Please check the code.");
             }
         } catch (error) {
-            alert(error.message);
+            toast.error(error.message);
         } finally {
             setLoading(false);
         }
@@ -43,9 +44,9 @@ function GroupJoin({ setView }) {
                         <FontAwesomeIcon icon={faTimes} />
                     </button>
                     <h2>Join Group</h2>
-                    <button 
-                        className={"GroupJoin-joinBtn"} 
-                        onClick={handleSubmit} 
+                    <button
+                        className={"GroupJoin-joinBtn"}
+                        onClick={handleSubmit}
                         disabled={loading || !classCode}
                     >
                         Join
@@ -68,11 +69,11 @@ function GroupJoin({ setView }) {
                     <div className={"GroupJoin-codeCard"}>
                         <h3>Group code</h3>
                         <p>Ask your fellows for the group code, then enter it here.</p>
-                        <input 
-                            type="text" 
-                            value={classCode} 
-                            placeholder="Group code" 
-                            className={"GroupJoin-input"} 
+                        <input
+                            type="text"
+                            value={classCode}
+                            placeholder="Group code"
+                            className={"GroupJoin-input"}
                             onChange={(e) => setClassCode(e.target.value)}
                         />
                     </div>
