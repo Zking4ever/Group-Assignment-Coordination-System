@@ -5,10 +5,14 @@ import AssignmentCard from '@components/AssignmentCard.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import Modal from './Modal';
 
 function AssignmentList({ groupId, isOwner }) {
     const [assignments, setAssignments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [assToDelete, setAssToDelete] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -19,6 +23,7 @@ function AssignmentList({ groupId, isOwner }) {
                 setAssignments(groupAssignments);
             } catch (error) {
                 console.error("Error loading assignments:", error);
+                toast.error("Failed to load assignments");
             } finally {
                 setLoading(false);
             }
@@ -26,13 +31,21 @@ function AssignmentList({ groupId, isOwner }) {
         loadData();
     }, [groupId]);
 
-    const handleDelete = async (id) => {
-        if (!window.confirm("Delete assignment and all its tasks?")) return;
+    const handleDeleteClick = (id) => {
+        setAssToDelete(id);
+        setIsModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!assToDelete) return;
         try {
-            await deleteAssignment(id);
-            setAssignments(prev => prev.filter(a => a.id !== id));
+            await deleteAssignment(assToDelete);
+            setAssignments(prev => prev.filter(a => a.id !== assToDelete));
+            toast.success("Assignment deleted");
+            setIsModalOpen(false);
+            setAssToDelete(null);
         } catch (error) {
-            alert(error.message);
+            toast.error(error.message);
         }
     };
 
@@ -61,11 +74,25 @@ function AssignmentList({ groupId, isOwner }) {
                             key={ass.id}
                             assignment={ass}
                             onClick={() => navigate(`/group/${groupId}/assignment/${ass.id}`)}
-                            onDelete={isOwner ? () => handleDelete(ass.id) : null}
+                            onDelete={isOwner ? () => handleDeleteClick(ass.id) : null}
                         />
                     ))
                 )}
             </div>
+
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Delete Assignment"
+                footer={(
+                    <>
+                        <button className="Modal-btn Modal-btn-cancel" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                        <button className="Modal-btn Modal-btn-danger" onClick={confirmDelete}>Delete</button>
+                    </>
+                )}
+            >
+                <p>Are you sure you want to delete this assignment and all its tasks? This action cannot be undone.</p>
+            </Modal>
         </div>
     );
 }

@@ -1,0 +1,122 @@
+.Modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.Modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.Modal-content {
+  position: relative;
+  background: var(--surface-color);
+  width: 100%;
+  max-width: 500px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.Modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.Modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.Modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Modal-close:hover {
+  background: var(--bg-color);
+  color: var(--text-primary);
+}
+
+.Modal-body {
+  padding: 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.Modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.Modal-btn {
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.Modal-btn-cancel {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.Modal-btn-cancel:hover {
+  background: var(--surface-color);
+  border-color: var(--text-muted);
+}
+
+.Modal-btn-danger {
+  background: var(--error-color);
+  border: none;
+  color: white;
+}
+
+.Modal-btn-danger:hover {
+  filter: brightness(0.9);
+}
+
+.Modal-btn-primary {
+  background: var(--primary-color);
+  border: none;
+  color: white;
+}
+
+.Modal-btn-primary:hover {
+  background: var(--primary-hover);
+}

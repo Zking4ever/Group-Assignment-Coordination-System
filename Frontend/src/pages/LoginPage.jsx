@@ -2,6 +2,7 @@ import '../assets/css/LoginPage.css';
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { checkAcc } from '@services/authService'
+import toast from 'react-hot-toast';
 
 function LoginPage() {
     const navigate = useNavigate();
@@ -18,12 +19,13 @@ function LoginPage() {
             if (response.ok && data.length > 0) {
                 const user = data[0];
                 localStorage.setItem("currentUser", JSON.stringify(user));
+                toast.success("Welcome back, " + user.firstName + "!");
                 navigate("/home");
             } else {
-                alert("Invalid email or password!");
+                toast.error("Invalid email or password!");
             }
         } catch (error) {
-            alert("Login failed: " + error.message);
+            toast.error("Login failed: " + error.message);
         } finally {
             setLoading(false);
         }

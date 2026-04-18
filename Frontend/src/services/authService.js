@@ -319,3 +319,28 @@ export const deleteTask = async (taskId) => {
 
   return { response, data };
 };
+
+export const kickMember = async (groupId, userId) => {
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const response = await fetch(`${BASE_URL}/groups/${groupId}/members/${userId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "x-user-id": currentUser?.id
+    }
+  });
+  const data = await response.json();
+  return { response, data };
+};
+
+export const getAiBreakdown = async (assignmentName, assignmentDescription, memberCount) => {
+  const response = await fetch(`${BASE_URL}/ai/breakdown`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ assignmentName, assignmentDescription, memberCount })
+  });
+  const data = await response.json();
+  return { response, data };
+};

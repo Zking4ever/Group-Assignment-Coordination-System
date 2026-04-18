@@ -2,6 +2,7 @@ import '../assets/css/RegisterPage.css';
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { createUsername } from '@services/authService'
+import toast from 'react-hot-toast';
 
 function RegisterPage() {
     const navigate = useNavigate();
@@ -22,7 +23,7 @@ function RegisterPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match!");
+            toast.error("Passwords do not match!");
             return;
         }
 
@@ -32,11 +33,11 @@ function RegisterPage() {
             const newUser = { ...userData, password };
             const { response } = await createUsername(newUser);
             if (response.ok) {
-                alert("Account created successfully!");
+                toast.success("Account created successfully!");
                 navigate("/login");
             }
         } catch (error) {
-            alert("Registration failed: " + error.message);
+            toast.error("Registration failed: " + error.message);
         } finally {
             setLoading(false);
         }

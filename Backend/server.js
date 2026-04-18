@@ -133,6 +133,29 @@ app.delete('/groups/:id', (req, res) => {
   }
 });
 
+app.delete('/groups/:groupId/members/:userId', (req, res) => {
+  const { groupId, userId } = req.params;
+  const requesterId = req.headers['x-user-id']; // Simple way to pass current user
+
+  try {
+    const group = db.prepare('SELECT creatorId FROM groups WHERE id = ?').get(groupId);
+    if (!group) return res.status(404).json({ error: 'Group not found' });
+
+    if (group.creatorId !== requesterId) {
+      return res.status(403).json({ error: 'Only the group owner can kick members' });
+    }
+
+    if (group.creatorId === userId) {
+      return res.status(400).json({ error: 'Owner cannot be kicked' });
+    }
+
+    db.prepare('DELETE FROM group_members WHERE groupId = ? AND userId = ?').run(groupId, userId);
+    res.json({ message: 'Member kicked successfully' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 app.post('/groups/join', (req, res) => {
   const { inviteCode, userId } = req.body;
   try {
@@ -145,6 +168,59 @@ app.post('/groups/join', (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
+});
+
+app.post('/ai/breakdown', (req, res) => {
+  const { assignmentName, assignmentDescription, memberCount } = req.body;
+
+  // Smart Simulator Logic
+  // In a real app, this would call an LLM API
+  const mockTasks = [
+    {
+      taskName: `Research for ${assignmentName}`,
+      taskDescription: `Initial research and documentation for ${assignmentDescription}.`,
+      estimatedHours: 4
+    },
+    {
+      taskName: `Drafting Structure`,
+      taskDescription: `Creating the main outline and structure of the assignment.`,
+      estimatedHours: 3
+    },
+    {
+      taskName: `Core Implementation/Writing`,
+      taskDescription: `Executing the main parts of the assignment.`,
+      estimatedHours: 8
+    },
+    {
+      taskName: `Review & Quality Assurance`,
+      taskDescription: `Final proofreading and checking against requirements.`,
+      estimatedHours: 3
+    }
+  ];
+
+  // Adjust based on member count
+  let resultTasks = [...mockTasks];
+  if (memberCount > 4) {
+    resultTasks.push({
+      taskName: `Presentation/Final Formatting`,
+      taskDescription: `Preparing the final delivery format and presentation materials.`,
+      estimatedHours: 5
+    });
+  }
+
+  // Add some variety based on description length
+  if (assignmentDescription.length > 100) {
+    resultTasks[2].taskName = `Detailed Implementation - Part 1`;
+    resultTasks.push({
+      taskName: `Detailed Implementation - Part 2`,
+      taskDescription: `Continuing the work started in Part 1.`,
+      estimatedHours: 8
+    });
+  }
+
+  setTimeout(() => {
+    res.json({ tasks: resultTasks });
+  }, 1500); // Simulate network/AI delay
 });
 
 

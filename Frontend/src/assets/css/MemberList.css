@@ -1,51 +1,117 @@
 .MemberList-peopleContainer {
   max-width: 800px;
-  margin: 0 auto;
+  margin: 20px auto;
+  padding: 0 20px;
 }
 
 .MemberList-section {
   margin-bottom: 48px;
+  animation: fadeIn 0.5s ease-out forwards;
 }
 
 .MemberList-sectionHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .MemberList-sectionHeader h2 {
-  font-size: 32px;
-  font-weight: 400;
+  font-size: 1.75rem;
+  font-weight: 600;
   color: var(--primary-color);
+  letter-spacing: -0.025em;
 }
 
 .MemberList-addIcon {
   color: var(--primary-color);
+  background: var(--primary-light);
+  width: 36px;
+  height: 36px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.MemberList-addIcon:hover {
+  transform: scale(1.1);
+  background: var(--primary-color);
+  color: white;
 }
 
 .MemberList-divider {
-  height: 1px;
-  background-color: var(--primary-color);
+  height: 2px;
+  background: linear-gradient(to right, var(--primary-color), transparent);
   margin-bottom: 16px;
+  border-radius: 2px;
 }
 
 .MemberList-personRow {
   display: flex;
   align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border-color);
+  justify-content: space-between;
+  padding: 16px;
+  background: var(--surface-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.MemberList-personRow:hover {
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.MemberList-personInfo {
+  display: flex;
+  align-items: center;
   gap: 16px;
 }
 
 .MemberList-avatarIcon {
-  font-size: 32px;
-  color: var(--text-secondary);
+  font-size: 2.25rem;
+  color: var(--text-muted);
+  background: var(--bg-color);
+  border-radius: 50%;
+}
+
+.MemberList-kickBtn {
+  color: var(--text-muted);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.MemberList-kickBtn:hover {
+  color: var(--error-color);
+  background: #fee2e2;
 }
 
 .MemberList-empty {
-  padding: 24px 0;
+  padding: 32px 0;
   text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  background: var(--bg-color);
+  border-radius: var(--radius-md);
+}
+
+.MemberList-loading {
+  text-align: center;
+  padding: 40px;
   color: var(--text-secondary);
+  font-weight: 500;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
