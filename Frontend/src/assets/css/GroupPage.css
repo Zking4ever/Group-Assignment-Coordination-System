@@ -1,5 +1,6 @@
 .GroupPage-groupPage {
-  max-width: 1000px;
+  padding: 24px;
+  max-width: 1200px;
   margin: 0 auto;
   padding-bottom: 40px;
 }
@@ -7,12 +8,30 @@
 .GroupPage-banner {
   height: 240px;
   border-radius: 8px;
-  margin-bottom: 24px;
+  margin-bottom: 34px;
   display: flex;
   align-items: flex-end;
   padding: 24px;
   color: white;
   background: var(--primary-color);
+}
+.GroupPage-bannerContent {
+  width: 90%;
+  margin: 0 auto;
+  padding: 10px 30px;
+  transform: translateY(50%);
+  background-color: white;
+  color: black;
+  border-radius: 8px;
+}
+.GroupPage-bannerContent .GroupCode-badge{
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 20px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  font-family: monospace;
 }
 
 .GroupPage-bannerContent h1 {

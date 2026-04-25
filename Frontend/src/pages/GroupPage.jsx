@@ -4,15 +4,17 @@ import GroupworkContent from '@components/AssignmentList.jsx'
 import MemberList from '@components/MemberList.jsx'
 import { fetchGroups } from '@services/authService.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClipboardList } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faClipboardList, faCopy } from '@fortawesome/free-solid-svg-icons';
+import toast from 'react-hot-toast';
 import '../assets/css/GroupPage.css';
 
 function GroupPage() {
     const { groupId } = useParams();
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('stream');
+    const [activeTab, setActiveTab] = useState('groupwork');
     const [group, setGroup] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
+    const [copying, setCopying] = useState(false);
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -31,6 +33,13 @@ function GroupPage() {
         loadGroup();
     }, [groupId]);
 
+     const handleCopyCode = () => {
+        navigator.clipboard.writeText(group.inviteCode);
+        setCopying(true);
+        setTimeout(() => setCopying(false), 2000);
+        toast.success("Invite code copied!");
+    };
+
     if (!group) return <div className={"GroupPage-loading"}>Loading group...</div>;
 
     const isOwner = group.creatorId === currentUser?.id;
@@ -42,9 +51,10 @@ function GroupPage() {
                     <h1>{group.groupName}</h1>
                     <p>{group.groupDescription}</p>
                     {isOwner && (
-                        <div className={"GroupPage-inviteContainer"}>
-                            <span className={"GroupPage-inviteLabel"}>Invite code:</span>
-                            <span className={"GroupPage-inviteCode"}>{group.inviteCode}</span>
+                        <div className="GroupCode-badge" onClick={handleCopyCode}>
+                            <span className="Code-label">INVITE CODE:</span>
+                            <span className="Code-value">{group.inviteCode}</span>
+                            <FontAwesomeIcon icon={copying ? faCheck : faCopy} className="Copy-icon" />
                         </div>
                     )}
                 </div>
@@ -52,16 +62,16 @@ function GroupPage() {
 
             <div className={"GroupPage-tabBar"}>
                 <button
-                    className={`${"GroupPage-tab"} ${activeTab === 'stream' ? "GroupPage-active" : ''}`}
-                    onClick={() => setActiveTab('stream')}
-                >
-                    Stream
-                </button>
-                <button
                     className={`${"GroupPage-tab"} ${activeTab === 'groupwork' ? "GroupPage-active" : ''}`}
                     onClick={() => setActiveTab('groupwork')}
                 >
                     Assignments
+                </button>
+                <button
+                    className={`${"GroupPage-tab"} ${activeTab === 'stream' ? "GroupPage-active" : ''}`}
+                    onClick={() => setActiveTab('stream')}
+                >
+                    Messages
                 </button>
                 <button
                     className={`${"GroupPage-tab"} ${activeTab === 'people' ? "GroupPage-active" : ''}`}
