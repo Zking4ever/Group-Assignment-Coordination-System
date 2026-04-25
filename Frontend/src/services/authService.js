@@ -3,7 +3,7 @@ const BASE_URL = "http://localhost:5000";
 
 //LOGIN PAGE 
 export const checkAcc = async (email, password) => {
-  const response = await fetch(`${BASE_URL}/login`, {
+  const response = await fetch(`${BASE_URL}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -59,14 +59,14 @@ export const fetchGroups = async (groupId = null) => {
 };
 
 
-// set up username
-export const createUsername = async (username) => {
-  const response = await fetch(`${BASE_URL}/users`, {
+// set up registration
+export const createUsername = async (userData) => {
+  const response = await fetch(`${BASE_URL}/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(username)
+    body: JSON.stringify(userData)
   });
 
   let data = {};
