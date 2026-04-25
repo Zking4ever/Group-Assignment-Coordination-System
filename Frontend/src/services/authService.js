@@ -109,12 +109,11 @@ export const fetchUserData = async (id) => {
 
 //assignment create
 export const createNewAss = async (newAssData) => {
+  const isFormData = newAssData instanceof FormData;
   const response = await fetch(`${BASE_URL}/assignments`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(newAssData)
+    headers: isFormData ? {} : { "Content-Type": "application/json" },
+    body: isFormData ? newAssData : JSON.stringify(newAssData)
   });
 
   let data = {};
@@ -339,13 +338,13 @@ export const kickMember = async (groupId, userId) => {
   return { response, data };
 };
 
-export const getAiBreakdown = async (assignmentName, assignmentDescription, memberCount) => {
+export const getAiBreakdown = async (assignmentName, assignmentDescription, memberCount, guidelinesText) => {
   const response = await fetch(`${BASE_URL}/ai/breakdown`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ assignmentName, assignmentDescription, memberCount })
+    body: JSON.stringify({ assignmentName, assignmentDescription, memberCount, guidelinesText })
   });
   const data = await response.json();
   return { response, data };

@@ -14,23 +14,22 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Security Middlewares
-app.use(helmet()); // Sets various HTTP headers for security
-app.use(cors());
-app.use(express.json());
-
 // Rate Limiting
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP, please try again after 15 minutes"
+  windowMs: 15 * 60 * 1000,
+  max: 50, // 50 attempts per 15 minutes
+  message: { error: "Too many authentication attempts, please try again after 15 minutes." }
 });
 
-app.use('/auth', authLimiter); // Apply to login/register routes if they start with /auth
-app.use('/users', authLimiter); // Apply to user routes for now as they handle auth tasks
+// App Config
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
+app.use('/auth', authLimiter);
 
 // Gemini AI Setup
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.trim() : "", { apiVersion: "v1" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Multer Configuration
@@ -49,41 +48,55 @@ app.get('/', (req, res) => {
 });
 
 // --- Users (Auth) ---
-app.post('/login', async (req, res) => {
+// --- Auth Routes ---
+app.post('/auth/login', async (req, res) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+
   try {
     const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
     if (user && await bcrypt.compare(password, user.password)) {
       const userCopy = { ...user };
       delete userCopy.password;
-      res.json([userCopy]); // Maintaining array return to keep frontend compatibility
+      res.json([userCopy]);
     } else {
       res.status(401).json({ error: 'Invalid email or password' });
     }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error during login' });
   }
 });
 
-app.get('/users', (req, res) => {
-  // We should ideally remove this endpoint or protect it
-  const users = db.prepare('SELECT id, firstName, lastName, email, username FROM users').all();
-  res.json(users);
-});
-
-app.post('/users', async (req, res) => {
+app.post('/auth/register', async (req, res) => {
   const { firstName, lastName, email, password, username } = req.body;
+  if (!email || !password || !username) {
+    return res.status(400).json({ error: 'Required fields missing' });
+  }
+
   const id = uuidv4();
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    
+
     db.prepare('INSERT INTO users (id, firstName, lastName, email, password, username) VALUES (?, ?, ?, ?, ?, ?)')
       .run(id, firstName, lastName, email, hashedPassword, username);
+    
     res.status(201).json({ id, firstName, lastName, email, username });
   } catch (err) {
-    res.status(400).json({ error: "Could not create user. Email or username might already exist." });
+    if (err.message.includes('UNIQUE')) {
+      res.status(400).json({ error: 'Email or username already exists' });
+    } else {
+      res.status(400).json({ error: 'Registration failed: ' + err.message });
+    }
   }
+});
+
+// --- User Routes ---
+app.get('/users', (req, res) => {
+  const users = db.prepare('SELECT id, firstName, lastName, email, username FROM users').all();
+  res.json(users);
 });
 
 app.patch('/users/:id', (req, res) => {
@@ -240,7 +253,7 @@ app.get('/notifications/:groupId', (req, res) => {
 });
 
 app.post('/ai/breakdown', async (req, res) => {
-  const { assignmentName, assignmentDescription, memberCount } = req.body;
+  const { assignmentName, assignmentDescription, memberCount, guidelinesText } = req.body;
 
   if (!process.env.GEMINI_API_KEY) {
     return res.status(500).json({ error: "Gemini API key not configured. Please add it to .env" });
@@ -251,12 +264,13 @@ app.post('/ai/breakdown', async (req, res) => {
     
     Assignment Name: ${assignmentName}
     Description: ${assignmentDescription}
+    ${guidelinesText ? `Project Guidelines: ${guidelinesText}` : ""}
     Member Count: ${memberCount}
     
     Return the response ONLY as a JSON object with a "tasks" array. Each task should have:
     - "taskName": a short, clear name
     - "taskDescription": a detailed description of what needs to be done
-    - "estimatedHours": a numberrepresenting the time effort
+    - "estimatedHours": a number representing the time effort
     
     Format: {"tasks": [{"taskName": "...", "taskDescription": "...", "estimatedHours": 0}, ...]}
   `;
@@ -285,13 +299,14 @@ app.get('/assignments', (req, res) => {
   res.json(assignments.map(a => ({ ...a, parentGroup: a.groupId })));
 });
 
-app.post('/assignments', (req, res) => {
-  const { assignmentName, assignmentDescription, creatorId, parentGroup } = req.body;
+app.post('/assignments', upload.single('guidelineFile'), (req, res) => {
+  const { assignmentName, assignmentDescription, creatorId, parentGroup, guidelinesText, guidelinesLink } = req.body;
+  const guidelinesFile = req.file ? `/uploads/${req.file.filename}` : null;
   const id = uuidv4();
   try {
-    db.prepare('INSERT INTO assignments (id, assignmentName, assignmentDescription, creatorId, groupId) VALUES (?, ?, ?, ?, ?)')
-      .run(id, assignmentName, assignmentDescription, creatorId, parentGroup);
-    res.status(201).json({ id, assignmentName, assignmentDescription, creatorId, parentGroup });
+    db.prepare('INSERT INTO assignments (id, assignmentName, assignmentDescription, creatorId, groupId, guidelinesText, guidelinesLink, guidelinesFile) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+      .run(id, assignmentName, assignmentDescription, creatorId, parentGroup, guidelinesText || null, guidelinesLink || null, guidelinesFile || null);
+    res.status(201).json({ id, assignmentName, assignmentDescription, creatorId, parentGroup, guidelinesFile });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -361,20 +376,20 @@ app.patch('/tasks/:id/start-work', (req, res) => {
 
 // Record Expired Session (internal use or trigger from frontend)
 app.post('/tasks/:id/record-expiry', (req, res) => {
-    const { id } = req.params;
-    const { userId } = req.body;
-    try {
-        const task = db.prepare('SELECT parentAssignmentId FROM tasks WHERE id = ?').get(id);
-        const assignment = db.prepare('SELECT groupId FROM assignments WHERE id = ?').get(task.parentAssignmentId);
-        
-        const notifId = uuidv4();
-        const message = `Task work session expired for user ${userId}`;
-        db.prepare('INSERT INTO notifications (id, groupId, userId, type, message) VALUES (?, ?, ?, ?, ?)')
-          .run(notifId, assignment.groupId, userId, 'SESSION_EXPIRED', message);
-        res.json({ message: 'Expiry recorded' });
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
+  const { id } = req.params;
+  const { userId } = req.body;
+  try {
+    const task = db.prepare('SELECT parentAssignmentId FROM tasks WHERE id = ?').get(id);
+    const assignment = db.prepare('SELECT groupId FROM assignments WHERE id = ?').get(task.parentAssignmentId);
+
+    const notifId = uuidv4();
+    const message = `Task work session expired for user ${userId}`;
+    db.prepare('INSERT INTO notifications (id, groupId, userId, type, message) VALUES (?, ?, ?, ?, ?)')
+      .run(notifId, assignment.groupId, userId, 'SESSION_EXPIRED', message);
+    res.json({ message: 'Expiry recorded' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 // Submit Work

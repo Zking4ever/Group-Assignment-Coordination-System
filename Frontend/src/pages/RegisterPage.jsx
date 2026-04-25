@@ -45,13 +45,12 @@ function RegisterPage() {
         try {
             const { password, confirmPassword, ...userData } = formData;
             const newUser = { ...userData, password };
-            const { response } = await createUsername(newUser);
+            const { response, data } = await createUsername(newUser);
             if (response.ok) {
                 setMessage({ type: 'success', text: "Account created successfully! Redirecting to login..." });
                 setTimeout(() => navigate("/login"), 1500);
             } else {
-                const data = await response.json();
-                setMessage({ type: 'error', text: data.error || "Registration failed" });
+                setMessage({ type: 'error', text: data?.error || "Registration failed" });
             }
         } catch (error) {
             setMessage({ type: 'error', text: "Registration failed: " + error.message });

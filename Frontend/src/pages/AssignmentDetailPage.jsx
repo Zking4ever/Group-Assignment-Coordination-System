@@ -9,10 +9,12 @@ import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatRelativeDeadline } from '../utils/timeUtils';
 
-function DraggableTask({ task, id }) {
+function EditableAiTask({ task, index, onUpdate }) {
+    const [isEditing, setIsEditing] = useState(false);
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-        id: id,
-        data: { task }
+        id: `ai-${index}`,
+        data: { task },
+        disabled: isEditing
     });
 
     const style = transform ? {
@@ -21,14 +23,65 @@ function DraggableTask({ task, id }) {
         opacity: isDragging ? 0.5 : 1,
     } : undefined;
 
+    const handleBlur = (e) => {
+        // Only close if the new focus is not inside the card
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+            setIsEditing(false);
+        }
+    };
+
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="AiTask-card">
-            <FontAwesomeIcon icon={faGripVertical} className="AiTask-grip" />
+        <div 
+            ref={setNodeRef} 
+            style={style} 
+            {...attributes} 
+            {...listeners} 
+            className={`AiTask-card ${isEditing ? 'editing' : ''}`}
+            onBlur={handleBlur}
+        >
+            {!isEditing && <FontAwesomeIcon icon={faGripVertical} className="AiTask-grip" />}
             <div className="AiTask-info">
-                <h4>{task.taskName}</h4>
-                <p>{task.taskDescription}</p>
+                {isEditing ? (
+                    <>
+                        <input 
+                            className="AiTask-nameInput" 
+                            name="taskName"
+                            value={task.taskName} 
+                            autoFocus
+                            onChange={(e) => onUpdate(index, { ...task, taskName: e.target.value })}
+                        />
+                        <textarea 
+                            className="AiTask-descInput" 
+                            name="taskDescription"
+                            value={task.taskDescription} 
+                            onChange={(e) => onUpdate(index, { ...task, taskDescription: e.target.value })}
+                        />
+                    </>
+                ) : (
+                    <>
+                        <div className="AiTask-titleRow">
+                            <h4>{task.taskName}</h4>
+                            <button className="AiTask-editBtn" onClick={() => setIsEditing(true)}>
+                                <FontAwesomeIcon icon={faEdit} />
+                            </button>
+                        </div>
+                        <p>{task.taskDescription}</p>
+                    </>
+                )}
+                
                 <div className="AiTask-footer">
-                    <span>Est: {task.estimatedHours}h</span>
+                    <span>Est: </span>
+                    {isEditing ? (
+                        <input 
+                            type="number" 
+                            className="AiTask-hourInput" 
+                            value={task.estimatedHours} 
+                            onChange={(e) => onUpdate(index, { ...task, estimatedHours: e.target.value })}
+                        />
+                    ) : (
+                        <strong>{task.estimatedHours}</strong>
+                    )}
+                    <span>h</span>
                 </div>
             </div>
         </div>
@@ -145,7 +198,8 @@ function AssignmentDetailPage() {
             const { data } = await getAiBreakdown(
                 assignment.assignmentName,
                 assignment.assignmentDescription,
-                members.length
+                members.length,
+                assignment.guidelinesText
             );
             if (data.error) {
                 toast.error(data.error);
@@ -161,35 +215,50 @@ function AssignmentDetailPage() {
         }
     };
 
+    const [confirmingTask, setConfirmingTask] = useState(null);
+
     const handleDragEnd = async (event) => {
         const { active, over } = event;
 
         if (over && active.data.current) {
             const { task } = active.data.current;
             const memberId = over.id;
+            const member = members.find(m => m.id === memberId);
 
             if (active.id.toString().startsWith('ai-')) {
-                const newTaskDetails = {
-                    taskName: task.taskName,
-                    taskDescription: task.taskDescription,
+                setConfirmingTask({
+                    ...task,
                     responsibleMember: memberId,
+                    memberName: `${member.firstName} ${member.lastName}`,
                     startDate: new Date().toISOString().split('T')[0],
                     deadLine: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    parentAssignment: assignmentId,
-                    state: 'yet'
-                };
-
-                try {
-                    const { response } = await createNewTask(newTaskDetails);
-                    if (response.ok) {
-                        toast.success(`Assigned "${task.taskName}" to member`);
-                        setAiTasks(prev => prev.filter((_, idx) => `ai-${idx}` !== active.id));
-                        loadData();
-                    }
-                } catch (error) {
-                    toast.error("Failed to assign task");
-                }
+                    aiIndex: active.id
+                });
             }
+        }
+    };
+
+    const confirmTaskAssignment = async () => {
+        const newTaskDetails = {
+            taskName: confirmingTask.taskName,
+            taskDescription: confirmingTask.taskDescription,
+            responsibleMember: confirmingTask.responsibleMember,
+            startDate: confirmingTask.startDate,
+            deadLine: confirmingTask.deadLine,
+            parentAssignment: assignmentId,
+            state: 'yet'
+        };
+
+        try {
+            const { response } = await createNewTask(newTaskDetails);
+            if (response.ok) {
+                toast.success(`Assigned "${confirmingTask.taskName}" to ${confirmingTask.memberName}`);
+                setAiTasks(prev => prev.filter((_, idx) => `ai-${idx}` !== confirmingTask.aiIndex));
+                setConfirmingTask(null);
+                loadData();
+            }
+        } catch (error) {
+            toast.error("Failed to assign task");
         }
     };
 
@@ -249,9 +318,18 @@ function AssignmentDetailPage() {
                         ) : (
                             <h1 onClick={() => isOwner && setIsEditingTitle(true)}>
                                 {assignment.assignmentName}
-                                {isOwner && <FontAwesomeIcon icon={faEdit} className="Inline-editIcon" />}
-                            </h1>
+                                </h1>
                         )}
+                        <div className="Header-badges">
+                            <span className="Badge-info">
+                                <FontAwesomeIcon icon={faMagicWandSparkles} /> AI Enabled
+                            </span>
+                            {(assignment.guidelinesText || assignment.guidelinesFile) && (
+                                <span className="Badge-guideline">
+                                    <FontAwesomeIcon icon={faPaperclip} /> Guidelines Included
+                                </span>
+                            )}
+                        </div>
                         <div className={`Description-wrapper ${showFullDesc ? 'expanded' : ''}`}>
                             <p>{assignment.assignmentDescription}</p>
                             {assignment.assignmentDescription.length > 150 && (
@@ -336,7 +414,24 @@ function AssignmentDetailPage() {
                                     exit={{ opacity: 0, x: -20 }}
                                     className="AssignmentDetailPage-aiView"
                                 >
-                                    {/* ... existing AI View layout ... */}
+                                    <div className="AiView-header">
+                                        <h3>AI Generated Drafts</h3>
+                                        <p>Edit details before dragging to a member</p>
+                                    </div>
+                                    <div className="AiView-tasks">
+                                        {aiTasks.map((task, idx) => (
+                                            <EditableAiTask 
+                                                key={`ai-${idx}`} 
+                                                task={task} 
+                                                index={idx} 
+                                                onUpdate={(i, updated) => {
+                                                    const newTs = [...aiTasks];
+                                                    newTs[i] = updated;
+                                                    setAiTasks(newTs);
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -386,6 +481,47 @@ function AssignmentDetailPage() {
                     </aside>
                 </div>
             </main>
+
+            {confirmingTask && (
+                <div className="TaskConfirm-overlay">
+                    <div className="TaskConfirm-modal">
+                        <h3>Confirm Assignment</h3>
+                        <p>Assigning to <strong>{confirmingTask.memberName}</strong></p>
+                        
+                        <div className="Form-group">
+                            <label>Task Name</label>
+                            <input 
+                                value={confirmingTask.taskName} 
+                                onChange={(e) => setConfirmingTask({...confirmingTask, taskName: e.target.value})}
+                            />
+                        </div>
+                        
+                        <div className="Form-group">
+                            <label>Instructions</label>
+                            <textarea 
+                                value={confirmingTask.taskDescription} 
+                                onChange={(e) => setConfirmingTask({...confirmingTask, taskDescription: e.target.value})}
+                            />
+                        </div>
+
+                        <div className="Form-row">
+                            <div className="Form-group">
+                                <label>Deadline</label>
+                                <input 
+                                    type="date"
+                                    value={confirmingTask.deadLine} 
+                                    onChange={(e) => setConfirmingTask({...confirmingTask, deadLine: e.target.value})}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="Modal-actions">
+                            <button className="btn-cancel" onClick={() => setConfirmingTask(null)}>Cancel</button>
+                            <button className="btn-confirm" onClick={confirmTaskAssignment}>Finalize Assignment</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -3,7 +3,7 @@ import { createNewAss, createNewTask, fetchGroupMembers } from '@services/authSe
 import toast from 'react-hot-toast';
 import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faAlignLeft } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faAlignLeft, faPaperclip, faLink, faMagicWandSparkles } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate, useParams } from 'react-router-dom';
 
 function TaskCreate({ type = "task" }) {
@@ -18,8 +18,11 @@ function TaskCreate({ type = "task" }) {
         responsibleMember: "",
         startDate: new Date().toISOString().split("T")[0],
         deadLine: "",
-        state: "YET",
+        state: "yet",
+        guidelinesText: "",
+        guidelinesLink: "",
     });
+    const [guidelineFile, setGuidelineFile] = useState(null);
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -49,13 +52,16 @@ function TaskCreate({ type = "task" }) {
         setLoading(true);
         try {
             if (type === "assignment") {
-                const newAss = {
-                    assignmentName: taskDetail.taskName,
-                    assignmentDescription: taskDetail.taskDescription,
-                    parentGroup: groupId,
-                    creatorId: currentUser.id
-                };
-                const { response } = await createNewAss(newAss);
+                const formData = new FormData();
+                formData.append("assignmentName", taskDetail.taskName);
+                formData.append("assignmentDescription", taskDetail.taskDescription);
+                formData.append("parentGroup", groupId);
+                formData.append("creatorId", currentUser.id);
+                formData.append("guidelinesText", taskDetail.guidelinesText);
+                formData.append("guidelinesLink", taskDetail.guidelinesLink);
+                if (guidelineFile) formData.append("guidelineFile", guidelineFile);
+
+                const { response } = await createNewAss(formData);
                 if (response.ok) {
                     navigate(`/group/${groupId}`);
                 } else {
@@ -125,7 +131,50 @@ function TaskCreate({ type = "task" }) {
                             value={taskDetail.taskDescription}
                             onChange={handleChange}
                         />
+                        {isAssignment && (
+                            <div className="Ai-notice">
+                                <FontAwesomeIcon icon={faMagicWandSparkles} />
+                                This description will be used by AI to generate tasks.
+                            </div>
+                        )}
                     </div>
+
+                    {isAssignment && (
+                        <div className="Guidelines-creation-group">
+                            <h3>Project Guidelines (Optional)</h3>
+                            <div className={"TaskCreate-inputGroup"}>
+                                <label><FontAwesomeIcon icon={faAlignLeft} /> Guideline Text</label>
+                                <textarea
+                                    name="guidelinesText"
+                                    placeholder="Summary of specific project rules or requirements..."
+                                    className="TaskCreate-descriptionInput small"
+                                    value={taskDetail.guidelinesText}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="Form-row">
+                                <div className={"TaskCreate-inputGroup"}>
+                                    <label><FontAwesomeIcon icon={faLink} /> Resource Link</label>
+                                    <input
+                                        type="url"
+                                        name="guidelinesLink"
+                                        placeholder="https://..."
+                                        className="TaskCreate-titleInput small"
+                                        value={taskDetail.guidelinesLink}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className={"TaskCreate-inputGroup"}>
+                                    <label><FontAwesomeIcon icon={faPaperclip} /> Attachment</label>
+                                    <input
+                                        type="file"
+                                        onChange={(e) => setGuidelineFile(e.target.files[0])}
+                                        className="File-input-minimal"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {!isAssignment && (
