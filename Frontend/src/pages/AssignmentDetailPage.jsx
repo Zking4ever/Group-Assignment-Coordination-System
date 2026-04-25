@@ -7,6 +7,7 @@ import { faPlus, faArrowLeft, faClipboardList, faChevronRight, faMagicWandSparkl
 import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatRelativeDeadline } from '../utils/timeUtils';
 
 function DraggableTask({ task, id }) {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -175,7 +176,7 @@ function AssignmentDetailPage() {
                     startDate: new Date().toISOString().split('T')[0],
                     deadLine: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
                     parentAssignment: assignmentId,
-                    state: 'YET'
+                    state: 'yet'
                 };
 
                 try {
@@ -293,7 +294,7 @@ function AssignmentDetailPage() {
                                             <div className={"AssignmentDetailPage-empty"}>No tasks assigned to this assignment yet.</div>
                                         ) : (
                                             tasks.map(task => {
-                                                const isWorking = task.state === 'WORKING';
+                                                const isWorking = task.state === 'working';
                                                 const expiryDate = task.workExpiryTime ? new Date(task.workExpiryTime) : null;
                                                 const isExpired = expiryDate && expiryDate < new Date();
 
@@ -309,7 +310,7 @@ function AssignmentDetailPage() {
                                                                 {isWorking && !isExpired && (
                                                                     <div className="Task-timerBadge">
                                                                         <span className="Pulse-dot"></span>
-                                                                        ACTIVE: 15m
+                                                                        ACTIVE: 20m
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -317,7 +318,7 @@ function AssignmentDetailPage() {
                                                                 <span className={`${"AssignmentDetailPage-status"} ${("AssignmentDetailPage-" + (task.state?.toLowerCase()))}`}>
                                                                     {task.state}
                                                                 </span>
-                                                                <span className={"AssignmentDetailPage-date"}>Due: {new Date(task.deadLine).toLocaleDateString()}</span>
+                                                                <span className={"AssignmentDetailPage-date"}>{formatRelativeDeadline(task.deadLine)}</span>
                                                             </div>
                                                         </div>
                                                         <FontAwesomeIcon icon={faChevronRight} className={"AssignmentDetailPage-arrow"} />

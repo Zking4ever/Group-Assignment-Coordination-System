@@ -3,7 +3,13 @@ const BASE_URL = "http://localhost:5000";
 
 //LOGIN PAGE 
 export const checkAcc = async (email, password) => {
-  const response = await fetch(`${BASE_URL}/users?email=${email}&password=${password}`);
+  const response = await fetch(`${BASE_URL}/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email, password })
+  });
 
   let data = [];
   try {
@@ -13,7 +19,7 @@ export const checkAcc = async (email, password) => {
     data = [];
   }
 
-  return { response: { ok: data.length > 0 }, data };
+  return { response, data };
 };
 
 

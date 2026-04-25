@@ -5,6 +5,7 @@ import { fetchTasks, updateTask, startTaskWork, submitTaskWork, verifyTaskSubmis
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faCheckCircle, faClock, faUserCircle, faExclamationCircle, faFileUpload, faLink, faFileAlt, faTimes, faCheck, faRedo } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
+import { formatRelativeDeadline } from '../utils/timeUtils';
 
 function TaskDetailPage() {
     const { groupId, assignmentId, taskId } = useParams();
@@ -33,7 +34,7 @@ function TaskDetailPage() {
             const currentAss = allAss.find(a => a.id === assignmentId);
             setAssignment(currentAss);
 
-            if (currentTask.state === 'WORKING' && currentTask.workExpiryTime) {
+            if (currentTask.state === 'working' && currentTask.workExpiryTime) {
                 const expiry = new Date(currentTask.workExpiryTime).getTime();
                 const now = new Date().getTime();
                 const remaining = Math.max(0, Math.floor((expiry - now) / 1000));
@@ -53,12 +54,18 @@ function TaskDetailPage() {
     }, [taskId]);
 
     useEffect(() => {
-        if (timeLeft > 0 && task?.state === 'WORKING') {
+        if (timeLeft > 0 && task?.state === 'working') {
             timerRef.current = setInterval(() => {
                 setTimeLeft(prev => {
                     if (prev <= 1) {
                         clearInterval(timerRef.current);
                         handleSessionEnd();
+                        // Record expiry on server
+                        fetch(`http://localhost:5000/tasks/${taskId}/record-expiry`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ userId: currentUser.id })
+                        }).catch(console.error);
                         return 0;
                     }
                     return prev - 1;
@@ -77,7 +84,7 @@ function TaskDetailPage() {
         try {
             const { response, data } = await startTaskWork(taskId, currentUser.id);
             if (response.ok) {
-                toast.success("Work timer started! You have 15 minutes.");
+                toast.success("Work timer started! You have 20 minutes.");
                 loadTask();
             } else {
                 toast.error(data.error || "Failed to start work");
@@ -146,7 +153,7 @@ function TaskDetailPage() {
                     <div className={"TaskDetailPage-meta"}>
                         <span>{task.responsibleMemberName || 'Assigned member'}</span>
                         <span className={"TaskDetailPage-separator"}>•</span>
-                        <span>Due {new Date(task.deadLine).toLocaleDateString()}</span>
+                        <span className="Deadline-expressive">{formatRelativeDeadline(task.deadLine)}</span>
                     </div>
                 </div>
             </header>
@@ -180,7 +187,7 @@ function TaskDetailPage() {
                         </section>
                     )}
 
-                    {isResponsible && (task.state === 'WORKING' || task.state === 'REJECTED') && (
+                    {isResponsible && (task.state === 'working' || task.state === 'REJECTED' || task.state === 'yet') && (
                         <section className={"TaskDetailPage-submissionForm"}>
                             <div className={"TaskDetailPage-sectionTitle"}>
                                 <FontAwesomeIcon icon={faFileUpload} />
@@ -227,18 +234,18 @@ function TaskDetailPage() {
                         <div className={"TaskDetailPage-workHeader"}>
                             <h3>Work Status</h3>
                             <span className={`${"TaskDetailPage-statusBadge"} ${("TaskDetailPage-" + (task.state?.toLowerCase() || 'yet'))}`}>
-                                {task.state || 'YET'}
+                                {task.state || 'yet'}
                             </span>
                         </div>
                         
                         <div className={"TaskDetailPage-actions"}>
-                            {(task.state === 'YET' || task.state === 'REJECTED') && isResponsible && (
+                            {(task.state === 'yet' || task.state === 'REJECTED') && isResponsible && (
                                 <button className={"TaskDetailPage-primaryBtn"} onClick={handleStartWork}>
-                                    <FontAwesomeIcon icon={faClock} /> Start working (15min)
+                                    <FontAwesomeIcon icon={faClock} /> Start working (20min)
                                 </button>
                             )}
                             
-                            {task.state === 'WORKING' && isResponsible && (
+                            {task.state === 'working' && isResponsible && (
                                 <div className="Timer-display">
                                     <div className="Timer-countdown">{formatTime(timeLeft)}</div>
                                     <p>Time remaining to record activity</p>
@@ -250,7 +257,7 @@ function TaskDetailPage() {
                         </div>
                     </div>
 
-                    {isOwner && task.state === 'SUBMITTED' && (
+                    {isOwner && task.state === 'submitted' && (
                         <div className={"TaskDetailPage-verificationCard"}>
                             <h3>Verification Required</h3>
                             <p>This work was submitted by <strong>{task.responsibleMemberName}</strong>. Review the details and decide.</p>
