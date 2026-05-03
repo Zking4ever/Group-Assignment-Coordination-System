@@ -3,7 +3,6 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import LandingPage from '@pages/LandingPage.jsx'
 import LoginPage from '@pages/LoginPage.jsx'
 import RegisterPage from '@pages/RegisterPage.jsx'
-import ConfirmationPage from '@pages/ConfirmationPage.jsx'
 import HomePage from '@pages/HomePage.jsx'
 import GroupPage from '@pages/GroupPage.jsx'
 import ProfilePage from '@pages/ProfilePage.jsx'
@@ -17,7 +16,7 @@ function Layout({ children, setDashboardView }) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
-  const hideLayout = ['/', '/login', '/register', '/confirm'].includes(location.pathname);
+  const hideLayout = ['/', '/login', '/register',].includes(location.pathname);
 
   if (hideLayout) return <>{children}</>;
 
@@ -50,7 +49,6 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/confirm" element={<ConfirmationPage />} />
 
           {/* Home/Dashboard */}
           <Route path="/home" element={<HomePage view={dashboardView} setView={setDashboardView} />} />

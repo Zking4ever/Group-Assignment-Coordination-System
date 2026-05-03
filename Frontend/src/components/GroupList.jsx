@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { fetchGroups, deleteGroup, fetchUsers } from '@services/authService.js'
-import toast from 'react-hot-toast';
-import '../assets/css/GroupList.css';
 import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast';
+import { getMyGroups, deleteGroup, getUserDetail } from '@services/authService.js'
 import GroupCard from '@components/GroupCard.jsx'
+import '../assets/css/GroupList.css';
 
 function GroupList() {
     const navigate = useNavigate();
@@ -14,17 +14,10 @@ function GroupList() {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const { response: gResp, data: gData } = await fetchGroups();
-                const { response: uResp, data: uData } = await fetchUsers();
-
-                if (gResp.ok && uResp.ok) {
-                    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-                    const userGroups = gData.filter(group => group.members.includes(currentUser.id));
-                    setGroups(userGroups);
-                    setUsers(uData);
-                }
+                const userGroups = await getMyGroups();
+                setGroups(userGroups);
             } catch (error) {
-                console.error("Failed to load dashboard data:", error);
+                console.error("Failed to load group data:", error);
             } finally {
                 setLoading(false);
             }
@@ -35,7 +28,7 @@ function GroupList() {
     const handleDelete = async (groupId) => {
         if (!window.confirm("Are you sure you want to delete this group?")) return;
         try {
-            const { response } = await deleteGroup(groupId);
+            const response  = await deleteGroup(groupId);
             if (response.ok) {
                 setGroups(prev => prev.filter(group => group.id !== groupId));
                 toast.success("Group deleted successfully");
@@ -45,11 +38,6 @@ function GroupList() {
         } catch (error) {
             toast.error("Error deleting group: " + error.message);
         }
-    };
-
-    const getCreatorName = (creatorId) => {
-        const user = users.find(u => u.id === creatorId);
-        return user ? `${user.firstName} ${user.lastName}` : 'Unknown User';
     };
 
     if (loading) return <div className={"GroupList-loading"}>Loading classes...</div>;
@@ -63,16 +51,18 @@ function GroupList() {
                 </div>
             ) : (
                 <div className={"GroupList-grid"}>
-                    {groups.map((group) => (
+                    {groups.map((group) => {
+                        const creator = getUserDetail(group.creatorId);
+                        return (
                         <GroupCard
                             key={group.id}
                             id={group.id}
                             title={group.groupName}
-                            creator={getCreatorName(group.creatorId)}
+                            creator={creator?.firstName + " " + creator?.lastName}
                             onDelete={() => handleDelete(group.id)}
                             isCreator={group.creatorId === JSON.parse(localStorage.getItem("currentUser"))?.id}
-                        />
-                    ))}
+                        />)}
+                    )}
                 </div>
             )}
         </div>

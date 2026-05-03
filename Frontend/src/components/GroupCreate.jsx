@@ -1,6 +1,6 @@
 import '../assets/css/GroupCreate.css';
 import React, { useState } from 'react'
-import { createNewGroup } from '@services/authService'
+import { createGroup } from '@services/authService'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
@@ -10,7 +10,7 @@ function GroupCreate({ setView }) {
     const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const createGroup = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
@@ -27,7 +27,7 @@ function GroupCreate({ setView }) {
                 creatorId: currentUser.id,
                 members: [currentUser.id]
             };
-            const { response } = await createNewGroup(newGroup);
+            const { response } = await createGroup(newGroup);
             if (response.ok) {
                 setView("home");
             } else {
@@ -49,7 +49,7 @@ function GroupCreate({ setView }) {
                         <FontAwesomeIcon icon={faTimes} />
                     </button>
                 </div>
-                <form className={"GroupCreate-form"} onSubmit={createGroup}>
+                <form className={"GroupCreate-form"} onSubmit={handleSubmit}>
                     <div className={"GroupCreate-inputGroup"}>
                         <input
                             type="text"

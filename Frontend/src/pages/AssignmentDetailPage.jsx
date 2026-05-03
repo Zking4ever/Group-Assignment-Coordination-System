@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchAssignments, fetchTasks, fetchGroupMembers, getAiBreakdown, createNewTask, updateTask, fetchGroups } from '@services/authService';
+import { fetchAssignments, fetchTasks, getGroupMembers, getAiBreakdown, createNewTask, updateTask, getGroupDetail } from '@services/authService';
 import '../assets/css/AssignmentDetailPage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faArrowLeft, faClipboardList, faChevronRight, faMagicWandSparkles, faUserCircle, faGripVertical, faCopy, faCheck, faEdit, faPaperclip, faLink } from '@fortawesome/free-solid-svg-icons';
@@ -149,14 +149,14 @@ function AssignmentDetailPage() {
             setEditedTitle(currentAss.assignmentName);
 
             // Fetch group to get invite code
-            const { data: group } = await fetchGroups(groupId);
+            const { data: group } = await getGroupDetail(groupId);
             setGroupCode(group.inviteCode);
 
             const { data: allTasks } = await fetchTasks();
             const assTasks = allTasks.filter(t => t.parentAssignment === assignmentId);
             setTasks(assTasks);
 
-            const { data: groupMembers } = await fetchGroupMembers(groupId);
+            const groupMembers = await getGroupMembers(groupId);
             setMembers(groupMembers);
         } catch (error) {
             console.error("Failed to load assignment details:", error);

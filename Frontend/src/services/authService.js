@@ -1,28 +1,17 @@
-// const BASE_URL = "http://localhost:5000";
-const BASE_URL = "https://gacs.onrender.com";
+const BASE_URL = "http://localhost:5000";
+// const BASE_URL = "https://gacs.onrender.com";
 
-//LOGIN PAGE 
-export const checkAcc = async (email, password) => {
-  const response = await fetch(`${BASE_URL}/auth/login`, {
+// ------------- Auth services -----------------------
+export const checkAccount = async (email, password) => {
+  return await fetch(`${BASE_URL}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({ email, password })
   });
-
-  let data = [];
-  try {
-    data = await response.json();
-  }
-  catch {
-    data = [];
-  }
-
-  return { response, data };
 };
 
-// set up registration
 export const createAccount = async (userData) => {
   return await fetch(`${BASE_URL}/auth/register`, {
     method: "POST",
@@ -33,68 +22,76 @@ export const createAccount = async (userData) => {
   });
 };
 
+export const getUserDetail = async(userId) =>{
+  const response = await fetch(`${BASE_URL}/auth/userdetail/${userId}`);
+  return await response.json();
+}
 
-//create new group appi
-export const createNewGroup = async (newGroupData) => {
-  const response = await fetch(`${BASE_URL}/groups`, {
+//------------------------------ Group endpoints -----------------------
+
+export const createGroup = async (newGroupData) => {
+  return await fetch(`${BASE_URL}/group/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(newGroupData)
   });
+};
 
-  let data = {};
-  try {
-    data = await response.json();
-  }
-  catch {
-    data = {};
-  }
-
+export const getMyGroups = async () => {
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const response = await fetch(`${BASE_URL}/group/user/${currentUser?.id}`);
+  const data = await response.json();
   return { response, data };
 };
 
+export const getGroupCreator = async (groupId) => {
+  const response = await fetch(`${BASE_URL}/group/creator/${groupId}`);
+  return await response.json();
+}
 
-//Get method for home page
-export const fetchGroups = async (groupId = null) => {
-  const url = groupId ? `${BASE_URL}/groups/${groupId}` : `${BASE_URL}/groups`;
-  const response = await fetch(url, {
-    method: "GET",
+export const getGroupDetail = async (groupId) => {
+  const response = await fetch(`${BASE_URL}/group/${groupId}`);
+  const data = await response.json();
+  return { response, data };
+};
+
+export const getGroupMembers = async (groupId) => {
+  const response = await fetch(`${BASE_URL}/group/members/${groupId}`);
+  return await response.json();
+};
+
+export const joinGroupByCode = async (inviteCode, userId) => {
+  const response = await fetch(`${BASE_URL}/group/join`, {
+    method: "POST",
     headers: {
       "Content-Type": "application/json"
-    }
+    },
+    body: JSON.stringify({ inviteCode, userId })
   });
   const data = await response.json();
   return { response, data };
 };
 
-
-
-//fetch username
-export const fetchUsername = async () => {
-  const response = await fetch(`${BASE_URL}/users`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json"
-    }
-  }
-  );
-  const data = await response.json();
-
-  return { response, data };
+export const deleteGroup = async (groupId) => {
+ return await fetch(`${BASE_URL}/group/${groupId}`, {
+            method: "DELETE"
+          });
 };
 
-export const fetchUserData = async (id) => {
-  const response = await fetch(`${BASE_URL}/user/${id}`, {
-    method: "GET",
+export const kickMember = async (groupId, userId) => {
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const response = await fetch(`${BASE_URL}/group/${groupId}/member/${userId}`, {
+    method: "DELETE",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "x-user-id": currentUser?.id
     }
-  }
-  );
-  return await response.json();
-}
+  });
+  const data = await response.json();
+  return { response, data };
+};
 
 
 //assignment create
@@ -134,7 +131,7 @@ export const fetchAssignments = async (assignmentId = null) => {
 
 // join group
 export const joinGroup = async (groupId, members) => {
-  const response = await fetch(`${BASE_URL}/groups/${groupId}`, {
+  const response = await fetch(`${BASE_URL}/group/join/${groupId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json"
@@ -146,28 +143,9 @@ export const joinGroup = async (groupId, members) => {
   return { response, data };
 };
 
-export const joinGroupByCode = async (inviteCode, userId) => {
-  const response = await fetch(`${BASE_URL}/groups/join`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ inviteCode, userId })
-  });
-  const data = await response.json();
-  return { response, data };
-};
 
-export const fetchGroupMembers = async (groupId) => {
-  const response = await fetch(`${BASE_URL}/groups/members/${groupId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json"
-    }
-  });
-  const data = await response.json();
-  return { response, data };
-};
+
+
 
 export const fetchUsers = async () => {
   const response = await fetch(`${BASE_URL}/users`);
@@ -268,20 +246,7 @@ export const updateTask = async (taskId, updatedTask) => {
 };
 
 
-export const deleteGroup = async (groupId) => {
-  const response = await fetch(`${BASE_URL}/groups/${groupId}`, {
-    method: "DELETE"
-  });
-  let data = {};
-  try {
-    data = await response.json();
-  }
-  catch {
-    data = {};
-  }
 
-  return { response, data };
-};
 
 
 export const deleteAssignment = async (assignmentsId) => {
@@ -315,18 +280,7 @@ export const deleteTask = async (taskId) => {
   return { response, data };
 };
 
-export const kickMember = async (groupId, userId) => {
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-  const response = await fetch(`${BASE_URL}/groups/${groupId}/members/${userId}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      "x-user-id": currentUser?.id
-    }
-  });
-  const data = await response.json();
-  return { response, data };
-};
+
 
 export const getAiBreakdown = async (assignmentName, assignmentDescription, memberCount, guidelinesText) => {
   const response = await fetch(`${BASE_URL}/ai/breakdown`, {

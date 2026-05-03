@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const db = require('./database');
+const db = require('./utils/database');
 const { v4: uuidv4 } = require('uuid');
 const multer = require('multer');
 const path = require('path');
@@ -47,7 +47,6 @@ app.get('/', (req, res) => {
   res.send('GACS server is running');
 });
 
-// --- Users (Auth) ---
 // --- Auth Routes ---
 app.post('/auth/login', async (req, res) => {
   const { email, password } = req.body;
@@ -93,31 +92,10 @@ app.post('/auth/register', async (req, res) => {
   }
 });
 
-// --- User Routes ---
-app.get('/users', (req, res) => {
-  const users = db.prepare('SELECT id, firstName, lastName, email, username FROM users').all();
-  res.json(users);
-});
-
-app.patch('/users/:id', (req, res) => {
-  const { id } = req.params;
-  const updates = req.body;
-  const keys = Object.keys(updates);
-  const setClause = keys.map(key => `${key} = ?`).join(', ');
-  const values = keys.map(key => updates[key]);
-
+app.get('/auth/userdetail/:userId', (req, res) => {
+  const { userId } = req.params;
   try {
-    db.prepare(`UPDATE users SET ${setClause} WHERE id = ?`).run(...values, id);
-    res.json({ message: 'User updated' });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-app.get('/user/:id', (req, res) => {
-  const { id } = req.params;
-  try {
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
     delete user.password;
     res.json(user);
   } catch (err) {
@@ -125,18 +103,68 @@ app.get('/user/:id', (req, res) => {
   }
 });
 
+
+// app.patch('/users/:id', (req, res) => {
+//   const { id } = req.params;
+//   const updates = req.body;
+//   const keys = Object.keys(updates);
+//   const setClause = keys.map(key => `${key} = ?`).join(', ');
+//   const values = keys.map(key => updates[key]);
+
+//   try {
+//     db.prepare(`UPDATE users SET ${setClause} WHERE id = ?`).run(...values, id);
+//     res.json({ message: 'User updated' });
+//   } catch (err) {
+//     res.status(400).json({ error: err.message });
+//   }
+// });
+
+
 // --- Groups ---
-app.get('/groups', (req, res) => {
-  const groups = db.prepare('SELECT * FROM groups').all();
-  // Fetch members for each group to maintain compatibility with db.json structure
-  const groupsWithMembers = groups.map(group => {
-    const members = db.prepare('SELECT userId FROM group_members WHERE groupId = ?').all(group.id);
-    return { ...group, members: members.map(m => m.userId) };
-  });
-  res.json(groupsWithMembers);
+
+//to get all user's groups
+app.get('/group/user/:userId', (req, res) => {
+  const { userId } = req.params;
+  const groups = db.prepare('SELECT id, groupName, groupDescription, creatorId, inviteCode FROM groups g JOIN group_members gm ON g.id = gm.groupId WHERE gm.userID = ?').all(userId);
+  res.json(groups);
 });
 
-app.post('/groups', (req, res) => {
+//to get detail of a single group by id
+app.get('/group/:groupId', (req, res) => {
+  const { groupId } = req.params;
+  try {
+    const group = db.prepare('SELECT * FROM groups WHERE id = ?').get(groupId);
+    res.json(group);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+//to get the creator user of a group from a groupid
+app.get('/group/creator/:groupid', (req, res) => {
+  const { groupid } = req.params;
+  try {
+    const user = db.prepate('SELECT id,firstName,lastName,email,username FROM users JOIN groups ON user.id == groups.creatorId WHERE groups.id = ?').get(groupid);
+    delete user.password;
+    res.json(user);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+//to get all members of a group
+app.get('/group/members/:groupId', (req, res) => {
+  const { groupId } = req.params;
+  try {
+    const members = db.prepare('SELECT id,firstName,lastName,email,username FROM users JOIN group_members ON users.id = group_members.userId WHERE group_members.groupId = ?').all(groupId);
+    res.json(members);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+//to create a new group
+app.post('/group/create', (req, res) => {
   const { groupName, groupDescription, creator, creatorId } = req.body;
   const id = uuidv4();
   const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -150,55 +178,46 @@ app.post('/groups', (req, res) => {
   }
 });
 
-app.get('/groups/:id', (req, res) => {
-  const { id } = req.params;
+//to join group by invite code
+app.post('/group/join', (req, res) => {
+  const { inviteCode, userId } = req.body;
   try {
-    const group = db.prepare('SELECT * FROM groups WHERE id = ?').get(id);
-    res.json(group);
+    const group = db.prepare('SELECT id, groupName FROM groups WHERE inviteCode = ?').get(inviteCode);
+    if (!group){
+      return res.status(404).json({ error: 'Group not found' });
+    }
+    const user = db.prepare('SELECT firstName, lastName FROM users WHERE id = ?').get(userId);
+
+    db.prepare('INSERT OR IGNORE INTO group_members (groupId, userId) VALUES (?, ?)').run(group.id, userId);
+
+    // // Log Notification
+    // const notifId = uuidv4();
+    // const message = `${user.firstName} ${user.lastName} joined the group "${group.groupName}"`;
+    // db.prepare('INSERT INTO notifications (id, groupId, userId, type, message) VALUES (?, ?, ?, ?, ?)')
+    //   .run(notifId, group.id, userId, 'MEMBER_JOIN', message);
+
+    res.json({ message: 'Joined group successfully', groupId: group.id });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 });
 
-app.get('/groups/members/:id', (req, res) => {
-  const { id } = req.params;
+// to delete an entire group
+app.delete('/group/:groupId', (req, res) => {
+  const { groupId } = req.params;
   try {
-    const members = db.prepare('SELECT id,firstName,lastName,email,username FROM users JOIN group_members ON users.id = group_members.userId WHERE group_members.groupId = ?').all(id);
-    res.json(members);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-
-app.patch('/groups/:id', (req, res) => {
-  const { id } = req.params;
-  const { members } = req.body; // Array of user IDs
-
-  try {
-    // For simplicity, we'll just insert new members. 
-    const insertMember = db.prepare('INSERT OR IGNORE INTO group_members (groupId, userId) VALUES (?, ?)');
-    members.forEach(userId => insertMember.run(id, userId));
-    res.json({ message: 'Members updated' });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-app.delete('/groups/:id', (req, res) => {
-  const { id } = req.params;
-  try {
-    db.prepare('DELETE FROM group_members WHERE groupId = ?').run(id);
-    db.prepare('DELETE FROM groups WHERE id = ?').run(id);
+    db.prepare('DELETE FROM group_members WHERE groupId = ?').run(groupId);
+    db.prepare('DELETE FROM groups WHERE id = ?').run(groupId);
     res.json({ message: 'Group deleted' });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 });
 
-app.delete('/groups/:groupId/members/:userId', (req, res) => {
+//to kick a member from a group
+app.delete('/group/:groupId/member/:userId', (req, res) => {
   const { groupId, userId } = req.params;
-  const requesterId = req.headers['x-user-id']; // Simple way to pass current user
+  const requesterId = req.headers['x-user-id'];
 
   try {
     const group = db.prepare('SELECT creatorId FROM groups WHERE id = ?').get(groupId);
@@ -219,28 +238,11 @@ app.delete('/groups/:groupId/members/:userId', (req, res) => {
   }
 });
 
-app.post('/groups/join', (req, res) => {
-  const { inviteCode, userId } = req.body;
-  try {
-    const group = db.prepare('SELECT id, groupName FROM groups WHERE inviteCode = ?').get(inviteCode);
-    if (!group) {
-      return res.status(404).json({ error: 'Group not found' });
-    }
-    const user = db.prepare('SELECT firstName, lastName FROM users WHERE id = ?').get(userId);
 
-    db.prepare('INSERT OR IGNORE INTO group_members (groupId, userId) VALUES (?, ?)').run(group.id, userId);
 
-    // Log Notification
-    const notifId = uuidv4();
-    const message = `${user.firstName} ${user.lastName} joined the group "${group.groupName}"`;
-    db.prepare('INSERT INTO notifications (id, groupId, userId, type, message) VALUES (?, ?, ?, ?, ?)')
-      .run(notifId, group.id, userId, 'MEMBER_JOIN', message);
+////////////////////////---------- astawus ----- ////////////
 
-    res.json({ message: 'Joined group successfully', groupId: group.id });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
+
 
 app.get('/notifications/:groupId', (req, res) => {
   const { groupId } = req.params;

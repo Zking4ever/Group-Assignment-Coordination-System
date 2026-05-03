@@ -1,5 +1,5 @@
 import '../assets/css/TaskCreate.css';
-import { createNewAss, createNewTask, fetchGroupMembers } from '@services/authService';
+import { createNewAss, createNewTask, getGroupMembers } from '@services/authService';
 import toast from 'react-hot-toast';
 import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -31,7 +31,7 @@ function TaskCreate({ type = "task" }) {
         const loadMembers = async () => {
             if (!groupId) return;
             try {
-                const { data: members } = await fetchGroupMembers(groupId);
+                const members = await getGroupMembers(groupId);
                 setUsers(members);
             } catch (error) {
                 console.error(error);

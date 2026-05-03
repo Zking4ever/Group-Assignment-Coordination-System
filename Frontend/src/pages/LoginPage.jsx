@@ -1,7 +1,7 @@
 import '../assets/css/LoginPage.css';
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { checkAcc } from '@services/authService'
+import { checkAccount } from '@services/authService'
 
 function LoginPage() {
     const navigate = useNavigate();
@@ -16,7 +16,7 @@ function LoginPage() {
         setMessage({ type: '', text: '' });
 
         try {
-            const { response, data } = await checkAcc(email, password);
+            const { response, data } = await checkAccount(email, password);
             if (response.ok && data.length > 0) {
                 const user = data[0];
                 localStorage.setItem("currentUser", JSON.stringify(user));

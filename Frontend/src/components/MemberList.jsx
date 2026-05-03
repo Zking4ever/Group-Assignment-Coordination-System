@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchGroups, fetchGroupMembers, fetchUserData, kickMember } from '@services/authService';
+import { getGroupDetail, getGroupMembers, getGroupCreator, kickMember } from '@services/authService';
 import '../assets/css/MemberList.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faUserCircle, faUserMinus } from '@fortawesome/free-solid-svg-icons';
@@ -17,12 +17,12 @@ function MemberList({ groupId }) {
   const loadPeople = async () => {
     try {
       const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-      const { data: groupData } = await fetchGroups(groupId);
-      const { data: members } = await fetchGroupMembers(groupId);
+      const { data: groupData } = await getGroupDetail(groupId);
+      const members = await getGroupMembers(groupId);
 
       if (groupData) {
-        setIsOwner(groupData.creatorId === currentUser?.id);
-        const creator = await fetchUserData(groupData?.creatorId);
+        const creator = await getGroupCreator(groupId);
+        setIsOwner(creator.id === currentUser?.id);
         setTeachers(creator ? [creator] : []);
         setStudents(members.filter(m => m.id != groupData?.creatorId));
       }

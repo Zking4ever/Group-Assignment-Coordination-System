@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom';
 import GroupworkContent from '@components/AssignmentList.jsx'
 import MemberList from '@components/MemberList.jsx'
-import { fetchGroups } from '@services/authService.js';
+import { getGroupDetail } from '@services/authService.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faClipboardList, faCopy } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
@@ -22,7 +22,7 @@ function GroupPage() {
 
         const loadGroup = async () => {
             try {
-                const { response, data } = await fetchGroups(groupId);
+                const { response, data } = await getGroupDetail(groupId);
                 if (response.ok) {
                     setGroup(data);
                 }
