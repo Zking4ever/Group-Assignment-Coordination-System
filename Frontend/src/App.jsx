@@ -6,7 +6,7 @@ import RegisterPage from '@pages/RegisterPage.jsx'
 import HomePage from '@pages/HomePage.jsx'
 import GroupPage from '@pages/GroupPage.jsx'
 import ProfilePage from '@pages/ProfilePage.jsx'
-import TaskPage from '@pages/TaskPage.jsx'
+import CreationPage from '@pages/CreationPage.jsx'
 import TaskDetailPage from '@pages/TaskDetailPage.jsx'
 import AssignmentDetailPage from '@pages/AssignmentDetailPage.jsx'
 import Header from '@components/Header.jsx'
@@ -58,11 +58,11 @@ function App() {
 
           {/* Group Routes */}
           <Route path="/group/:groupId" element={<GroupPage />} />
-          <Route path="/group/:groupId/createAssignment" element={<TaskPage type="assignment" />} />
+          <Route path="/group/:groupId/createAssignment" element={<CreationPage type="assignment" />} />
 
           {/* Assignment Routes within a Group */}
           <Route path="/group/:groupId/assignment/:assignmentId" element={<AssignmentDetailPage />} />
-          <Route path="/group/:groupId/assignment/:assignmentId/addTask" element={<TaskPage type="task" />} />
+          <Route path="/group/:groupId/assignment/:assignmentId/addTask" element={<CreationPage type="task" />} />
 
           {/* Task Detail */}
           <Route path="/group/:groupId/assignment/:assignmentId/task/:taskId" element={<TaskDetailPage />} />

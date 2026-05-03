@@ -50,9 +50,4 @@
   transition: opacity 300ms, transform 300ms;
 }
 
-@media (max-width: 768px) {
-  .content-area {
-    padding: 16px;
-  }
-}
 

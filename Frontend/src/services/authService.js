@@ -3,13 +3,15 @@ const BASE_URL = "http://localhost:5000";
 
 // ------------- Auth services -----------------------
 export const checkAccount = async (email, password) => {
-  return await fetch(`${BASE_URL}/auth/login`, {
+  const response = await fetch(`${BASE_URL}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({ email, password })
   });
+  const data = await response.json();
+  return { response, data };
 };
 
 export const createAccount = async (userData) => {
@@ -23,9 +25,19 @@ export const createAccount = async (userData) => {
 };
 
 export const getUserDetail = async(userId) =>{
-  const response = await fetch(`${BASE_URL}/auth/userdetail/${userId}`);
+  const response = await fetch(`${BASE_URL}/gacs/user/userdetail/${userId}`);
   return await response.json();
 }
+
+export const editProfile = async (userId, userInfo) => {
+ return await fetch(`${BASE_URL}/auth/user/${userId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(userInfo)
+  });
+};
 
 //------------------------------ Group endpoints -----------------------
 
@@ -220,30 +232,7 @@ export const getAiBreakdown = async (assignmentName, assignmentDescription, memb
 };
 
 
-//edit profile 
-export const editProfile = async (userId, userInfo) => {
-  const response = await fetch(`${BASE_URL}/users/${userId}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(userInfo)
-  });
-  let data = {};
-  try {
-    data = await response.json();
-  }
-  catch {
-    data = {};
-  }
-
-  return { response, data };
-};
-
-
-
-
-
+//------------------------------ notification endpoints -----------------------
 
 
 export const fetchNotifications = async (groupId) => {

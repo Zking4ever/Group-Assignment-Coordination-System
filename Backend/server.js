@@ -92,7 +92,23 @@ app.post('/auth/register', async (req, res) => {
   }
 });
 
-app.get('/auth/userdetail/:userId', (req, res) => {
+
+app.patch('/auth/user/:id', (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+  const keys = Object.keys(updates);
+  const setClause = keys.map(key => `${key} = ?`).join(', ');
+  const values = keys.map(key => updates[key]);
+
+  try {
+    db.prepare(`UPDATE users SET ${setClause} WHERE id = ?`).run(...values, id);
+    res.json({ message: 'User updated' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/gacs/user/userdetail/:userId', (req, res) => {
   const { userId } = req.params;
   try {
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
@@ -102,23 +118,6 @@ app.get('/auth/userdetail/:userId', (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-
-
-// app.patch('/users/:id', (req, res) => {
-//   const { id } = req.params;
-//   const updates = req.body;
-//   const keys = Object.keys(updates);
-//   const setClause = keys.map(key => `${key} = ?`).join(', ');
-//   const values = keys.map(key => updates[key]);
-
-//   try {
-//     db.prepare(`UPDATE users SET ${setClause} WHERE id = ?`).run(...values, id);
-//     res.json({ message: 'User updated' });
-//   } catch (err) {
-//     res.status(400).json({ error: err.message });
-//   }
-// });
-
 
 // --- Groups ---
 
@@ -144,7 +143,7 @@ app.get('/group/:groupId', (req, res) => {
 app.get('/group/creator/:groupid', (req, res) => {
   const { groupid } = req.params;
   try {
-    const user = db.prepate('SELECT id,firstName,lastName,email,username FROM users JOIN groups ON user.id == groups.creatorId WHERE groups.id = ?').get(groupid);
+    const user = db.prepare('SELECT users.id, firstName, lastName, email, username FROM users JOIN groups ON users.id == groups.creatorId WHERE groups.id = ?').get(groupid);
     delete user.password;
     res.json(user);
   } catch (err) {
@@ -241,18 +240,17 @@ app.delete('/group/:groupId/member/:userId', (req, res) => {
 // --- Assignments ---
 
 // to get assignmetns of specific group
-app.get('/assignment/:groupID', (req, res) => {
+app.get('/assignment/:groupId', (req, res) => {
   const { groupId } = req.params;
   const assignments = db.prepare('SELECT * FROM assignments where groupId = ?').all(groupId);
-  // Map back to parentGroup field for frontend compatibility
   res.json(assignments.map(a => ({ ...a, parentGroup: a.groupId })));
 });
 
 // to get assignemt detail by id
 app.get('/assignment/detail/:assignmentId', (req, res) => {
   const { assignmentId } = req.params;
-  const assignments = db.prepare('SELECT * FROM assignments where id = ?').all(assignmentId);
-  res.json(assignments.map(a => ({ ...a, parentGroup: a.groupId })));
+  const assignment = db.prepare('SELECT * FROM assignments where id = ?').get(assignmentId);
+  res.json(assignment);
 });
 
 // to create new assignments

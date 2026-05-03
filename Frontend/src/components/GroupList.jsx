@@ -1,20 +1,19 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast';
-import { getMyGroups, deleteGroup, getUserDetail } from '@services/authService.js'
+import { getMyGroups, deleteGroup } from '@services/authService.js'
 import GroupCard from '@components/GroupCard.jsx'
 import '../assets/css/GroupList.css';
 
 function GroupList() {
     const navigate = useNavigate();
     const [groups, setGroups] = useState([]);
-    const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const loadData = async () => {
             try {
-                const userGroups = await getMyGroups();
+                const {data: userGroups} = await getMyGroups();
                 setGroups(userGroups);
             } catch (error) {
                 console.error("Failed to load group data:", error);
@@ -51,17 +50,15 @@ function GroupList() {
                 </div>
             ) : (
                 <div className={"GroupList-grid"}>
-                    {groups.map((group) => {
-                        const creator = getUserDetail(group.creatorId);
-                        return (
+                    {groups.map((group) => (
                         <GroupCard
                             key={group.id}
                             id={group.id}
                             title={group.groupName}
-                            creator={creator?.firstName + " " + creator?.lastName}
+                            creatorId={group.creatorId}
                             onDelete={() => handleDelete(group.id)}
                             isCreator={group.creatorId === JSON.parse(localStorage.getItem("currentUser"))?.id}
-                        />)}
+                        />)
                     )}
                 </div>
             )}

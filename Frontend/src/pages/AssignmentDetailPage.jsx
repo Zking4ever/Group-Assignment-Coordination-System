@@ -205,7 +205,7 @@ function AssignmentDetailPage() {
             }
             setAiTasks(data.tasks);
             setViewMode('ai');
-            toast.success("AI generated a balanced task breakdown!");
+            toast.success("AI generated draft breakdown! Edit details and drag to assign.");
         } catch (error) {
             toast.error("Failed to generate AI breakdown");
         } finally {

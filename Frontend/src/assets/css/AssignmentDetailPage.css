@@ -1,8 +1,9 @@
 .AssignmentDetailPage-page {
-  padding: 24px;
+  padding: 24px 0;
   max-width: 1200px;
   margin: 0 auto;
   min-height: calc(100vh - var(--header-height));
+  transform: translateY(-60px);
 }
 
 .AssignmentDetailPage-header {
@@ -443,6 +444,7 @@
     grid-template-columns: 1fr;
   }
 }
+ 
 
 @media (max-width: 600px) {
   .AssignmentDetailPage-headerInfo {
@@ -696,3 +698,7 @@
   font-size: 1.1rem;
   margin-bottom: 16px;
 }
+
+
+
+

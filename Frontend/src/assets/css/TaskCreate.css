@@ -149,3 +149,15 @@
   border-width: 2px;
   padding: 11px;
 }
+
+@media (max-width:728px) {
+  .TaskCreate-form {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .TaskCreate-sideColumn {
+    width: 72%;
+    border-left: none;
+    margin: auto;
+  }
+}

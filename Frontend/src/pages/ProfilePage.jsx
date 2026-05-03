@@ -48,7 +48,7 @@ function ProfilePage() {
         };
 
         try {
-            const { response } = await editProfile(user.id, updatedUser);
+            const response = await editProfile(user.id, updatedUser);
             if (response.ok) {
                 localStorage.setItem("currentUser", JSON.stringify(updatedUser));
                 toast.success("Profile updated successfully!");

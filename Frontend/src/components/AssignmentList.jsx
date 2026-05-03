@@ -18,7 +18,7 @@ function AssignmentList({ groupId, isOwner }) {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const groupAssignments = await getGroupAssignments();
+                const groupAssignments = await getGroupAssignments(groupId);
                 setAssignments(groupAssignments);
             } catch (error) {
                 console.error("Error loading assignments:", error);

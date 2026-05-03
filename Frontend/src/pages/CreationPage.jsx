@@ -1,7 +1,7 @@
 import '../assets/css/TaskPage.css';
 import TaskCreate from '@components/TaskCreate.jsx'
 
-function TaskPage({ type }) {
+function CreationPage({ type }) {
     return (
         <div className={"TaskPage-taskPageBody"}>
             <TaskCreate type={type} />
@@ -9,4 +9,4 @@ function TaskPage({ type }) {
     );
 }
 
-export default TaskPage;
+export default CreationPage;

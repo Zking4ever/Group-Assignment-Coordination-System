@@ -27,7 +27,7 @@ function GroupCreate({ setView }) {
                 creatorId: currentUser.id,
                 members: [currentUser.id]
             };
-            const { response } = await createGroup(newGroup);
+            const response  = await createGroup(newGroup);
             if (response.ok) {
                 setView("home");
             } else {

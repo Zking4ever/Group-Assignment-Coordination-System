@@ -3,6 +3,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding-bottom: 40px;
+  transform: translateY(-160px);
 }
 
 .GroupPage-banner {
@@ -144,4 +145,20 @@
 .GroupPage-date {
   font-size: 12px;
   color: var(--text-secondary);
+}
+
+@media (max-width: 400px) {
+  .GroupPage-groupPage {
+    transform: translateY(-140px);
+    padding: 0;
+  }
+  .GroupPage-bannerContent{
+    width: 100%;
+  }
+  .GroupPage-bannerContent h1 {
+    font-size: 24px;
+  }
+  .GroupPage-tabContent {
+    padding: 0 ;
+  }
 }

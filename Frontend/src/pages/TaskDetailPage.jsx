@@ -67,7 +67,7 @@ function TaskDetailPage() {
         return () => clearInterval(timerRef.current);
     }, [timeLeft, task?.state]);
 
-    const handleSessionEnd = () => {
+    const handleSessionEnd = async() => {
         await recordTimeExpiry(taskId, currentUser.id);
         toast("Work session expired. Progress recorded.", { icon: '⏰' });
 

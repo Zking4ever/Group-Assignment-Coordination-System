@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom';
-import GroupworkContent from '@components/AssignmentList.jsx'
+import AssignmentList from '@components/AssignmentList.jsx'
 import MemberList from '@components/MemberList.jsx'
 import { getGroupDetail } from '@services/authService.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,7 +11,7 @@ import '../assets/css/GroupPage.css';
 function GroupPage() {
     const { groupId } = useParams();
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('groupwork');
+    const [activeTab, setActiveTab] = useState('assignment');
     const [group, setGroup] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
     const [copying, setCopying] = useState(false);
@@ -62,8 +62,8 @@ function GroupPage() {
 
             <div className={"GroupPage-tabBar"}>
                 <button
-                    className={`${"GroupPage-tab"} ${activeTab === 'groupwork' ? "GroupPage-active" : ''}`}
-                    onClick={() => setActiveTab('groupwork')}
+                    className={`${"GroupPage-tab"} ${activeTab === 'assignment' ? "GroupPage-active" : ''}`}
+                    onClick={() => setActiveTab('assignment')}
                 >
                     Assignments
                 </button>
@@ -101,7 +101,7 @@ function GroupPage() {
                         </div>
                     </div>
                 </div>}
-                {activeTab === 'groupwork' && <GroupworkContent groupId={groupId} isOwner={isOwner} />}
+                {activeTab === 'assignment' && <AssignmentList groupId={groupId} isOwner={isOwner} />}
                 {activeTab === 'people' && <MemberList groupId={groupId} />}
             </div>
         </div>

@@ -63,6 +63,7 @@ function TaskCreate({ type = "task" }) {
 
                 const response = await createAssignment(formData);
                 if (response.ok) {
+                    toast.success("Assignment created successfully");
                     navigate(`/group/${groupId}`);
                 } else {
                     toast.error("Failed to create assignment.");

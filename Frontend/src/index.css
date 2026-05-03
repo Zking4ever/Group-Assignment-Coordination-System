@@ -189,3 +189,14 @@ ul {
 .btn-outline:hover {
   background-color: var(--surface-color);
 }
+
+@media (max-width: 768px) {
+  .content-area {
+    padding: 16px;
+  }
+}
+@media (max-width: 400px) {
+  .content-area {
+    padding: 12px;
+  }
+}
