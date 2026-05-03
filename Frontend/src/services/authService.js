@@ -1,5 +1,5 @@
-const BASE_URL = "http://localhost:5000";
-// const BASE_URL = "https://gacs.onrender.com";
+// const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://gacs.onrender.com";
 
 //LOGIN PAGE 
 export const checkAcc = async (email, password) => {
@@ -20,6 +20,17 @@ export const checkAcc = async (email, password) => {
   }
 
   return { response, data };
+};
+
+// set up registration
+export const createAccount = async (userData) => {
+  return await fetch(`${BASE_URL}/auth/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(userData)
+  });
 };
 
 
@@ -58,27 +69,6 @@ export const fetchGroups = async (groupId = null) => {
   return { response, data };
 };
 
-
-// set up registration
-export const createUsername = async (userData) => {
-  const response = await fetch(`${BASE_URL}/auth/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(userData)
-  });
-
-  let data = {};
-  try {
-    data = await response.json();
-  }
-  catch {
-    data = {};
-  }
-
-  return { response, data };
-};
 
 
 //fetch username

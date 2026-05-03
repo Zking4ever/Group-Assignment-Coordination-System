@@ -1,7 +1,7 @@
 import '../assets/css/RegisterPage.css';
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { createUsername } from '@services/authService'
+import { createAccount } from '@services/authService'
 
 function RegisterPage() {
     const navigate = useNavigate();
@@ -20,21 +20,10 @@ function RegisterPage() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const validatePassword = (pass) => {
-        const hasNumber = /\d/.test(pass);
-        const hasUpper = /[A-Z]/.test(pass);
-        const isLongEnough = pass.length >= 8;
-        return hasNumber && hasUpper && isLongEnough;
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage({ type: '', text: '' });
-
-        if (!validatePassword(formData.password)) {
-            setMessage({ type: 'error', text: "Password must be at least 8 characters long and contain both numbers and uppercase letters." });
-            return;
-        }
 
         if (formData.password !== formData.confirmPassword) {
             setMessage({ type: 'error', text: "Passwords do not match!" });
@@ -45,7 +34,7 @@ function RegisterPage() {
         try {
             const { password, confirmPassword, ...userData } = formData;
             const newUser = { ...userData, password };
-            const { response, data } = await createUsername(newUser);
+            const response = await createAccount(newUser);
             if (response.ok) {
                 setMessage({ type: 'success', text: "Account created successfully! Redirecting to login..." });
                 setTimeout(() => navigate("/login"), 1500);
@@ -84,8 +73,8 @@ function RegisterPage() {
                         <input name="email" type="email" placeholder="Email address" onChange={handleChange} required className={"RegisterPage-full"} />
                         
                         <div className={"RegisterPage-row"}>
-                            <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
-                            <input name="confirmPassword" type="password" placeholder="Confirm" onChange={handleChange} required />
+                            <input name="password" type="password" placeholder="Password" minLength={8} onChange={handleChange} required />
+                            <input name="confirmPassword" type="password" placeholder="Confirm" minLength={8} onChange={handleChange} required />
                         </div>
 
                         <div className={"RegisterPage-footer"}>

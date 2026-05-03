@@ -46,7 +46,6 @@ function LandingPage() {
                         transition={{ delay: 0.6, duration: 0.8 }}
                     >
                         <Link to="/register" className={"LandingPage-mainCta"}>Create an Account</Link>
-                        <span className={"LandingPage-subText"}>Free for solo students & small teams</span>
                     </motion.div>
                 </motion.div>
 
@@ -56,44 +55,7 @@ function LandingPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.3, duration: 1 }}
                 >
-                    <div className="LandingPage-mockup">
-                        <motion.div 
-                            className={"LandingPage-floatingCard"}
-                            style={{ top: '10%', left: '-10%' }}
-                            animate={{ y: [0, -10, 0] }}
-                            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                        >
-                            <FontAwesomeIcon icon={faUsers} className={"LandingPage-cardIcon"} />
-                            <div className={"LandingPage-cardText"}>
-                                <strong>Team Coordination</strong>
-                                <span>12 active members</span>
-                            </div>
-                        </motion.div>
-
-                        <motion.div 
-                            className={"LandingPage-floatingCard"}
-                            style={{ bottom: '15%', right: '-5%' }}
-                            animate={{ y: [0, 10, 0] }}
-                            transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 0.5 }}
-                        >
-                            <FontAwesomeIcon icon={faCheckCircle} className={"LandingPage-cardIcon"} style={{ color: '#10b981' }} />
-                            <div className={"LandingPage-cardText"}>
-                                <strong>Project Milestone</strong>
-                                <span>85% complete</span>
-                            </div>
-                        </motion.div>
-
-                        <div className="Mockup-content">
-                            {/* Visual representation of an app UI */}
-                            <div className="Mockup-line" style={{ width: '60%' }}></div>
-                            <div className="Mockup-line" style={{ width: '40%' }}></div>
-                            <div className="Mockup-grid">
-                                <div className="Mockup-box"></div>
-                                <div className="Mockup-box"></div>
-                                <div className="Mockup-box"></div>
-                            </div>
-                        </div>
-                    </div>
+                   
                 </motion.div>
             </main>
 
