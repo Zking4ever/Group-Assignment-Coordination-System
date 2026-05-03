@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: var(--bg-color);
   padding: 24px;
 }
 
@@ -23,7 +23,6 @@
 
 .RegisterPage-side {
   flex: 1;
-  background: white;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,7 +38,7 @@
   width: 68px;
   height: 32px;
   background: var(--primary-color);
-  color: white;
+  color: var(--text-primary);
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -51,12 +50,12 @@
 .RegisterPage-header h1 {
   font-size: 24px;
   font-weight: 400;
-  color: #202124;
+  color: var(--text-primary);
 }
 
 .RegisterPage-header p {
   font-size: 16px;
-  color: #202124;
+  color: var(--text-primary);
 }
 
 .RegisterPage-form {
@@ -78,8 +77,10 @@
   width: 100%;
   padding: 13px 15px;
   font-size: 14px;
-  border: 1px solid #dadce0;
+  border: 1px solid  var(--border-color);
   border-radius: 4px;
+  color: var(--text-primary);
+  background-color: var(--bg-color);
 }
 
 .RegisterPage-form input:focus {

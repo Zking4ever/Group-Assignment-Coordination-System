@@ -81,7 +81,7 @@ function LoginPage() {
             </div>
 
             <div className={"LoginPage-bottomLinks"}>
-                <span>English (United States)</span>
+                <span>English</span>
                 <div className={"LoginPage-extra"}>
                     <a href="#">Help</a>
                     <a href="#">Privacy</a>

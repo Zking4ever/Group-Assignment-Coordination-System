@@ -37,36 +37,41 @@ function Layout({ children, setDashboardView }) {
   );
 }
 
+import ThemeToggle from '@components/ThemeToggle.jsx'
+
 function App() {
   const [dashboardView, setDashboardView] = useState("home");
 
   return (
-    <Layout setDashboardView={setDashboardView}>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/confirm" element={<ConfirmationPage />} />
+    <>
+      <Layout setDashboardView={setDashboardView}>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/confirm" element={<ConfirmationPage />} />
 
-        {/* Home/Dashboard */}
-        <Route path="/home" element={<HomePage view={dashboardView} setView={setDashboardView} />} />
+          {/* Home/Dashboard */}
+          <Route path="/home" element={<HomePage view={dashboardView} setView={setDashboardView} />} />
 
-        {/* Profile */}
-        <Route path="/profile" element={<ProfilePage />} />
+          {/* Profile */}
+          <Route path="/profile" element={<ProfilePage />} />
 
-        {/* Group Routes */}
-        <Route path="/group/:groupId" element={<GroupPage />} />
-        <Route path="/group/:groupId/createAssignment" element={<TaskPage type="assignment" />} />
+          {/* Group Routes */}
+          <Route path="/group/:groupId" element={<GroupPage />} />
+          <Route path="/group/:groupId/createAssignment" element={<TaskPage type="assignment" />} />
 
-        {/* Assignment Routes within a Group */}
-        <Route path="/group/:groupId/assignment/:assignmentId" element={<AssignmentDetailPage />} />
-        <Route path="/group/:groupId/assignment/:assignmentId/addTask" element={<TaskPage type="task" />} />
+          {/* Assignment Routes within a Group */}
+          <Route path="/group/:groupId/assignment/:assignmentId" element={<AssignmentDetailPage />} />
+          <Route path="/group/:groupId/assignment/:assignmentId/addTask" element={<TaskPage type="task" />} />
 
-        {/* Task Detail */}
-        <Route path="/group/:groupId/assignment/:assignmentId/task/:taskId" element={<TaskDetailPage />} />
-      </Routes>
-    </Layout>
+          {/* Task Detail */}
+          <Route path="/group/:groupId/assignment/:assignmentId/task/:taskId" element={<TaskDetailPage />} />
+        </Routes>
+      </Layout>
+      <ThemeToggle />
+    </>
   );
 }
 

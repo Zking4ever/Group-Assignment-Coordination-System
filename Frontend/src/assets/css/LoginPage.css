@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: var(--bg-color);
   padding: 24px;
 }
 
@@ -25,7 +25,7 @@
   width: 68px;
   height: 32px;
   background: var(--primary-color);
-  color: white;
+  color: var(--text-primary);
   border-radius: 4px;
   display: inline-flex;
   align-items: center;
@@ -38,12 +38,12 @@
   font-size: 24px;
   font-weight: 400;
   margin-bottom: 8px;
-  color: #202124;
+  color: var(--text-primary);
 }
 
 .LoginPage-header p {
   font-size: 16px;
-  color: #202124;
+  color: var(--text-primary);
 }
 
 .LoginPage-form {
@@ -57,9 +57,11 @@
   width: 100%;
   padding: 13px 15px;
   font-size: 16px;
-  border: 1px solid #dadce0;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   transition: border-color 0.2s;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
 }
 
 .LoginPage-inputGroup input:focus {

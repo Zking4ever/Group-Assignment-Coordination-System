@@ -1,6 +1,6 @@
 import '../assets/css/ConfirmationPage.css';
 import { useState, useEffect } from 'react';
-import { fetchUsername, createUsername  } from '@services/authService'
+import { fetchUsername, createAccount  } from '@services/authService'
 import { useLocation, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast';
 
@@ -63,7 +63,7 @@ function ConfirmationPage(){
 
         try {
             const fullUser = { ...userInfo, username: username.trim().toLowerCase(), id:`${username}${Date.now()}` };
-            const { response, data } = await createUsername(fullUser);
+            const response = await createAccount(fullUser);
 
             if (response.ok) {
                 localStorage.setItem("currentUser", JSON.stringify({

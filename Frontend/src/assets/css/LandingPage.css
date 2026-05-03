@@ -1,9 +1,11 @@
 .LandingPage-page {
   min-height: 100vh;
-  color: #0a0a0c;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .LandingPage-nav {
@@ -13,12 +15,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  background: rgba(10, 10, 12, 0.1);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--glass-bg);
   backdrop-filter: blur(10px);
   position: fixed;
   top: 0;
   z-index: 1000;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .LandingPage-logo {
@@ -28,7 +31,7 @@
   font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: -0.05em;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .LandingPage-logoIcon {
@@ -40,6 +43,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+  color: white;
 }
 
 .LandingPage-navLinks {
@@ -49,27 +53,31 @@
 }
 
 .LandingPage-loginLink {
-  color: #5a626d;
+  color: var(--text-secondary);
   font-weight: 600;
   transition: color 0.2s;
 }
 
 .LandingPage-loginLink:hover {
-  color: #1744e8;
+  color: var(--primary-color);
 }
 
 .LandingPage-registerBtn {
-  background: #fff;
-  color: #000;
+  background: var(--text-primary);
+  color: var(--bg-color);
   padding: 8px 24px;
   border-radius: 99px;
   font-weight: 700;
   transition: all 0.2s;
+  border: 1px solid transparent;
 }
 
 .LandingPage-registerBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: var(--bg-color);
+  color: var(--text-primary);
+  border-color: var(--text-primary);
 }
 
 .LandingPage-hero {
@@ -79,234 +87,383 @@
   margin: 0 auto;
   display: flex;
   align-items: center;
-  padding: 120px 28px;
-  gap: 80px;
+  padding: 140px 28px 80px 28px;
+  gap: 60px;
   position: relative;
 }
 
 .LandingPage-hero::before {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 40%;
+  left: 30%;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 70%);
+  background: radial-gradient(circle, var(--primary-light), transparent 60%);
   transform: translate(-50%, -50%);
   pointer-events: none;
+  opacity: 0.5;
+  filter: blur(60px);
 }
 
 .LandingPage-heroContent {
-  flex: 1.2;
+  flex: 1;
   z-index: 2;
 }
 
 .LandingPage-heroContent h1 {
   font-size: 4.5rem;
-  line-height: 1;
+  line-height: 1.1;
   font-weight: 800;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   letter-spacing: -0.04em;
-  background: linear-gradient(to right, #423b3b, #94a3b8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-primary);
 }
 
 .LandingPage-heroContent p {
   font-size: 1.25rem;
-  color: #94a3b8;
-  margin-bottom: 48px;
+  color: var(--text-secondary);
+  margin-bottom: 40px;
   line-height: 1.6;
-  max-width: 600px;
+  max-width: 550px;
 }
 
 .LandingPage-ctaWrapper {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
 }
 
 .LandingPage-mainCta {
-  background: var(--primary-color);
-  color: white;
-  padding: 18px 40px;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.3);
+  background: var(--text-primary);
+  color: var(--bg-color);
+  padding: 16px 32px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   transition: all 0.2s;
+  border: 1px solid transparent;
 }
 
 .LandingPage-mainCta:hover {
-  transform: translateY(-2px);
-  background: var(--primary-hover);
+  background: var(--bg-color);
+  color: var(--text-primary);
+  border-color: var(--border-color);
 }
 
-.LandingPage-subText {
-  color: #64748b;
-  font-size: 0.9rem;
+.LandingPage-secondaryCta {
+  background: transparent;
+  color: var(--text-primary);
+  padding: 16px 32px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s;
 }
 
-.LandingPage-heroImage {
-  flex: 0.8;
+.LandingPage-secondaryCta:hover {
+  background: var(--surface-color);
+  border-color: var(--text-secondary);
+}
+
+.LandingPage-arrow {
+  transition: transform 0.2s;
+}
+
+.LandingPage-mainCta:hover .LandingPage-arrow {
+  transform: translateX(4px);
+}
+
+.LandingPage-heroVisual {
+  flex: 1;
   position: relative;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 24px;
+  z-index: 2;
 }
 
-.LandingPage-mockup {
-  width: 100%;
-  aspect-ratio: 4/3;
-  background: rgba(255, 255, 255, 0.03);
+.LandingPage-terminal {
+  background: #0f172a;
+  /* Always dark to look like a terminal */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.LandingPage-terminalHeader {
+  background: #1e293b;
+  padding: 12px 16px;
   display: flex;
-  flex-direction: column;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.dot-red {
+  background: #ef4444;
+}
+
+.dot-yellow {
+  background: #f59e0b;
+}
+
+.dot-green {
+  background: #10b981;
+}
+
+.LandingPage-terminalBody {
   padding: 24px;
+  font-family: 'Fira Code', 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  color: #f8fafc;
+  line-height: 1.6;
+}
+
+.text-muted {
+  color: #64748b;
+}
+
+.text-success {
+  color: #10b981;
+}
+
+.text-primary {
+  color: var(--primary-color);
+}
+
+.LandingPage-dashboardCards {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+}
+
+.LandingPage-dashCard {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  width: 200px;
+  box-shadow: var(--shadow-sm);
+}
+
+.dashCard-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.dashCard-header svg {
+  font-size: 1rem;
+}
+
+.badge {
+  margin-left: auto;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 99px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.badge-active {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.badge-success {
+  background: #d1fae5;
+  color: #047857;
+}
+
+[data-theme="dark"] .badge-pending {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fcd34d;
+}
+
+[data-theme="dark"] .badge-active {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .badge-success {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+}
+
+.dashCard-metrics {
+  width: 100%;
+}
+
+.metric-bar {
+  height: 6px;
+  background: var(--border-color);
+  border-radius: 3px;
   overflow: hidden;
 }
 
-.LandingPage-floatingCard {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
+.metric-fill {
+  height: 100%;
+  background: var(--primary-color);
+  border-radius: 3px;
 }
 
-.LandingPage-cardIcon {
-  font-size: 1.5rem;
-  color: var(--primary-color);
-}
-
-.LandingPage-cardText strong {
-  display: block;
-  font-size: 1rem;
-  color: #fff;
-}
-
-.LandingPage-cardText span {
-  font-size: 0.85rem;
-  color: #94a3b8;
-}
-
-.LandingPage-features {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+/* About Grid */
+.LandingPage-aboutGrid {
+  padding: 100px 48px;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 100px 48px;
-  gap: 32px;
+  width: 100%;
 }
 
-.LandingPage-feature {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 48px 32px;
+.LandingPage-gridContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 300px;
+  gap: 24px;
+}
+
+.LandingPage-gridItem {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
   border-radius: 24px;
-  transition: all 0.3s;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
-.LandingPage-feature:hover {
-  background: rgba(255, 255, 255, 0.04);
+.LandingPage-gridItem:hover {
   transform: translateY(-5px);
-  border-color: rgba(99, 102, 241, 0.2);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-color);
 }
 
-.LandingPage-feature svg {
+.LandingPage-gridItem.large-span {
+  grid-column: span 2;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.gridItem-content {
+  position: relative;
+  z-index: 2;
+  max-width: 500px;
+}
+
+.gridItem-icon {
   font-size: 2.5rem;
   color: var(--primary-color);
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
-.LandingPage-feature h3 {
-  font-size: 1.5rem;
-  margin-bottom: 16px;
+.LandingPage-gridItem h3 {
+  font-size: 1.8rem;
   font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text-primary);
 }
 
-.LandingPage-feature p {
-  color: #64748b;
+.LandingPage-gridItem p {
+  color: var(--text-secondary);
   font-size: 1.1rem;
   line-height: 1.6;
 }
 
-.Mockup-content {
-  margin-top: 24px;
+.gridItem-visual {
   flex: 1;
+  height: 100%;
+  border-radius: 16px;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
 
-.Mockup-line {
-  height: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+.bg-gradient {
+  background: linear-gradient(135deg, var(--primary-light), rgba(236, 72, 153, 0.1));
 }
 
-.Mockup-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-top: 24px;
+.bg-icon {
+  font-size: 10rem;
+  color: var(--primary-color);
+  opacity: 0.2;
+  transform: rotate(15deg);
 }
 
-.Mockup-box {
-  height: 60px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-}
-
-@media (max-width: 1100px) {
-  .LandingPage-heroContent h1 {
-    font-size: 3.5rem;
-  }
-}
-
-@media (max-width: 900px) {
-  .LandingPage-nav {
-    padding: 0 24px;
-  }
-
+@media (max-width: 1024px) {
   .LandingPage-hero {
     flex-direction: column;
-    text-align: center;
-    padding: 60px 24px;
+    padding-top: 120px;
   }
 
-  .LandingPage-heroContent {
-    flex: none;
+  .LandingPage-gridContainer {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
   }
 
+  .LandingPage-gridItem.large-span {
+    grid-column: span 1;
+    flex-direction: column;
+  }
+
+  .gridItem-visual {
+    height: 200px;
+    width: 100%;
+    margin-top: 24px;
+  }
+
+  .LandingPage-dashboardCards {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
   .LandingPage-heroContent h1 {
     font-size: 3rem;
   }
 
-  .LandingPage-heroContent p {
-    margin-left: auto;
-    margin-right: auto;
+  .LandingPage-nav {
+    padding: 0 24px;
   }
 
-  .LandingPage-ctaWrapper {
-    justify-content: center;
-    flex-direction: column;
+  .LandingPage-registerBtn {
+    display: none;
   }
 
-  .LandingPage-heroImage {
-    width: 100%;
-    margin-top: 40px;
+  .LandingPage-heroVisual {
+    display: none;
   }
 
-  .LandingPage-features {
-    grid-template-columns: 1fr;
+  .LandingPage-aboutGrid {
     padding: 60px 24px;
+  }
+
+  .LandingPage-gridItem {
+    padding: 20px;
   }
 }
