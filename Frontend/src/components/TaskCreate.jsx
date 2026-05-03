@@ -1,5 +1,5 @@
 import '../assets/css/TaskCreate.css';
-import { createNewAss, createNewTask, getGroupMembers } from '@services/authService';
+import { createAssignment, createTask, getGroupMembers } from '@services/authService';
 import toast from 'react-hot-toast';
 import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -61,7 +61,7 @@ function TaskCreate({ type = "task" }) {
                 formData.append("guidelinesLink", taskDetail.guidelinesLink);
                 if (guidelineFile) formData.append("guidelineFile", guidelineFile);
 
-                const { response } = await createNewAss(formData);
+                const response = await createAssignment(formData);
                 if (response.ok) {
                     navigate(`/group/${groupId}`);
                 } else {
@@ -72,7 +72,7 @@ function TaskCreate({ type = "task" }) {
                     ...taskDetail,
                     parentAssignment: assignmentId
                 };
-                const { response } = await createNewTask(newTask);
+                const response = await createTask(newTask);
                 if (response.ok) {
                     navigate(-1);
                 } else {

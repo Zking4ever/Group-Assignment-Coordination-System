@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { fetchAssignments, deleteAssignment } from '@services/authService';
-import '../assets/css/AssignmentList.css';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { getGroupAssignments, deleteAssignment } from '@services/authService';
 import AssignmentCard from '@components/AssignmentCard.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
 import Modal from './Modal';
+import '../assets/css/AssignmentList.css';
 
 function AssignmentList({ groupId, isOwner }) {
     const [assignments, setAssignments] = useState([]);
@@ -18,8 +18,7 @@ function AssignmentList({ groupId, isOwner }) {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const { data: assData } = await fetchAssignments();
-                const groupAssignments = assData.filter(a => a.parentGroup === groupId);
+                const groupAssignments = await getGroupAssignments();
                 setAssignments(groupAssignments);
             } catch (error) {
                 console.error("Error loading assignments:", error);

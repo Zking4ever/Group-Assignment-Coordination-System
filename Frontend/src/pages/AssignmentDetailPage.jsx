@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchAssignments, fetchTasks, getGroupMembers, getAiBreakdown, createNewTask, updateTask, getGroupDetail } from '@services/authService';
+import { getAssignmentDetail, getAssignmentTasks, getGroupMembers, getAiBreakdown, createTask, updateTask, getGroupDetail } from '@services/authService';
 import '../assets/css/AssignmentDetailPage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faArrowLeft, faClipboardList, faChevronRight, faMagicWandSparkles, faUserCircle, faGripVertical, faCopy, faCheck, faEdit, faPaperclip, faLink } from '@fortawesome/free-solid-svg-icons';
@@ -143,8 +143,7 @@ function AssignmentDetailPage() {
             const user = JSON.parse(localStorage.getItem("currentUser"));
             setCurrentUser(user);
 
-            const { data: allAssignments } = await fetchAssignments();
-            const currentAss = allAssignments.find(a => a.id === assignmentId);
+            const currentAss = await getAssignmentDetail(assignmentId);
             setAssignment(currentAss);
             setEditedTitle(currentAss.assignmentName);
 
@@ -152,8 +151,7 @@ function AssignmentDetailPage() {
             const { data: group } = await getGroupDetail(groupId);
             setGroupCode(group.inviteCode);
 
-            const { data: allTasks } = await fetchTasks();
-            const assTasks = allTasks.filter(t => t.parentAssignment === assignmentId);
+            const assTasks = await getAssignmentTasks(assignmentId);
             setTasks(assTasks);
 
             const groupMembers = await getGroupMembers(groupId);
@@ -180,9 +178,9 @@ function AssignmentDetailPage() {
     const handleUpdateTitle = async () => {
         if (!editedTitle.trim()) return setIsEditingTitle(false);
         try {
-            // Re-using createNewTask logic or just a manual update if service not ready
+            // Re-using createTask logic or just a manual update if service not ready
+            // Do the update logic in here
             // But we can just use setAssignment locally for now and implement the API call later
-            // Better to use fetchAssignments to update or specific patch
             setAssignment(prev => ({ ...prev, assignmentName: editedTitle }));
             setIsEditingTitle(false);
             toast.success("Title updated!");
@@ -250,7 +248,7 @@ function AssignmentDetailPage() {
         };
 
         try {
-            const { response } = await createNewTask(newTaskDetails);
+            const response = await createTask(newTaskDetails);
             if (response.ok) {
                 toast.success(`Assigned "${confirmingTask.taskName}" to ${confirmingTask.memberName}`);
                 setAiTasks(prev => prev.filter((_, idx) => `ai-${idx}` !== confirmingTask.aiIndex));

@@ -1,5 +1,5 @@
 import '../assets/css/ProfilePage.css';
-import { fetchUsers, editProfile } from '@services/authService'
+import { getUserDetail, editProfile } from '@services/authService'
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -18,8 +18,7 @@ function ProfilePage() {
             const currentUser = JSON.parse(localStorage.getItem("currentUser"));
             if (!currentUser) return;
             try {
-                const { data } = await fetchUsers();
-                const userNow = data.find(d => d.id === currentUser.id);
+                const userNow = await getUserDetail(currentUser.id);
                 setUser(userNow);
             } catch (error) {
                 console.error(error);

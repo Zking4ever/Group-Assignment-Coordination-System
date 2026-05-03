@@ -93,107 +93,131 @@ export const kickMember = async (groupId, userId) => {
   return { response, data };
 };
 
+//------------------------------ assignment endpoints -----------------------
 
-//assignment create
-export const createNewAss = async (newAssData) => {
-  const isFormData = newAssData instanceof FormData;
-  const response = await fetch(`${BASE_URL}/assignments`, {
-    method: "POST",
-    headers: isFormData ? {} : { "Content-Type": "application/json" },
-    body: isFormData ? newAssData : JSON.stringify(newAssData)
-  });
+export const getAssignmentDetail = async (assignmetnId)=>{
+  const response = await fetch(`${BASE_URL}/assignment/detail/${assignmetnId}`);
+  return await response.json();
+}
 
-  let data = {};
-  try {
-    data = await response.json();
-  }
-  catch {
-    data = {};
-  }
-
-  return { response, data };
-};
-
-
-//fetch assignments
-export const fetchAssignments = async (assignmentId = null) => {
-  const url = assignmentId ? `${BASE_URL}/assignments/${assignmentId}` : `${BASE_URL}/assignments`;
-  const response = await fetch(url, {
+export const getGroupAssignments = async (groupId) => {
+  const response = await fetch(`${BASE_URL}/assignment/${groupId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
     }
   });
-  const data = await response.json();
-  return { response, data };
+  return await response.json();
 };
 
-
-// join group
-export const joinGroup = async (groupId, members) => {
-  const response = await fetch(`${BASE_URL}/group/join/${groupId}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ members })
+export const createAssignment = async (newAssignment) => {
+  const isFormData = newAssignment instanceof FormData;
+  return await fetch(`${BASE_URL}/assignment`, {
+    method: "POST",
+    headers: isFormData ? {} : { "Content-Type": "application/json" },
+    body: isFormData ? newAssignment : JSON.stringify(newAssignment)
   });
-
-  const data = await response.json();
-  return { response, data };
 };
 
-
-
-
-
-export const fetchUsers = async () => {
-  const response = await fetch(`${BASE_URL}/users`);
-
-  const data = await response.json();
-
-  return { response, data };
+export const deleteAssignment = async (assignmentsId) => {
+  return await fetch(`${BASE_URL}/assignment/${assignmentsId}`, {
+    method: "DELETE"
+  });
 };
 
+// export const updateAssignmentGuidelines = async (assignmentId, formData) => {
+//   const response = await fetch(`${BASE_URL}/assignment/${assignmentId}/guidelines`, {
+//     method: "PATCH",
+//     body: formData
+//   });
+//   const data = await response.json();
+//   return { response, data };
+// };
 
-//create new task
-export const createNewTask = async (taskDetails) => {
-  const response = await fetch(`${BASE_URL}/tasks`, {
+
+//------------------------------ task endpoints -----------------------
+
+export const createTask = async (taskDetails) => {
+  return await fetch(`${BASE_URL}/task`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(taskDetails)
   });
-  let data = {};
-  try {
-    data = await response.json();
-  }
-  catch {
-    data = {};
-  }
-
-  return { response, data };
 }
 
+export const deleteTask = async (taskId) => {
+  return await fetch(`${BASE_URL}/task/${taskId}`, {
+    method: "DELETE"
+  });
+};
 
-export const fetchTasks = async () => {
-  const response = await fetch(`${BASE_URL}/tasks`, {
-    method: "GET",
+export const getTaskDetail = async (taskId) => {
+  const response = await fetch(`${BASE_URL}/task/detail/${taskId}`);
+  return await response.json();
+}
+
+export const getAssignmentTasks = async (assignmentId) => {
+  const response = await fetch(`${BASE_URL}/task/${assignmentId}`);
+  return await response.json();
+}
+
+export const updateTask = async (taskId, updatedTask) => {
+  if (!taskId) throw new Error("Task ID is required");
+  return await fetch(`${BASE_URL}/task/${taskId}`, {
+    method: "PATCH",
     headers: {
       "Content-Type": "application/json"
-    }
+    },
+    body: JSON.stringify(updatedTask),
   });
-  let data = {};
-  try {
-    data = await response.json();
-  }
-  catch {
-    data = {};
-  }
+};
 
+export const startTaskWork = async (taskId, userId) => {
+  return await fetch(`${BASE_URL}/task/${taskId}/start-work`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId })
+  });
+};
+
+export const recordTimeExpiry = async (taskId, userId) => {
+  return await fetch(`${BASE_URL}/task/${taskId}/record-expiry`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId })
+  });
+};
+
+export const submitTaskWork = async (taskId, formData) => {
+  return await fetch(`${BASE_URL}/task/${taskId}/submit-work`, {
+    method: "PATCH",
+    body: formData
+  });
+};
+
+export const verifyTaskSubmission = async (taskId, status, feedback) => {
+  const response = await fetch(`${BASE_URL}/task/${taskId}/verify-submission`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status, feedback })
+  });
+  const data = await response.json();
   return { response, data };
-}
+};
+
+export const getAiBreakdown = async (assignmentName, assignmentDescription, memberCount, guidelinesText) => {
+  const response = await fetch(`${BASE_URL}/task/breakdown/ai`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ assignmentName, assignmentDescription, memberCount, guidelinesText })
+  });
+  const data = await response.json();
+  return { response, data };
+};
 
 
 //edit profile 
@@ -217,82 +241,10 @@ export const editProfile = async (userId, userInfo) => {
 };
 
 
-export const updateTask = async (taskId, updatedTask) => {
-  if (!taskId) {
-    throw new Error("Task ID is required");
-  }
-
-  const response = await fetch(`${BASE_URL}/tasks/${taskId}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(updatedTask),
-  });
-
-  let data = {};
-  try {
-    data = await response.json();
-  }
-  catch {
-    data = {};
-  }
-
-  if (!response.ok) {
-    console.warn("Task update failed", data);
-  }
-
-  return { response, data };
-};
 
 
 
 
-
-export const deleteAssignment = async (assignmentsId) => {
-  const response = await fetch(`${BASE_URL}/assignments/${assignmentsId}`, {
-    method: "DELETE"
-  });
-  let data = {};
-  try {
-    data = await response.json();
-  }
-  catch {
-    data = {};
-  }
-
-  return { response, data };
-};
-
-
-export const deleteTask = async (taskId) => {
-  const response = await fetch(`${BASE_URL}/tasks/${taskId}`, {
-    method: "DELETE"
-  });
-  let data = {};
-  try {
-    data = await response.json();
-  }
-  catch {
-    data = {};
-  }
-
-  return { response, data };
-};
-
-
-
-export const getAiBreakdown = async (assignmentName, assignmentDescription, memberCount, guidelinesText) => {
-  const response = await fetch(`${BASE_URL}/ai/breakdown`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ assignmentName, assignmentDescription, memberCount, guidelinesText })
-  });
-  const data = await response.json();
-  return { response, data };
-};
 
 export const fetchNotifications = async (groupId) => {
   const response = await fetch(`${BASE_URL}/notifications/${groupId}`);
@@ -300,40 +252,8 @@ export const fetchNotifications = async (groupId) => {
   return { response, data };
 };
 
-export const updateAssignmentGuidelines = async (assignmentId, formData) => {
-  const response = await fetch(`${BASE_URL}/assignments/${assignmentId}/guidelines`, {
-    method: "PATCH",
-    body: formData
-  });
-  const data = await response.json();
-  return { response, data };
-};
 
-export const startTaskWork = async (taskId, userId) => {
-  const response = await fetch(`${BASE_URL}/tasks/${taskId}/start-work`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId })
-  });
-  const data = await response.json();
-  return { response, data };
-};
 
-export const submitTaskWork = async (taskId, formData) => {
-  const response = await fetch(`${BASE_URL}/tasks/${taskId}/submit-work`, {
-    method: "PATCH",
-    body: formData
-  });
-  const data = await response.json();
-  return { response, data };
-};
 
-export const verifyTaskSubmission = async (taskId, status, feedback) => {
-  const response = await fetch(`${BASE_URL}/tasks/${taskId}/verify-submission`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status, feedback })
-  });
-  const data = await response.json();
-  return { response, data };
-};
+
+

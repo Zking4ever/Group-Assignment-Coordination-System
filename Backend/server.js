@@ -238,23 +238,217 @@ app.delete('/group/:groupId/member/:userId', (req, res) => {
   }
 });
 
+// --- Assignments ---
 
-
-////////////////////////---------- astawus ----- ////////////
-
-
-
-app.get('/notifications/:groupId', (req, res) => {
+// to get assignmetns of specific group
+app.get('/assignment/:groupID', (req, res) => {
   const { groupId } = req.params;
+  const assignments = db.prepare('SELECT * FROM assignments where groupId = ?').all(groupId);
+  // Map back to parentGroup field for frontend compatibility
+  res.json(assignments.map(a => ({ ...a, parentGroup: a.groupId })));
+});
+
+// to get assignemt detail by id
+app.get('/assignment/detail/:assignmentId', (req, res) => {
+  const { assignmentId } = req.params;
+  const assignments = db.prepare('SELECT * FROM assignments where id = ?').all(assignmentId);
+  res.json(assignments.map(a => ({ ...a, parentGroup: a.groupId })));
+});
+
+// to create new assignments
+app.post('/assignment', upload.single('guidelineFile'), (req, res) => {
+  const { assignmentName, assignmentDescription, creatorId, parentGroup, guidelinesText, guidelinesLink } = req.body;
+  const guidelinesFile = req.file ? `/uploads/${req.file.filename}` : null;
+  const id = uuidv4();
   try {
-    const notifs = db.prepare('SELECT * FROM notifications WHERE groupId = ? ORDER BY createdAt DESC LIMIT 20').all(groupId);
-    res.json(notifs);
+    db.prepare('INSERT INTO assignments (id, assignmentName, assignmentDescription, creatorId, groupId, guidelinesText, guidelinesLink, guidelinesFile) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+      .run(id, assignmentName, assignmentDescription, creatorId, parentGroup, guidelinesText || null, guidelinesLink || null, guidelinesFile || null);
+    res.status(201).json({ id, assignmentName, assignmentDescription, creatorId, parentGroup, guidelinesFile });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 });
 
-app.post('/ai/breakdown', async (req, res) => {
+app.delete('/assignment/:id', (req, res) => {
+  const { id } = req.params;
+  try {
+    db.prepare('DELETE FROM assignments WHERE id = ?').run(id);
+    res.json({ message: 'Assignment deleted' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// to Update Assignment Guidelines
+// app.patch('/assignment/:id/guidelines', upload.single('guidelineFile'), (req, res) => {
+//   const { id } = req.params;
+//   const { guidelinesText, guidelinesLink } = req.body;
+//   const guidelinesFile = req.file ? `/uploads/${req.file.filename}` : null;
+
+//   try {
+//     const fields = [];
+//     const values = [];
+//     if (guidelinesText !== undefined) { fields.push('guidelinesText = ?'); values.push(guidelinesText); }
+//     if (guidelinesLink !== undefined) { fields.push('guidelinesLink = ?'); values.push(guidelinesLink); }
+//     if (guidelinesFile) { fields.push('guidelinesFile = ?'); values.push(guidelinesFile); }
+
+//     if (fields.length > 0) {
+//       db.prepare(`UPDATE assignments SET ${fields.join(', ')} WHERE id = ?`).run(...values, id);
+//     }
+//     res.json({ message: 'Guidelines updated', fileUrl: guidelinesFile });
+//   } catch (err) {
+//     res.status(400).json({ error: err.message });
+//   }
+// });
+
+
+
+// --- Tasks ---
+
+//to get assignment's tasks
+app.get('/task/:assignmentId',(req, res)=>{
+  const { assignmentId } = req.params;
+   const tasks = db.prepare(`
+      SELECT tasks.*, users.firstName || ' ' || users.lastName as responsibleMemberName 
+      FROM tasks 
+      LEFT JOIN users ON tasks.responsibleMemberId = users.id
+      WHERE parentAssignmentId = ?
+    `).all(assignmentId);
+  res.json(tasks.map(t => ({
+    ...t,
+    parentAssignment: t.parentAssignmentId,
+    responsibleMember: t.responsibleMemberId
+  })));
+})
+
+//to get task detail
+app.get('/task/detail/:taskId',(req,res)=>{
+  const { taskId } = req.params;
+  const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId);
+  res.json(task);
+})
+
+// to create a task
+app.post('/task', (req, res) => {
+  const { taskName, taskDescription, responsibleMember, startDate, deadLine, parentAssignment, state } = req.body;
+  const id = uuidv4();
+  try {
+    db.prepare('INSERT INTO tasks (id, taskName, taskDescription, responsibleMemberId, startDate, deadLine, parentAssignmentId, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+      .run(id, taskName, taskDescription, responsibleMember, startDate, deadLine, parentAssignment, state || 'yet');
+    res.status(201).json({ id, taskName, taskDescription, responsibleMember, startDate, deadLine, parentAssignment, state: state || 'yet' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// to start Work Timer (20 mins)
+app.patch('/task/:id/start-work', (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body;
+  const workStartTime = new Date().toISOString();
+  const workExpiryTime = new Date(Date.now() + 20 * 60 * 1000).toISOString(); // 20 mins
+
+  try {
+    db.prepare('UPDATE tasks SET workingUserId = ?, workStartTime = ?, workExpiryTime = ?, state = ? WHERE id = ?')
+      .run(userId, workStartTime, workExpiryTime, 'working', id);
+    res.json({ message: 'Work timer started', workExpiryTime });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// record Expired Session (internal use or trigger from frontend)
+app.post('/task/:id/record-expiry', (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body;
+  try {
+    const task = db.prepare('SELECT parentAssignmentId FROM tasks WHERE id = ?').get(id);
+    const assignment = db.prepare('SELECT groupId FROM assignments WHERE id = ?').get(task.parentAssignmentId);
+
+    const notifId = uuidv4();
+    const message = `Task work session expired for user ${userId}`;
+    db.prepare('INSERT INTO notifications (id, groupId, userId, type, message) VALUES (?, ?, ?, ?, ?)')
+      .run(notifId, assignment.groupId, userId, 'SESSION_EXPIRED', message);
+    res.json({ message: 'Expiry recorded' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// to update a task
+app.patch('/task/:id', (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+  // Map frontend fields (responsibleMember, parentAssignment) to DB fields
+  if (updates.responsibleMember) {
+    updates.responsibleMemberId = updates.responsibleMember;
+    delete updates.responsibleMember;
+  }
+  if (updates.parentAssignment) {
+    updates.parentAssignmentId = updates.parentAssignment;
+    delete updates.parentAssignment;
+  }
+
+  const keys = Object.keys(updates);
+  const setClause = keys.map(key => `${key} = ?`).join(', ');
+  const values = keys.map(key => updates[key]);
+
+  try {
+    db.prepare(`UPDATE tasks SET ${setClause} WHERE id = ?`).run(...values, id);
+    res.json({ message: 'Task updated' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// to delete a task
+app.delete('/task/:id', (req, res) => {
+  const { id } = req.params;
+  try {
+    db.prepare('DELETE FROM tasks WHERE id = ?').run(id);
+    res.json({ message: 'Task deleted' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// to submit a task
+app.patch('/task/:id/submit-work', upload.single('submissionFile'), (req, res) => {
+  const { id } = req.params;
+  const { submissionReport, submissionLink } = req.body;
+  const submissionFile = req.file ? `/uploads/${req.file.filename}` : null;
+
+  try {
+    db.prepare('UPDATE tasks SET submissionReport = ?, submissionFile = ?, submissionLink = ?, submissionStatus = ?, state = ?, workingUserId = NULL, workEndTime = ? WHERE id = ?')
+      .run(submissionReport, submissionFile, submissionLink, 'submitted', 'submitted', new Date().toISOString(), id);
+    res.json({ message: 'Work submitted for verification', fileUrl: submissionFile });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// to verify task submission
+app.patch('/task/:id/verify-submission', (req, res) => {
+  const { id } = req.params;
+  const { status, feedback } = req.body; // status: 'ACCEPTED', 'REJECTED'
+
+  try {
+    let newState = 'completed';
+    if (status === 'REJECTED') {
+      newState = 'yet'; // Reassign or back to start
+    }
+
+    db.prepare('UPDATE tasks SET submissionStatus = ?, state = ? WHERE id = ?')
+      .run(status, newState, id);
+
+    res.json({ message: `Submission ${status.toLowerCase()}`, newState });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// to breakdown tasks with ai
+app.post('/task/breakdown/ai', async (req, res) => {
   const { assignmentName, assignmentDescription, memberCount, guidelinesText } = req.body;
 
   if (!process.env.GEMINI_API_KEY) {
@@ -294,183 +488,12 @@ app.post('/ai/breakdown', async (req, res) => {
 });
 
 
-// --- Assignments ---
-app.get('/assignments', (req, res) => {
-  const assignments = db.prepare('SELECT * FROM assignments').all();
-  // Map back to parentGroup field for frontend compatibility
-  res.json(assignments.map(a => ({ ...a, parentGroup: a.groupId })));
-});
 
-app.post('/assignments', upload.single('guidelineFile'), (req, res) => {
-  const { assignmentName, assignmentDescription, creatorId, parentGroup, guidelinesText, guidelinesLink } = req.body;
-  const guidelinesFile = req.file ? `/uploads/${req.file.filename}` : null;
-  const id = uuidv4();
+app.get('/notifications/:groupId', (req, res) => {
+  const { groupId } = req.params;
   try {
-    db.prepare('INSERT INTO assignments (id, assignmentName, assignmentDescription, creatorId, groupId, guidelinesText, guidelinesLink, guidelinesFile) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-      .run(id, assignmentName, assignmentDescription, creatorId, parentGroup, guidelinesText || null, guidelinesLink || null, guidelinesFile || null);
-    res.status(201).json({ id, assignmentName, assignmentDescription, creatorId, parentGroup, guidelinesFile });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-app.delete('/assignments/:id', (req, res) => {
-  const { id } = req.params;
-  try {
-    db.prepare('DELETE FROM assignments WHERE id = ?').run(id);
-    res.json({ message: 'Assignment deleted' });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-// --- Tasks ---
-app.get('/tasks', (req, res) => {
-  const tasks = db.prepare(`
-    SELECT tasks.*, users.firstName || ' ' || users.lastName as responsibleMemberName 
-    FROM tasks 
-    LEFT JOIN users ON tasks.responsibleMemberId = users.id
-  `).all();
-  res.json(tasks.map(t => ({
-    ...t,
-    parentAssignment: t.parentAssignmentId,
-    responsibleMember: t.responsibleMemberId
-  })));
-});
-
-// Update Assignment Guidelines
-app.patch('/assignments/:id/guidelines', upload.single('guidelineFile'), (req, res) => {
-  const { id } = req.params;
-  const { guidelinesText, guidelinesLink } = req.body;
-  const guidelinesFile = req.file ? `/uploads/${req.file.filename}` : null;
-
-  try {
-    const fields = [];
-    const values = [];
-    if (guidelinesText !== undefined) { fields.push('guidelinesText = ?'); values.push(guidelinesText); }
-    if (guidelinesLink !== undefined) { fields.push('guidelinesLink = ?'); values.push(guidelinesLink); }
-    if (guidelinesFile) { fields.push('guidelinesFile = ?'); values.push(guidelinesFile); }
-
-    if (fields.length > 0) {
-      db.prepare(`UPDATE assignments SET ${fields.join(', ')} WHERE id = ?`).run(...values, id);
-    }
-    res.json({ message: 'Guidelines updated', fileUrl: guidelinesFile });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-// Start Work Timer (20 mins)
-app.patch('/tasks/:id/start-work', (req, res) => {
-  const { id } = req.params;
-  const { userId } = req.body;
-  const workStartTime = new Date().toISOString();
-  const workExpiryTime = new Date(Date.now() + 20 * 60 * 1000).toISOString(); // 20 mins
-
-  try {
-    db.prepare('UPDATE tasks SET workingUserId = ?, workStartTime = ?, workExpiryTime = ?, state = ? WHERE id = ?')
-      .run(userId, workStartTime, workExpiryTime, 'working', id);
-    res.json({ message: 'Work timer started', workExpiryTime });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-// Record Expired Session (internal use or trigger from frontend)
-app.post('/tasks/:id/record-expiry', (req, res) => {
-  const { id } = req.params;
-  const { userId } = req.body;
-  try {
-    const task = db.prepare('SELECT parentAssignmentId FROM tasks WHERE id = ?').get(id);
-    const assignment = db.prepare('SELECT groupId FROM assignments WHERE id = ?').get(task.parentAssignmentId);
-
-    const notifId = uuidv4();
-    const message = `Task work session expired for user ${userId}`;
-    db.prepare('INSERT INTO notifications (id, groupId, userId, type, message) VALUES (?, ?, ?, ?, ?)')
-      .run(notifId, assignment.groupId, userId, 'SESSION_EXPIRED', message);
-    res.json({ message: 'Expiry recorded' });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-// Submit Work
-app.patch('/tasks/:id/submit-work', upload.single('submissionFile'), (req, res) => {
-  const { id } = req.params;
-  const { submissionReport, submissionLink } = req.body;
-  const submissionFile = req.file ? `/uploads/${req.file.filename}` : null;
-
-  try {
-    db.prepare('UPDATE tasks SET submissionReport = ?, submissionFile = ?, submissionLink = ?, submissionStatus = ?, state = ?, workingUserId = NULL, workEndTime = ? WHERE id = ?')
-      .run(submissionReport, submissionFile, submissionLink, 'submitted', 'submitted', new Date().toISOString(), id);
-    res.json({ message: 'Work submitted for verification', fileUrl: submissionFile });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-// Verify Submission
-app.patch('/tasks/:id/verify-submission', (req, res) => {
-  const { id } = req.params;
-  const { status, feedback } = req.body; // status: 'ACCEPTED', 'REJECTED'
-
-  try {
-    let newState = 'completed';
-    if (status === 'REJECTED') {
-      newState = 'yet'; // Reassign or back to start
-    }
-
-    db.prepare('UPDATE tasks SET submissionStatus = ?, state = ? WHERE id = ?')
-      .run(status, newState, id);
-
-    res.json({ message: `Submission ${status.toLowerCase()}`, newState });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-app.post('/tasks', (req, res) => {
-  const { taskName, taskDescription, responsibleMember, startDate, deadLine, parentAssignment, state } = req.body;
-  const id = uuidv4();
-  try {
-    db.prepare('INSERT INTO tasks (id, taskName, taskDescription, responsibleMemberId, startDate, deadLine, parentAssignmentId, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-      .run(id, taskName, taskDescription, responsibleMember, startDate, deadLine, parentAssignment, state || 'yet');
-    res.status(201).json({ id, taskName, taskDescription, responsibleMember, startDate, deadLine, parentAssignment, state: state || 'yet' });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-app.patch('/tasks/:id', (req, res) => {
-  const { id } = req.params;
-  const updates = req.body;
-  // Map frontend fields (responsibleMember, parentAssignment) to DB fields
-  if (updates.responsibleMember) {
-    updates.responsibleMemberId = updates.responsibleMember;
-    delete updates.responsibleMember;
-  }
-  if (updates.parentAssignment) {
-    updates.parentAssignmentId = updates.parentAssignment;
-    delete updates.parentAssignment;
-  }
-
-  const keys = Object.keys(updates);
-  const setClause = keys.map(key => `${key} = ?`).join(', ');
-  const values = keys.map(key => updates[key]);
-
-  try {
-    db.prepare(`UPDATE tasks SET ${setClause} WHERE id = ?`).run(...values, id);
-    res.json({ message: 'Task updated' });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-app.delete('/tasks/:id', (req, res) => {
-  const { id } = req.params;
-  try {
-    db.prepare('DELETE FROM tasks WHERE id = ?').run(id);
-    res.json({ message: 'Task deleted' });
+    const notifs = db.prepare('SELECT * FROM notifications WHERE groupId = ? ORDER BY createdAt DESC LIMIT 20').all(groupId);
+    res.json(notifs);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

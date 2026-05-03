@@ -1,7 +1,7 @@
 import '../assets/css/TaskDetailPage.css';
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { fetchTasks, updateTask, startTaskWork, submitTaskWork, verifyTaskSubmission, fetchAssignments } from '@services/authService'
+import { getTaskDetail, updateTask, startTaskWork, submitTaskWork, verifyTaskSubmission, getAssignmentDetail, recordTimeExpiry } from '@services/authService'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faCheckCircle, faClock, faUserCircle, faExclamationCircle, faFileUpload, faLink, faFileAlt, faTimes, faCheck, faRedo } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
@@ -26,12 +26,10 @@ function TaskDetailPage() {
 
     const loadTask = async () => {
         try {
-            const { data: allTasks } = await fetchTasks();
-            const currentTask = allTasks.find(t => t.id === taskId);
+            const currentTask = await getTaskDetail(taskId);
             setTask(currentTask);
 
-            const { data: allAss } = await fetchAssignments();
-            const currentAss = allAss.find(a => a.id === assignmentId);
+            const currentAss = await getAssignmentDetail(assignmentId);
             setAssignment(currentAss);
 
             if (currentTask.state === 'working' && currentTask.workExpiryTime) {
@@ -60,12 +58,6 @@ function TaskDetailPage() {
                     if (prev <= 1) {
                         clearInterval(timerRef.current);
                         handleSessionEnd();
-                        // Record expiry on server
-                        fetch(`http://localhost:5000/tasks/${taskId}/record-expiry`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ userId: currentUser.id })
-                        }).catch(console.error);
                         return 0;
                     }
                     return prev - 1;
@@ -76,18 +68,20 @@ function TaskDetailPage() {
     }, [timeLeft, task?.state]);
 
     const handleSessionEnd = () => {
+        await recordTimeExpiry(taskId, currentUser.id);
         toast("Work session expired. Progress recorded.", { icon: '⏰' });
+
         loadTask(); // Refresh to see state change from server if any
     };
 
     const handleStartWork = async () => {
         try {
-            const { response, data } = await startTaskWork(taskId, currentUser.id);
+            const response = await startTaskWork(taskId, currentUser.id);
             if (response.ok) {
                 toast.success("Work timer started! You have 20 minutes.");
                 loadTask();
             } else {
-                toast.error(data.error || "Failed to start work");
+                toast.error("Failed to start work");
             }
         } catch (err) {
             toast.error("Error starting work");
@@ -103,12 +97,12 @@ function TaskDetailPage() {
         if (file) formData.append("file", file);
 
         try {
-            const { response, data } = await submitTaskWork(taskId, formData);
+            const response = await submitTaskWork(taskId, formData);
             if (response.ok) {
                 toast.success("Work submitted for verification!");
                 loadTask();
             } else {
-                toast.error(data.error || "Submission failed");
+                toast.error("Submission failed");
             }
         } catch (err) {
             toast.error("Error submitting work");
