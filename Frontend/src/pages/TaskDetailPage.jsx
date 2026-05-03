@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getTaskDetail, updateTask, startTaskWork, submitTaskWork, verifyTaskSubmission, getAssignmentDetail, recordTimeExpiry } from '@services/authService'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faCheckCircle, faClock, faUserCircle, faExclamationCircle, faFileUpload, faLink, faFileAlt, faTimes, faCheck, faRedo } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCheckCircle, faClock, faUserCircle, faExclamationCircle, faFileUpload, faLink, faFileAlt, faTimes, faCheck, faRedo, faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import { formatRelativeDeadline } from '../utils/timeUtils';
 
@@ -16,12 +16,13 @@ function TaskDetailPage() {
     const [currentUser, setCurrentUser] = useState(null);
     const [timeLeft, setTimeLeft] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
+
     // Submission form state
     const [report, setReport] = useState("");
     const [link, setLink] = useState("");
     const [file, setFile] = useState(null);
-    
+    const [isPaused, setIsPaused] = useState(false);
+
     const timerRef = useRef(null);
 
     const loadTask = async () => {
@@ -52,7 +53,7 @@ function TaskDetailPage() {
     }, [taskId]);
 
     useEffect(() => {
-        if (timeLeft > 0 && task?.state === 'working') {
+        if (timeLeft > 0 && task?.state === 'working' && !isPaused) {
             timerRef.current = setInterval(() => {
                 setTimeLeft(prev => {
                     if (prev <= 1) {
@@ -65,9 +66,9 @@ function TaskDetailPage() {
             }, 1000);
         }
         return () => clearInterval(timerRef.current);
-    }, [timeLeft, task?.state]);
+    }, [timeLeft, task?.state, isPaused]);
 
-    const handleSessionEnd = async() => {
+    const handleSessionEnd = async () => {
         await recordTimeExpiry(taskId, currentUser.id);
         toast("Work session expired. Progress recorded.", { icon: '⏰' });
 
@@ -161,7 +162,7 @@ function TaskDetailPage() {
                         </div>
                         <p>{task.taskDescription || "No instructions provided."}</p>
                     </section>
-                    
+
                     {task.submissionStatus && (
                         <section className={"TaskDetailPage-submissionInfo"}>
                             <div className={"TaskDetailPage-sectionTitle"}>
@@ -190,9 +191,9 @@ function TaskDetailPage() {
                             <form onSubmit={handleSubmitWork}>
                                 <div className="Form-group">
                                     <label>Action Report</label>
-                                    <textarea 
-                                        placeholder="Describe what you worked on..." 
-                                        value={report} 
+                                    <textarea
+                                        placeholder="Describe what you worked on..."
+                                        value={report}
                                         onChange={(e) => setReport(e.target.value)}
                                         required
                                     ></textarea>
@@ -200,18 +201,18 @@ function TaskDetailPage() {
                                 <div className="Form-row">
                                     <div className="Form-group">
                                         <label><FontAwesomeIcon icon={faLink} /> External Link</label>
-                                        <input 
-                                            type="url" 
-                                            placeholder="GitHub, Drive, etc." 
-                                            value={link} 
-                                            onChange={(e) => setLink(e.target.value)} 
+                                        <input
+                                            type="url"
+                                            placeholder="GitHub, Drive, etc."
+                                            value={link}
+                                            onChange={(e) => setLink(e.target.value)}
                                         />
                                     </div>
                                     <div className="Form-group">
                                         <label><FontAwesomeIcon icon={faFileUpload} /> File Attachment</label>
-                                        <input 
-                                            type="file" 
-                                            onChange={(e) => setFile(e.target.files[0])} 
+                                        <input
+                                            type="file"
+                                            onChange={(e) => setFile(e.target.files[0])}
                                         />
                                     </div>
                                 </div>
@@ -231,21 +232,26 @@ function TaskDetailPage() {
                                 {task.state || 'yet'}
                             </span>
                         </div>
-                        
+
                         <div className={"TaskDetailPage-actions"}>
                             {(task.state === 'yet' || task.state === 'REJECTED') && isResponsible && (
                                 <button className={"TaskDetailPage-primaryBtn"} onClick={handleStartWork}>
                                     <FontAwesomeIcon icon={faClock} /> Start working (20min)
                                 </button>
                             )}
-                            
+
                             {task.state === 'working' && isResponsible && (
                                 <div className="Timer-display">
                                     <div className="Timer-countdown">{formatTime(timeLeft)}</div>
                                     <p>Time remaining to record activity</p>
-                                    <button className="TaskDetailPage-secondaryBtn" onClick={() => loadTask()}>
-                                        <FontAwesomeIcon icon={faTimes} /> Stop work session
-                                    </button>
+                                    <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                                        <button className="TaskDetailPage-primaryBtn" onClick={() => setIsPaused(!isPaused)}>
+                                            <FontAwesomeIcon icon={isPaused ? faPlay : faPause} /> {isPaused ? 'Resume' : 'Pause'}
+                                        </button>
+                                        <button className="TaskDetailPage-secondaryBtn" onClick={() => loadTask()}>
+                                            <FontAwesomeIcon icon={faTimes} /> Stop
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>

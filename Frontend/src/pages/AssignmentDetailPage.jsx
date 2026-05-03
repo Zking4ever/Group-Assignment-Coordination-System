@@ -31,29 +31,31 @@ function EditableAiTask({ task, index, onUpdate }) {
     };
 
     return (
-        <div 
-            ref={setNodeRef} 
-            style={style} 
-            {...attributes} 
-            {...listeners} 
+        <div
+            ref={setNodeRef}
+            style={style}
             className={`AiTask-card ${isEditing ? 'editing' : ''}`}
             onBlur={handleBlur}
         >
-            {!isEditing && <FontAwesomeIcon icon={faGripVertical} className="AiTask-grip" />}
+            {!isEditing && (
+                <div {...attributes} {...listeners} className="AiTask-grip" style={{ cursor: 'grab', padding: '10px' }}>
+                    <FontAwesomeIcon icon={faGripVertical} />
+                </div>
+            )}
             <div className="AiTask-info">
                 {isEditing ? (
                     <>
-                        <input 
-                            className="AiTask-nameInput" 
+                        <input
+                            className="AiTask-nameInput"
                             name="taskName"
-                            value={task.taskName} 
+                            value={task.taskName}
                             autoFocus
                             onChange={(e) => onUpdate(index, { ...task, taskName: e.target.value })}
                         />
-                        <textarea 
-                            className="AiTask-descInput" 
+                        <textarea
+                            className="AiTask-descInput"
                             name="taskDescription"
-                            value={task.taskDescription} 
+                            value={task.taskDescription}
                             onChange={(e) => onUpdate(index, { ...task, taskDescription: e.target.value })}
                         />
                     </>
@@ -68,14 +70,14 @@ function EditableAiTask({ task, index, onUpdate }) {
                         <p>{task.taskDescription}</p>
                     </>
                 )}
-                
+
                 <div className="AiTask-footer">
                     <span>Est: </span>
                     {isEditing ? (
-                        <input 
-                            type="number" 
-                            className="AiTask-hourInput" 
-                            value={task.estimatedHours} 
+                        <input
+                            type="number"
+                            className="AiTask-hourInput"
+                            value={task.estimatedHours}
                             onChange={(e) => onUpdate(index, { ...task, estimatedHours: e.target.value })}
                         />
                     ) : (
@@ -316,7 +318,7 @@ function AssignmentDetailPage() {
                         ) : (
                             <h1 onClick={() => isOwner && setIsEditingTitle(true)}>
                                 {assignment.assignmentName}
-                                </h1>
+                            </h1>
                         )}
                         <div className="Header-badges">
                             <span className="Badge-info">
@@ -416,20 +418,39 @@ function AssignmentDetailPage() {
                                         <h3>AI Generated Drafts</h3>
                                         <p>Edit details before dragging to a member</p>
                                     </div>
-                                    <div className="AiView-tasks">
-                                        {aiTasks.map((task, idx) => (
-                                            <EditableAiTask 
-                                                key={`ai-${idx}`} 
-                                                task={task} 
-                                                index={idx} 
-                                                onUpdate={(i, updated) => {
-                                                    const newTs = [...aiTasks];
-                                                    newTs[i] = updated;
-                                                    setAiTasks(newTs);
-                                                }}
-                                            />
-                                        ))}
-                                    </div>
+                                    <DndContext onDragEnd={handleDragEnd}>
+                                        <div className="AiView-layout">
+                                            <div className="AiView-pool">
+                                                <h4>Drafts</h4>
+                                                <div className="AiView-tasks">
+                                                    {aiTasks.map((task, idx) => (
+                                                        <EditableAiTask
+                                                            key={`ai-${idx}`}
+                                                            task={task}
+                                                            index={idx}
+                                                            onUpdate={(i, updated) => {
+                                                                const newTs = [...aiTasks];
+                                                                newTs[i] = updated;
+                                                                setAiTasks(newTs);
+                                                            }}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div className="AiView-members">
+                                                <h4>Group Members</h4>
+                                                <div className="AiView-memberList">
+                                                    {members.map(member => (
+                                                        <DroppableMember
+                                                            key={member.id}
+                                                            member={member}
+                                                            assignedTasks={tasks.filter(t => t.responsibleMember === member.id)}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </DndContext>
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -485,30 +506,30 @@ function AssignmentDetailPage() {
                     <div className="TaskConfirm-modal">
                         <h3>Confirm Assignment</h3>
                         <p>Assigning to <strong>{confirmingTask.memberName}</strong></p>
-                        
+
                         <div className="Form-group">
                             <label>Task Name</label>
-                            <input 
-                                value={confirmingTask.taskName} 
-                                onChange={(e) => setConfirmingTask({...confirmingTask, taskName: e.target.value})}
+                            <input
+                                value={confirmingTask.taskName}
+                                onChange={(e) => setConfirmingTask({ ...confirmingTask, taskName: e.target.value })}
                             />
                         </div>
-                        
+
                         <div className="Form-group">
                             <label>Instructions</label>
-                            <textarea 
-                                value={confirmingTask.taskDescription} 
-                                onChange={(e) => setConfirmingTask({...confirmingTask, taskDescription: e.target.value})}
+                            <textarea
+                                value={confirmingTask.taskDescription}
+                                onChange={(e) => setConfirmingTask({ ...confirmingTask, taskDescription: e.target.value })}
                             />
                         </div>
 
                         <div className="Form-row">
                             <div className="Form-group">
                                 <label>Deadline</label>
-                                <input 
+                                <input
                                     type="date"
-                                    value={confirmingTask.deadLine} 
-                                    onChange={(e) => setConfirmingTask({...confirmingTask, deadLine: e.target.value})}
+                                    value={confirmingTask.deadLine}
+                                    onChange={(e) => setConfirmingTask({ ...confirmingTask, deadLine: e.target.value })}
                                 />
                             </div>
                         </div>
