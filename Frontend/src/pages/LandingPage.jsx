@@ -9,8 +9,7 @@ function LandingPage() {
         <div className="LandingPage-page">
             <nav className="LandingPage-nav">
                 <div className="LandingPage-logo">
-                    <div className="LandingPage-logoIcon">G</div>
-                    <span>Coordination</span>
+                    GACS
                 </div>
                 <div className="LandingPage-navLinks">
                     <Link to="/login" className="LandingPage-loginLink">Sign in</Link>

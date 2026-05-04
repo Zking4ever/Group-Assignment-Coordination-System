@@ -137,6 +137,17 @@ export const deleteAssignment = async (assignmentsId) => {
   });
 };
 
+export const updateAssignment = async (assignmentId, updatedAssignment) => {
+  if (!assignmentId) throw new Error("Assignment ID is required");
+  return await fetch(`${BASE_URL}/assignment/${assignmentId}/title`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(updatedAssignment),
+  });
+}
+
 // export const updateAssignmentGuidelines = async (assignmentId, formData) => {
 //   const response = await fetch(`${BASE_URL}/assignment/${assignmentId}/guidelines`, {
 //     method: "PATCH",

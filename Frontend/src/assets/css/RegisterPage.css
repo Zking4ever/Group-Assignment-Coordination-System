@@ -77,10 +77,14 @@
   width: 100%;
   padding: 13px 15px;
   font-size: 14px;
-  border: 1px solid  var(--border-color);
+  border: 2px solid  var(--border-color);
   border-radius: 4px;
   color: var(--text-primary);
   background-color: var(--bg-color);
+}
+
+.RegisterPage-form input::placeholder {
+  color: var(--text-secondary);
 }
 
 .RegisterPage-form input:focus {

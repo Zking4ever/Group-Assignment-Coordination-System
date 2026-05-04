@@ -180,10 +180,8 @@ function AssignmentDetailPage() {
     const handleUpdateTitle = async () => {
         if (!editedTitle.trim()) return setIsEditingTitle(false);
         try {
-            // Re-using createTask logic or just a manual update if service not ready
-            // Do the update logic in here
-            // But we can just use setAssignment locally for now and implement the API call later
             setAssignment(prev => ({ ...prev, assignmentName: editedTitle }));
+            await updateAssignment(assignmentId, { ...assignment, assignmentName: editedTitle });
             setIsEditingTitle(false);
             toast.success("Title updated!");
         } catch (err) {

@@ -29,6 +29,14 @@ router.post('/', upload.single('guidelineFile'), (req, res) => {
   }
 });
 
+router.patch('/:id/title', upload.single('guidelineFile'), (req, res) => {
+  const { id } = req.params;
+  const { assignmentName, assignmentDescription, guidelinesText, guidelinesLink } = req.body;
+ 
+  db.prepare('UPDATE assignments SET assignmentName = ? WHERE id = ?').run(updated.assignmentName, id);
+  res.json({ message: 'Assignment updated' });
+});
+
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
   try {
