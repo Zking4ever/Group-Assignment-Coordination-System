@@ -1,7 +1,4 @@
-.content-area{
-  display: flex;
-  padding: 0;
-}
+
 .TaskDetailPage-page {
   padding: 0 10px;
   width: 100%;
@@ -209,16 +206,11 @@
   height: 3px;
 }
 
-.separator[data-separator='hover'] {
-  background-color: #64748b; /* slate-500 */
-}
-
-.separator[data-separator='active'] {
-  background-color: #94a3b8; /* slate-400 */
-}
-
+.separator[data-separator='hover'],
+.separator[data-separator='active'],
 .separator[data-separator='focus'] {
-  background-color: #38bdf8; /* sky-400 */
+  background-color: unset;
+  border: 1px dashed #a4b8d4;
 }
 
 .TaskDetailPage-sectionTitle {

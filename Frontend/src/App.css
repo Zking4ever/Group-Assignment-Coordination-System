@@ -20,6 +20,7 @@
   position: relative;
 }
 
+
 /* Scrollbar styling */
 .content-area::-webkit-scrollbar {
   width: 8px;

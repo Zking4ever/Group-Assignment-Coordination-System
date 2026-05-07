@@ -151,6 +151,10 @@ ul {
   padding: 24px;
   background-color: var(--bg-color);
 }
+.content-area:has(.TaskDetailPage-page){
+  display: flex;
+  padding: 0;
+}
 
 .card {
   background: var(--bg-color);
