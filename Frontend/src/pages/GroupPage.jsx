@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom';
 import AssignmentList from '@components/AssignmentList.jsx'
 import MemberList from '@components/MemberList.jsx'
-import { getGroupDetail } from '@services/authService.js';
+import { getGroupDetail } from '@services/Service.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faClipboardList, faCopy } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';

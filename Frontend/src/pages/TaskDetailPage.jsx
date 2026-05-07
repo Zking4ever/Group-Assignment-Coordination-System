@@ -1,9 +1,10 @@
 import '../assets/css/TaskDetailPage.css';
 import React, { useState, useEffect, useRef } from 'react'
+import { Panel,Group, Separator } from 'react-resizable-panels'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getTaskDetail, updateTask, startTaskWork, submitTaskWork, verifyTaskSubmission, getAssignmentDetail, recordTimeExpiry } from '@services/authService'
+import { getTaskDetail, updateTask, startTaskWork, submitTaskWork, verifyTaskSubmission, getAssignmentDetail, recordTimeExpiry } from '@services/Service'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faCheckCircle, faClock, faUserCircle, faExclamationCircle, faFileUpload, faLink, faFileAlt, faTimes, faCheck, faRedo, faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCheckCircle, faClock, faUserCircle, faExclamationCircle, faFileUpload, faLink, faFileAlt, faTimes, faCheck, faRedo, faPlay,faGripLines,faGripLinesVertical } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import { formatRelativeDeadline } from '../utils/timeUtils';
 
@@ -136,25 +137,48 @@ function TaskDetailPage() {
         const s = seconds % 60;
         return `${m}:${s < 10 ? '0' : ''}${s}`;
     };
+    
 
     return (
-        <div className={"TaskDetailPage-page"}>
-            <header className={"TaskDetailPage-header"}>
-                <button className={"TaskDetailPage-backBtn"} onClick={() => navigate(-1)}>
-                    <FontAwesomeIcon icon={faArrowLeft} />
-                </button>
-                <div className={"TaskDetailPage-titleSection"}>
-                    <h1>{task.taskName}</h1>
-                    <div className={"TaskDetailPage-meta"}>
-                        <span>{task.responsibleMemberName || 'Assigned member'}</span>
-                        <span className={"TaskDetailPage-separator"}>•</span>
-                        <span className="Deadline-expressive">{formatRelativeDeadline(task.deadLine)}</span>
-                    </div>
-                </div>
-            </header>
 
-            <main className={"TaskDetailPage-content"}>
-                <div className={"TaskDetailPage-mainCol"}>
+        // <div className={"TaskDetailPage-actions"}>
+        //                         {(task.state === 'yet' || task.state === 'REJECTED') && isResponsible && (
+        //                             <button className={"TaskDetailPage-primaryBtn"} onClick={handleStartWork}>
+        //                                 <FontAwesomeIcon icon={faClock} /> Start working (20min)
+        //                             </button>
+        //                         )}
+        //                         {task.state === 'working' && isResponsible && (
+        //                             <div className="Timer-display">
+        //                                 <div className="Timer-countdown">{formatTime(timeLeft)}</div>
+        //                                 <p>Time remaining to record activity</p>
+        //                                 <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+        //                                     <button className="TaskDetailPage-primaryBtn" onClick={() => setIsPaused(!isPaused)}>
+        //                                         <FontAwesomeIcon icon={isPaused ? faPlay : faPause} /> {isPaused ? 'Resume' : 'Pause'}
+        //                                     </button>
+        //                                     <button className="TaskDetailPage-secondaryBtn" onClick={() => loadTask()}>
+        //                                         <FontAwesomeIcon icon={faTimes} /> Stop
+        //                                     </button>
+        //                                 </div>
+        //                             </div>
+        //                         )}
+        //                     </div>
+
+        <div className={"TaskDetailPage-page"}>
+            <Group orientation="horizontal" className={"TaskDetailPage-content"}>
+                <Panel minSize={300} className={"TaskDetailPage-mainCol"}>
+                    <header className={"TaskDetailPage-header"}>
+                        <button className={"TaskDetailPage-backBtn"} onClick={() => navigate(-1)}>
+                            <FontAwesomeIcon icon={faArrowLeft} />
+                        </button>
+                        <div className={"TaskDetailPage-titleSection"}>
+                            <h1>{task.taskName}</h1>
+                            <div className={"TaskDetailPage-meta"}>
+                                <span>{task.responsibleMemberName || 'Assigned member'}</span>
+                                <span className={"TaskDetailPage-separator"}>•</span>
+                                <span className="Deadline-expressive">{formatRelativeDeadline(task.deadLine)}</span>
+                            </div>
+                        </div>
+                    </header>
                     <section className={"TaskDetailPage-description"}>
                         <div className={"TaskDetailPage-sectionTitle"}>
                             <FontAwesomeIcon icon={faExclamationCircle} />
@@ -162,25 +186,6 @@ function TaskDetailPage() {
                         </div>
                         <p>{task.taskDescription || "No instructions provided."}</p>
                     </section>
-
-                    {task.submissionStatus && (
-                        <section className={"TaskDetailPage-submissionInfo"}>
-                            <div className={"TaskDetailPage-sectionTitle"}>
-                                <FontAwesomeIcon icon={faFileAlt} />
-                                Last Submission
-                                <span className={`Submission-status-tag ${task.submissionStatus?.toLowerCase()}`}>
-                                    {task.submissionStatus}
-                                </span>
-                            </div>
-                            <div className="Submission-details">
-                                <p><strong>Report:</strong> {task.submissionReport || "No report provided."}</p>
-                                {task.submissionLink && <p><strong>Link:</strong> <a href={task.submissionLink} target="_blank" rel="noreferrer">{task.submissionLink}</a></p>}
-                                {task.submissionFile && (
-                                    <p><strong>File:</strong> <a href={`http://localhost:5000${task.submissionFile}`} target="_blank" rel="noreferrer">Download Attachment</a></p>
-                                )}
-                            </div>
-                        </section>
-                    )}
 
                     {isResponsible && (task.state === 'working' || task.state === 'REJECTED' || task.state === 'yet') && (
                         <section className={"TaskDetailPage-submissionForm"}>
@@ -222,60 +227,63 @@ function TaskDetailPage() {
                             </form>
                         </section>
                     )}
-                </div>
-
-                <div className={"TaskDetailPage-sideCol"}>
-                    <div className={"TaskDetailPage-workCard"}>
-                        <div className={"TaskDetailPage-workHeader"}>
-                            <h3>Work Status</h3>
-                            <span className={`${"TaskDetailPage-statusBadge"} ${("TaskDetailPage-" + (task.state?.toLowerCase() || 'yet'))}`}>
-                                {task.state || 'yet'}
-                            </span>
-                        </div>
-
-                        <div className={"TaskDetailPage-actions"}>
-                            {(task.state === 'yet' || task.state === 'REJECTED') && isResponsible && (
-                                <button className={"TaskDetailPage-primaryBtn"} onClick={handleStartWork}>
-                                    <FontAwesomeIcon icon={faClock} /> Start working (20min)
-                                </button>
-                            )}
-
-                            {task.state === 'working' && isResponsible && (
-                                <div className="Timer-display">
-                                    <div className="Timer-countdown">{formatTime(timeLeft)}</div>
-                                    <p>Time remaining to record activity</p>
-                                    <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                                        <button className="TaskDetailPage-primaryBtn" onClick={() => setIsPaused(!isPaused)}>
-                                            <FontAwesomeIcon icon={isPaused ? faPlay : faPause} /> {isPaused ? 'Resume' : 'Pause'}
-                                        </button>
-                                        <button className="TaskDetailPage-secondaryBtn" onClick={() => loadTask()}>
-                                            <FontAwesomeIcon icon={faTimes} /> Stop
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {isOwner && task.state === 'submitted' && (
-                        <div className={"TaskDetailPage-verificationCard"}>
-                            <h3>Verification Required</h3>
-                            <p>This work was submitted by <strong>{task.responsibleMemberName}</strong>. Review the details and decide.</p>
-                            <div className="Verification-actions">
-                                <button className="Verify-accept" onClick={() => handleVerifyStatus('ACCEPTED')}>
-                                    <FontAwesomeIcon icon={faCheck} /> Accept
-                                </button>
-                                <button className="Verify-reject" onClick={() => handleVerifyStatus('REJECTED')}>
-                                    <FontAwesomeIcon icon={faTimes} /> Reject
-                                </button>
-                                <button className="Verify-reassign" onClick={() => handleVerifyStatus('REASSIGNED')}>
-                                    <FontAwesomeIcon icon={faRedo} /> Reassign
-                                </button>
+                </Panel>
+                <Separator className='separator vertical'>
+                    <FontAwesomeIcon icon={faGripLinesVertical} size="lg" />  
+                </Separator>
+                <Panel minSize={200} className={"TaskDetailPage-sideCol"}>
+                    <Group orientation="vertical">
+                        <Panel className={"TaskDetailPage-taskfile"}>
+                            <div className={"TaskDetailPage-workHeader"}>
+                                {/* <h3>{JSON.stringify(assignment)}</h3> */}
+                                <span className={`${"TaskDetailPage-statusBadge"} ${("TaskDetailPage-" + (task.state?.toLowerCase() || 'yet'))}`}>
+                                    {task.state}
+                                </span>
                             </div>
-                        </div>
-                    )}
-                </div>
-            </main>
+                        </Panel>
+                        <Separator className='separator horizontal'>
+                            <FontAwesomeIcon icon={faGripLines} size="lg" />
+                        </Separator>
+                        <Panel className={"TaskDetailPage-infoCard"}>
+                            {task.submissionStatus && (
+                            <section className={"TaskDetailPage-submissionInfo"}>
+                                <div className={"TaskDetailPage-sectionTitle"}>
+                                    <FontAwesomeIcon icon={faFileAlt} />
+                                    Last Submission
+                                    <span className={`Submission-status-tag ${task.submissionStatus?.toLowerCase()}`}>
+                                        {task.submissionStatus}
+                                    </span>
+                                </div>
+                                <div className="Submission-details">
+                                    <p><strong>Report:</strong> {task.submissionReport || "No report provided."}</p>
+                                    {task.submissionLink && <p><strong>Link:</strong> <a href={task.submissionLink} target="_blank" rel="noreferrer">{task.submissionLink}</a></p>}
+                                    {task.submissionFile && (
+                                        <p><strong>File:</strong> <a href={`http://localhost:5000${task.submissionFile}`} target="_blank" rel="noreferrer">Download Attachment</a></p>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+                        {isOwner && task.state === 'submitted' && (
+                            <div className={"TaskDetailPage-verificationCard"}>
+                                <h3>Verification Required</h3>
+                                <p>This work was submitted by <strong>{task.responsibleMemberName}</strong>. Review the details and decide.</p>
+                                <div className="Verification-actions">
+                                    <button className="Verify-accept" onClick={() => handleVerifyStatus('ACCEPTED')}>
+                                        <FontAwesomeIcon icon={faCheck} /> Accept
+                                    </button>
+                                    <button className="Verify-reject" onClick={() => handleVerifyStatus('REJECTED')}>
+                                        <FontAwesomeIcon icon={faTimes} /> Reject
+                                    </button>
+                                    <button className="Verify-reassign" onClick={() => handleVerifyStatus('REASSIGNED')}>
+                                        <FontAwesomeIcon icon={faRedo} /> Reassign
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                        </Panel>
+                    </Group>
+                </Panel>
+            </Group>
         </div>
     );
 }

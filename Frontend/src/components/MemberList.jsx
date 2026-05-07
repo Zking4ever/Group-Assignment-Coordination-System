@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getGroupDetail, getGroupMembers, getGroupCreator, kickMember } from '@services/authService';
+import { getGroupDetail, getGroupMembers, getGroupCreator, kickMember } from '@services/Service';
 import '../assets/css/MemberList.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faUserCircle, faUserMinus } from '@fortawesome/free-solid-svg-icons';

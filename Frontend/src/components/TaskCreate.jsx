@@ -1,5 +1,5 @@
 import '../assets/css/TaskCreate.css';
-import { createAssignment, createTask, getGroupMembers } from '@services/authService';
+import { createAssignment, createTask, getGroupMembers } from '@services/Service';
 import toast from 'react-hot-toast';
 import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -207,20 +207,6 @@ function TaskCreate({ type = "task" }) {
                                     onChange={handleChange}
                                     required
                                 />
-                            </div>
-
-                            <div className={"TaskCreate-setting"}>
-                                <label>Status</label>
-                                <select
-                                    name="state"
-                                    value={taskDetail.state}
-                                    onChange={handleChange}
-                                    className={"TaskCreate-select"}
-                                >
-                                    <option value="YET">Yet to start</option>
-                                    <option value="WORKING">Working</option>
-                                    <option value="DONE">Done</option>
-                                </select>
                             </div>
                         </div>
                     </div>

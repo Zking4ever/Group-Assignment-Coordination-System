@@ -1,5 +1,5 @@
-// const BASE_URL = "http://localhost:5000";
-const BASE_URL = "https://gacs.onrender.com";
+const BASE_URL = "http://localhost:5000";
+// const BASE_URL = "https://gacs.onrender.com";
 
 // ------------- Auth services -----------------------
 export const checkAccount = async (email, password) => {

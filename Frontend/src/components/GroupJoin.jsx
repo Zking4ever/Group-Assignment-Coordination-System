@@ -1,6 +1,6 @@
 import '../assets/css/GroupJoin.css';
 import React, { useState, useEffect } from 'react'
-import { joinGroupByCode } from '@services/authService'
+import { joinGroupByCode } from '@services/Service'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';

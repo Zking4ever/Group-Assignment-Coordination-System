@@ -1,5 +1,5 @@
 import '../assets/css/ProfilePage.css';
-import { getUserDetail, editProfile } from '@services/authService'
+import { getUserDetail, editProfile } from '@services/Service'
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'

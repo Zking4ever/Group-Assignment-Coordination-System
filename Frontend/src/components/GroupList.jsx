@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast';
-import { getMyGroups, deleteGroup } from '@services/authService.js'
+import { getMyGroups, deleteGroup } from '@services/Service.js'
 import GroupCard from '@components/GroupCard.jsx'
 import '../assets/css/GroupList.css';
 

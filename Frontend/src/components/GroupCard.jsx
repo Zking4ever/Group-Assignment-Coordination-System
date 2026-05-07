@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisV, faFolderOpen, faChartLine } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { use } from 'react';
-import { getUserDetail } from '@services/authService.js';
+import { getUserDetail } from '@services/Service.js';
 import { useState, useEffect } from 'react';
 
 const GROUP_COLORS = ['#1a73e8', '#1e8e3e', '#f9ab00', '#d93025', '#8ab4f8'];

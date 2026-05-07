@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchNotifications } from '@services/authService';
+import { fetchNotifications } from '@services/Service';
 import '../assets/css/NotificationCenter.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faBell } from '@fortawesome/free-solid-svg-icons';

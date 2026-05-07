@@ -1,6 +1,6 @@
 import '../assets/css/GroupCreate.css';
 import React, { useState } from 'react'
-import { createGroup } from '@services/authService'
+import { createGroup } from '@services/Service'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';

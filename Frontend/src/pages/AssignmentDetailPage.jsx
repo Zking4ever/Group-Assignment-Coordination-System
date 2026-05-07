@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getAssignmentDetail, getAssignmentTasks, getGroupMembers, getAiBreakdown, createTask, updateTask, getGroupDetail } from '@services/authService';
+import { getAssignmentDetail, getAssignmentTasks, getGroupMembers, getAiBreakdown, createTask, updateTask, getGroupDetail } from '@services/Service';
 import '../assets/css/AssignmentDetailPage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faArrowLeft, faClipboardList, faChevronRight, faMagicWandSparkles, faUserCircle, faGripVertical, faCopy, faCheck, faEdit, faPaperclip, faLink } from '@fortawesome/free-solid-svg-icons';

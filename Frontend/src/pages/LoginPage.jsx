@@ -1,7 +1,7 @@
 import '../assets/css/LoginPage.css';
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { checkAccount } from '@services/authService'
+import { checkAccount } from '@services/Service'
 
 function LoginPage() {
     const navigate = useNavigate();

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { getGroupAssignments, deleteAssignment } from '@services/authService';
+import { getGroupAssignments, deleteAssignment } from '@services/Service';
 import AssignmentCard from '@components/AssignmentCard.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';

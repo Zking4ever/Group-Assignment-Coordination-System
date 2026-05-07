@@ -27,6 +27,7 @@ const authLimiter = rateLimit({
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+app.set('trust proxy', 1); // Trust first proxy for rate limiting
 app.use('/auth', authLimiter);
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
