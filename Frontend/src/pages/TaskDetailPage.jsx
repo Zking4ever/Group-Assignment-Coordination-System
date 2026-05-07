@@ -4,9 +4,10 @@ import { Panel,Group, Separator } from 'react-resizable-panels'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getTaskDetail, updateTask, startTaskWork, submitTaskWork, verifyTaskSubmission, getAssignmentDetail, recordTimeExpiry } from '@services/Service'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faCheckCircle, faClock, faUserCircle, faExclamationCircle, faFileUpload, faLink, faFileAlt, faTimes, faCheck, faRedo, faPlay,faGripLines,faGripLinesVertical } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCheckCircle, faClock, faUserCircle, faExclamationCircle, faFileUpload, faLink, faFileAlt, faTimes, faCheck, faRedo, faPlay,faGripLines,faGripLinesVertical, faFolder,faFilePdf } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import { formatRelativeDeadline } from '../utils/timeUtils';
+import Submissions from '../components/Submissions';
 
 function TaskDetailPage() {
     const { groupId, assignmentId, taskId } = useParams();
@@ -234,35 +235,31 @@ function TaskDetailPage() {
                 <Panel minSize={200} className={"TaskDetailPage-sideCol"}>
                     <Group orientation="vertical">
                         <Panel className={"TaskDetailPage-taskfile"}>
-                            <div className={"TaskDetailPage-workHeader"}>
+                            <div className={"TaskDetailPage-fileContainer"}>
                                 {/* <h3>{JSON.stringify(assignment)}</h3> */}
-                                <span className={`${"TaskDetailPage-statusBadge"} ${("TaskDetailPage-" + (task.state?.toLowerCase() || 'yet'))}`}>
-                                    {task.state}
-                                </span>
+
+                                <div className='file header'>
+                                    <span>Name</span><span>Date</span><span>Type</span><span>Size</span>
+                                </div>
+                                <div className='file'>
+                                    <span><FontAwesomeIcon icon={faFolder} /> File Name</span><span>3/06/2026 2:03 AM</span><span>File Folder</span><span></span>
+                                </div>
+                                <div className='file'>
+                                    <span><FontAwesomeIcon icon={faFolder} /> Solution</span><span>1/07/2026 3:40 PM</span><span>File Folder</span><span></span>
+                                </div>
+                                <div className='file'>
+                                    <span><FontAwesomeIcon icon={faFilePdf} /> Answer</span><span>1/07/2026 3:53 PM</span><span>Microsoft Edge PDF Document</span><span>172 KB</span>
+                                </div>
+                            </div>
+                            <div className="TaskDetailPage-Prompt">
+                                <input type="text" className='TaskDetailPage-PromptInput' placeholder='Contribute to the assignment by using GACS AI' />
                             </div>
                         </Panel>
                         <Separator className='separator horizontal'>
                             <FontAwesomeIcon icon={faGripLines} size="lg" />
                         </Separator>
-                        <Panel className={"TaskDetailPage-infoCard"}>
-                            {task.submissionStatus && (
-                            <section className={"TaskDetailPage-submissionInfo"}>
-                                <div className={"TaskDetailPage-sectionTitle"}>
-                                    <FontAwesomeIcon icon={faFileAlt} />
-                                    Last Submission
-                                    <span className={`Submission-status-tag ${task.submissionStatus?.toLowerCase()}`}>
-                                        {task.submissionStatus}
-                                    </span>
-                                </div>
-                                <div className="Submission-details">
-                                    <p><strong>Report:</strong> {task.submissionReport || "No report provided."}</p>
-                                    {task.submissionLink && <p><strong>Link:</strong> <a href={task.submissionLink} target="_blank" rel="noreferrer">{task.submissionLink}</a></p>}
-                                    {task.submissionFile && (
-                                        <p><strong>File:</strong> <a href={`http://localhost:5000${task.submissionFile}`} target="_blank" rel="noreferrer">Download Attachment</a></p>
-                                    )}
-                                </div>
-                            </section>
-                        )}
+                        <Panel minSize={150} className={"TaskDetailPage-infoCard"}>
+                            <Submissions />
                         {isOwner && task.state === 'submitted' && (
                             <div className={"TaskDetailPage-verificationCard"}>
                                 <h3>Verification Required</h3>

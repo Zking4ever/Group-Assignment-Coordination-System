@@ -75,14 +75,6 @@
 .Submission-status-tag.accepted { background: #dcfce7; color: #15803d; }
 .Submission-status-tag.rejected { background: #fee2e2; color: #b91c1c; }
 
-.Submission-details {
-  margin-top: 16px;
-  line-height: 1.6;
-}
-
-.Submission-details p {
-  margin-bottom: 8px;
-}
 
 .TaskDetailPage-submissionForm form {
   display: flex;
@@ -175,7 +167,6 @@
 
 .TaskDetailPage-mainCol {
   overflow: auto;
-  
 }
 
 .TaskDetailPage-sideCol {
@@ -183,9 +174,97 @@
 }
 .TaskDetailPage-taskfile{
   padding: 20px;
+  padding-bottom: 0;
+  position: relative;
+}
+.TaskDetailPage-fileContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+.file{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  margin: 1px;
+  padding: 5px;
+  cursor: pointer;
+}
+.file:not(.header):hover{
+  background-color: #a2a7ac34;
+  border-radius: 1px;
+}
+.file span{
+  flex: 1;
+  font-size: small;
+}
+.file.header span{
+  border-right: 1px solid gray;
+  margin-right: 2px;
+}
+.TaskDetailPage-Prompt{
+  position:absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  border-top: 1px solid rgba(128, 128, 128, 0.354);
+  display: flex;
+}
+.TaskDetailPage-PromptInput{
+  flex: 1;
+  border: none;
+  padding: 5px;
+  outline: none;
 }
 .TaskDetailPage-infoCard{
-  padding: 20px;
+  padding-top: 0;
+  position: relative;
+}
+.submission.header{
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  margin: 1px;
+  justify-content: start;
+  background-color: var(--surface-color);
+  z-index: 1;
+}
+.submission.header button{
+  background-color: transparent;
+  font-weight: bold;
+  font-size: 20px;
+  padding: 5px 10px;
+  border-radius: 2px;
+  color: var(--text-primary);
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.submission.header div{
+  font-weight: bold;
+  font-size: 20px;
+  padding: 5px 2px;
+}
+.submission.header button:hover{
+  background-color: #a2a7ac34;
+  border-radius: 1px;
+}
+.submission{
+  display: flex;
+  flex-wrap: nowrap;
+  cursor: pointer;
+}
+.submission span{
+  flex: 1;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  padding: 5px;
 }
 
 .separator{
@@ -193,7 +272,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: green;
+  color: var(--primary-color);
   margin: 2px;
   background-color: #a4b8d4;
 }
@@ -234,13 +313,6 @@
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302);
-}
-
-.TaskDetailPage-workHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
 }
 
 .TaskDetailPage-statusBadge {
