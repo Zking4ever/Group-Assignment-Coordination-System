@@ -177,6 +177,48 @@
   padding-bottom: 0;
   position: relative;
 }
+.Taskfile-Overly{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--glass-bg);
+  color: var(--text-secondary);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: -1;
+  opacity: 0;
+  transition: all 1s ease;
+}
+
+.TaskDetailPage-taskfile:focus-within > .Taskfile-Overly{
+  opacity: 1;
+  z-index: 10;
+}
+#CheckBox{
+  display: none;
+}
+#CheckBox:checked ~ .Taskfile-Overly{
+  opacity: 1;
+  z-index: 10;
+}
+
+.Taskfile-Overly ul{
+  list-style:circle;
+  padding: 0;
+  margin: 0;
+  font-size: small;
+  text-align: left;
+}
+.Taskfile-Overly p{
+  font-size: 14px;
+}
+
 .TaskDetailPage-fileContainer {
   display: flex;
   flex-direction: column;
@@ -234,6 +276,11 @@
   background-color: var(--surface-color);
   z-index: 1;
 }
+.submission:nth-child(2) span{
+  font-weight: bold;
+  border-right: 1px solid gray;
+  padding-right: 3px;
+}
 .submission.header button{
   background-color: transparent;
   font-weight: bold;
@@ -263,8 +310,18 @@
 .submission span{
   flex: 1;
   font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
   padding: 5px;
+}
+.submission span:nth-child(1){
+  flex: 2.3;
+}
+
+.submission:not(.header):not(:nth-child(2)):hover{
+  background-color: #a2a7ac34;
+  border-radius: 1px;
 }
 
 .separator{

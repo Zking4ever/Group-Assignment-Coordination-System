@@ -78,6 +78,23 @@ export default function Submissions() {
                 )}
         </section>
     )} */}
+    {/* {isOwner && task.state === 'submitted' && (
+                            <div className={"TaskDetailPage-verificationCard"}>
+                                <h3>Verification Required</h3>
+                                <p>This work was submitted by <strong>{task.responsibleMemberName}</strong>. Review the details and decide.</p>
+                                <div className="Verification-actions">
+                                    <button className="Verify-accept" onClick={() => handleVerifyStatus('ACCEPTED')}>
+                                        <FontAwesomeIcon icon={faCheck} /> Accept
+                                    </button>
+                                    <button className="Verify-reject" onClick={() => handleVerifyStatus('REJECTED')}>
+                                        <FontAwesomeIcon icon={faTimes} /> Reject
+                                    </button>
+                                    <button className="Verify-reassign" onClick={() => handleVerifyStatus('REASSIGNED')}>
+                                        <FontAwesomeIcon icon={faRedo} /> Reassign
+                                    </button>
+                                </div>
+                            </div>
+                        )} */}
     </>
   )
 }

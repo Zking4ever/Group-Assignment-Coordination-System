@@ -24,6 +24,7 @@ function TaskDetailPage() {
     const [link, setLink] = useState("");
     const [file, setFile] = useState(null);
     const [isPaused, setIsPaused] = useState(false);
+    const [fileInFocus, setFileInFocus] = useState(false);
 
     const timerRef = useRef(null);
 
@@ -234,7 +235,20 @@ function TaskDetailPage() {
                 </Separator>
                 <Panel minSize={200} className={"TaskDetailPage-sideCol"}>
                     <Group orientation="vertical">
-                        <Panel className={"TaskDetailPage-taskfile"}>
+                        <Panel className={"TaskDetailPage-taskfile"} onClick={()=>setFileInFocus(!fileInFocus)}>
+                            <input type="checkbox" id="CheckBox" checked={fileInFocus}/>
+                            <div className="Taskfile-Overly">
+                                <h3>GACS 2.0 is Under development</h3>
+                                <span>We are working on GACS to make it all in one place to work on your assingments without leaving the platform.</span>
+                                <h5>Upcoming features</h5>
+                                <ul>
+                                    <li>Enhanced AI integration for real-time collaboration</li>
+                                    <li>Improved file management and version control</li>
+                                    <li>Streamlined submission process with automated grading</li>
+                                </ul>
+                                 
+                                <span>Stay updated on our latest developments!</span>
+                            </div>
                             <div className={"TaskDetailPage-fileContainer"}>
                                 {/* <h3>{JSON.stringify(assignment)}</h3> */}
 
@@ -260,23 +274,6 @@ function TaskDetailPage() {
                         </Separator>
                         <Panel minSize={150} className={"TaskDetailPage-infoCard"}>
                             <Submissions />
-                        {isOwner && task.state === 'submitted' && (
-                            <div className={"TaskDetailPage-verificationCard"}>
-                                <h3>Verification Required</h3>
-                                <p>This work was submitted by <strong>{task.responsibleMemberName}</strong>. Review the details and decide.</p>
-                                <div className="Verification-actions">
-                                    <button className="Verify-accept" onClick={() => handleVerifyStatus('ACCEPTED')}>
-                                        <FontAwesomeIcon icon={faCheck} /> Accept
-                                    </button>
-                                    <button className="Verify-reject" onClick={() => handleVerifyStatus('REJECTED')}>
-                                        <FontAwesomeIcon icon={faTimes} /> Reject
-                                    </button>
-                                    <button className="Verify-reassign" onClick={() => handleVerifyStatus('REASSIGNED')}>
-                                        <FontAwesomeIcon icon={faRedo} /> Reassign
-                                    </button>
-                                </div>
-                            </div>
-                        )}
                         </Panel>
                     </Group>
                 </Panel>
