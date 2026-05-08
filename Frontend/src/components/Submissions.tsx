@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAssignmentDetail, getAssignmentSubmissions, verifyTaskSubmission } from "../services/Service";
+import { getAssignmentDetail, getAssignmentSubmissions, getUserDetail, verifyTaskSubmission } from "../services/Service";
 import { useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faRedo, faTimes } from "@fortawesome/free-solid-svg-icons";
@@ -9,6 +9,7 @@ interface Submission {
     id:string;
     taskName: string;
     report:string;
+    link:string;
     file:string;
     date: string;
     status: string;
@@ -25,27 +26,34 @@ export default function Submissions() {
     const [assignment,setAssignment] = useState(null);
     const [currentUser,setCurrentUser] = useState(null);
     const [submissions, setSubmissions] = useState<Submission[]>([]);
+    const [selected, setSelected] = useState(null as Submission | null);
+    const [submitter,setSubmitter] = useState(null);
+
+    const isOwner = assignment?.creatorId === currentUser?.id;
 
     const loadData = async ()=> {
-
         const submission = await getAssignmentSubmissions(assignmentId);
-        console.log(submission)
         setSubmissions(submission);
         
         const currentAss = await getAssignmentDetail(assignmentId);
         setAssignment(currentAss);
     }
 
-    
-    const isOwner = assignment?.creatorId === currentUser?.id;
+    const getSubmitter = async()=>{
+        if(!selected) return;
+        const user = await getUserDetail(selected.submitter);
+        setSubmitter(user);
+    }
 
     useEffect(()=>{
         const user = JSON.parse(localStorage.getItem('currentUser') || '');
         setCurrentUser(user);
         loadData();
-    },[assignmentId])
+    },[assignmentId]);
 
-    const [selected, setSelected] = useState(null as Submission | null);
+     useEffect(()=>{
+        getSubmitter();
+    },[selected]);
     
     const handleVerifyStatus = async (status:string) => {
         if(!selected) return;
@@ -60,6 +68,26 @@ export default function Submissions() {
             toast.error("Failed to verify submission");
         }
     };
+
+    const format = (dateString)=>{
+
+        const date = new Date(dateString);
+        if (isNaN(date)) return null;
+
+        const time = date.toLocaleTimeString("en-US", {
+            hour12: false,
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        });
+        const datePart = date.toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric"
+        });
+
+    return `${time} ${datePart}`;
+    }
   return (
     <>
         <div className="submission header">
@@ -90,12 +118,26 @@ export default function Submissions() {
                     </div>
             ) : (
                 <div className="submissionDetail">
-                    <span>{selected.taskName}</span>
-                    <span>{selected.report}</span>
+                    <div style={{display:'flex',justifyContent:'end',padding:5}}><b>{submitter?.firstName+" "+submitter?.lastName}</b></div>
+                    <div>
+                        <b>TASK: </b><span>{selected.taskName}</span><br/>
+                        <b>Submitted at: </b><span>{format(selected.date)}</span>
+                    </div>
+                    <b>Report</b>
+                    <div style={{borderRadius:5,backgroundColor:'#d3d3d338',padding:'5px 10px',marginBottom:10}}>{(selected.report ? selected.report :'No detailed report found. Check the external link of attached files')}</div>
+                    <div style={{display:'flex',justifyContent:'space-between,gap:5'}}>
+                        <a target="_blank"
+                            rel="stylesheet" href={(selected.link ? selected.link : '')} className={(selected.link ? 'SubmissionLink ': 'SubmissionLink disabled')}>
+                            {(selected.link ? 'Visit External Resources': 'No Attached Resource')}
+                        </a>
+                        <a target="_blank"
+                            rel="stylesheet" href={(selected.file ? selected.file : '')} className={(selected.file ? 'SubmissionLink ': 'SubmissionLink disabled')}>
+                            {(selected.file ? 'Download Attached File': 'No Attached File')}
+                        </a>
+                    </div>
                     {isOwner && selected.status === 'submitted' && (
                         <div className={"TaskDetailPage-verificationCard"}>
                             <h3>Verification Required</h3>
-                            <p>This work was submitted by <strong>{selected.submitter}</strong>. Review the details and decide.</p>
                             <div className="Verification-actions">
                                 <button className="Verify-accept" onClick={() => handleVerifyStatus('ACCEPTED')}>
                                     <FontAwesomeIcon icon={faCheck} /> Accept
@@ -103,25 +145,12 @@ export default function Submissions() {
                                 <button className="Verify-reject" onClick={() => handleVerifyStatus('REJECTED')}>
                                     <FontAwesomeIcon icon={faTimes} /> Reject
                                 </button>
-                                <button className="Verify-reassign" onClick={() => handleVerifyStatus('REASSIGNED')}>
-                                    <FontAwesomeIcon icon={faRedo} /> Reassign
-                                </button>
                             </div>
+                            <p>This work was submitted by <strong>{submitter?.firstName}</strong>. Review the details and decide.</p>
                         </div>
                     )}
                 </div>
             )}
-        {/* {task.submissionStatus && (
-        <section className={"TaskDetailPage-submissionInfo"}>
-            
-                <p><strong>Report:</strong> {task.submissionReport || "No report provided."}</p>
-                {task.submissionLink && <p><strong>Link:</strong> <a href={task.submissionLink} target="_blank" rel="noreferrer">{task.submissionLink}</a></p>}
-                {task.submissionFile && (
-                    <p><strong>File:</strong> <a href={`http://localhost:5000${task.submissionFile}`} target="_blank" rel="noreferrer">Download Attachment</a></p>
-                )}
-        </section>
-    )} */}
-    
     </>
   )
 }

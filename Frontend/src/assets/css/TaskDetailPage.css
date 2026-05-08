@@ -149,14 +149,12 @@
 }
 
 .Verification-actions {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin-top: 20px;
+  display: flex;
+  gap: 5px;
 }
 
-.Verify-accept { background: #10b981; color: white; padding: 12px; border-radius: 8px; font-weight: 600; }
-.Verify-reject { background: #ef4444; color: white; padding: 12px; border-radius: 8px; font-weight: 600; }
+.Verify-accept { background: #10b981; color: white; padding: 12px;  font-weight: 600; }
+.Verify-reject { background: #ef4444; color: white; padding: 12px;  font-weight: 600; }
 .Verify-reassign { background: #6366f1; color: white; padding: 12px; border-radius: 8px; font-weight: 600; }
 
 @media (max-width: 768px) {
@@ -434,6 +432,23 @@
   justify-content: center;
   text-align: center;
   margin-top: 15px;
+}
+.submissionDetail{
+  padding: 0 10px;
+}
+
+.SubmissionLink{
+  border-radius:5px;
+  background-color: #d3d3d338;
+  padding:5px 10px;
+  flex:1;
+}
+
+.SubmissionLink:nth-child(1){
+  margin-right:10px;
+}
+.SubmissionLink.disabled{
+  pointer-events: none;
 }
 
 @media (max-width:620px) {
