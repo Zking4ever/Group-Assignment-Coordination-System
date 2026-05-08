@@ -122,6 +122,11 @@ export const getGroupAssignments = async (groupId) => {
   return await response.json();
 };
 
+export const getAssignmentSubmissions = async (assignmentId) => {
+  const response = await fetch(`${BASE_URL}/assignment/submissions/${assignmentId}`);
+  return await response.json();
+}
+
 export const createAssignment = async (newAssignment) => {
   const isFormData = newAssignment instanceof FormData;
   return await fetch(`${BASE_URL}/assignment`, {
@@ -178,10 +183,6 @@ export const deleteTask = async (taskId) => {
 
 export const getTaskDetail = async (taskId) => {
   const response = await fetch(`${BASE_URL}/task/detail/${taskId}`);
-  return await response.json();
-}
-export const getTaskSubmissions = async (taskId) => {
-  const response = await fetch(`${BASE_URL}/task/submissions/${taskId}`);
   return await response.json();
 }
 

@@ -13,7 +13,6 @@ function TaskDetailPage() {
     const { groupId, assignmentId, taskId } = useParams();
     const navigate = useNavigate();
     const [task, setTask] = useState(null);
-    const [assignment, setAssignment] = useState(null);
     const [loading, setLoading] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
     const [timeLeft, setTimeLeft] = useState(null);
@@ -35,10 +34,6 @@ function TaskDetailPage() {
         try {
             const currentTask = await getTaskDetail(taskId);
             setTask(currentTask);
-
-            const currentAss = await getAssignmentDetail(assignmentId);
-            setAssignment(currentAss);
-
         } catch (error) {
             console.error(error);
         } finally {
@@ -110,6 +105,7 @@ function TaskDetailPage() {
         const formData = new FormData();
         formData.append("report", report);
         formData.append("link", link);
+        formData.append("assignmentId",assignmentId);
         if (file) formData.append("file", file);
 
         try {
@@ -132,7 +128,6 @@ function TaskDetailPage() {
     if (!task) return <div className={"TaskDetailPage-error"}>Task not found</div>;
 
     const isResponsible = task.responsibleMemberId === currentUser?.id;
-    const isOwner = assignment?.creatorId === currentUser?.id;
 
     const formatTime = (seconds) => {
         const m = Math.floor(seconds / 60);
@@ -182,10 +177,16 @@ function TaskDetailPage() {
 
                     {isResponsible && (task.state === 'submitted') && (
                         <div className={"TaskDetailPage-verification"}>
-                            {/* lets change the icon to marked [right symbol] */}
-                            <FontAwesomeIcon icon={faCheck} style={{color:'lightgreen'}}/> 
-                            <div className={"TaskDetailPage-sectionTitle"} style={{color:'lightgreen',fontWeight:'bold',fontSize:20}}>Submitted</div>
+                            <FontAwesomeIcon icon={faCheck} style={{color:'#ffca00ed'}}/> 
+                            <div className={"TaskDetailPage-sectionTitle"} style={{color:'#ffca00ed',fontWeight:'bold',fontSize:20}}>Submitted</div>
                             <p>Your submission is being reviewed by the assignment owner. You will receive feedback once it's evaluated.</p>
+                        </div>
+                    )}
+                    {isResponsible && (task.state === 'completed') && (
+                        <div className={"TaskDetailPage-verification"}>
+                            <FontAwesomeIcon icon={faCheck} style={{color:'lightgreen'}}/> 
+                            <div className={"TaskDetailPage-sectionTitle"} style={{color:'lightgreen',fontWeight:'bold',fontSize:20}}>Completed</div>
+                            <p> The task has been completed and received final approval </p>
                         </div>
                     )}
                     {isResponsible && (task.state === 'working' || task.state === 'REJECTED' || task.state === 'yet') && (

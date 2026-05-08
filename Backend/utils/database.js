@@ -76,7 +76,8 @@ db.exec(`
     submissionLink TEXT,
     date DATETIME DEFAULT CURRENT_TIMESTAMP,
     submissionStatus TEXT DEFAULT 'submitted',
-    FOREIGN KEY (taskId) REFERENCES tasks(id)
+    FOREIGN KEY (taskId) REFERENCES tasks(id),
+    FOREIGN KEY (assignmentId) REFERENCES assignments(id)
   );
 
   CREATE TABLE IF NOT EXISTS notifications (

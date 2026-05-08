@@ -1,63 +1,65 @@
 import { useEffect, useState } from "react";
-import { getTaskSubmissions } from "../services/Service";
+import { getAssignmentDetail, getAssignmentSubmissions, verifyTaskSubmission } from "../services/Service";
 import { useParams } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck, faRedo, faTimes } from "@fortawesome/free-solid-svg-icons";
+import toast from "react-hot-toast";
 
 interface Submission {
+    id:string;
     taskName: string;
+    report:string;
+    file:string;
     date: string;
     status: string;
     submitter: string;
 }
+
 export default function Submissions() {
 
     //prepare an end point to get assignment submissions in here
     // and then user could see submitted one navigation
 
 
-    const {taskId} = useParams();
-    const [submissions, setSubmissions] = useState([
-        {
-            taskName:"Building the frontend UI in figma",
-            date:"2024-06-01",
-            status:"Accepted",
-            submitter:"User A",
-        },
-        {
-            taskName:"Drafting the first version of the project requirements and specifications document",
-            date:"2024-06-02",
-            status:"Rejected",
-            submitter:"User B",
-        },
-        {
-            taskName:"Implementing the backend API endpoints for user authentication and task management",
-            date:"2024-06-03",
-            status:"Pending",
-            submitter:"User C",
-        },
-    ]);
-    const load = async()=>{
-        const submissions = await getTaskSubmissions(taskId);
-        console.log(submissions);
+    const {assignmentId} = useParams();
+    const [assignment,setAssignment] = useState(null);
+    const [currentUser,setCurrentUser] = useState(null);
+    const [submissions, setSubmissions] = useState<Submission[]>([]);
+
+    const loadData = async ()=> {
+
+        const submission = await getAssignmentSubmissions(assignmentId);
+        console.log(submission)
+        setSubmissions(submission);
+        
+        const currentAss = await getAssignmentDetail(assignmentId);
+        setAssignment(currentAss);
     }
 
+    
+    const isOwner = assignment?.creatorId === currentUser?.id;
+
     useEffect(()=>{
-        load();
-    },[taskId])
+        const user = JSON.parse(localStorage.getItem('currentUser') || '');
+        setCurrentUser(user);
+        loadData();
+    },[assignmentId])
 
     const [selected, setSelected] = useState(null as Submission | null);
     
-    //     const handleVerifyStatus = async (status) => {
-    //     const feedback = prompt(`Enter feedback for ${status}:`) || "";
-    //     try {
-    //         const { response } = await verifyTaskSubmission(taskId, status, feedback);
-    //         if (response.ok) {
-    //             toast.success(`Task ${status.toLowerCase()} successfully`);
-    //             loadTask();
-    //         }
-    //     } catch (err) {
-    //         toast.error("Failed to verify submission");
-    //     }
-    // };
+    const handleVerifyStatus = async (status:string) => {
+        if(!selected) return;
+        const feedback = prompt(`Enter feedback for ${status}:`) || "";
+        try {
+            const { response } = await verifyTaskSubmission(selected.id, status, feedback);
+            if (response.ok) {
+                toast.success(`Task ${status.toLowerCase()} successfully`);
+                loadData();
+            }
+        } catch (err) {
+            toast.error("Failed to verify submission");
+        }
+    };
   return (
     <>
         <div className="submission header">
@@ -76,19 +78,37 @@ export default function Submissions() {
         }
         {selected === null ? 
             submissions.length > 0 ?
-                submissions.map((sub, i) => (
+                submissions?.map((sub, i) => (
                     <div key={i}
                          onClick={()=>setSelected(sub)} 
                          className="submission">
-                            <span>{sub.taskName}</span><span>{sub.date}</span><span>{sub.status}</span><span>{sub.submitter}</span>
+                            <span>{sub.taskName}</span><span>{sub.date}</span><span>{(sub.status == 'submitted' ? 'Pending' :sub.status)}</span><span>{sub.submitter}</span>
                     </div>
                 )) : (
                     <div className="submission">
                         <span>No submissions yet.</span>
                     </div>
             ) : (
-                <div className="submission">
-                    <span>{selected?.taskName}</span>
+                <div className="submissionDetail">
+                    <span>{selected.taskName}</span>
+                    <span>{selected.report}</span>
+                    {isOwner && selected.status === 'submitted' && (
+                        <div className={"TaskDetailPage-verificationCard"}>
+                            <h3>Verification Required</h3>
+                            <p>This work was submitted by <strong>{selected.submitter}</strong>. Review the details and decide.</p>
+                            <div className="Verification-actions">
+                                <button className="Verify-accept" onClick={() => handleVerifyStatus('ACCEPTED')}>
+                                    <FontAwesomeIcon icon={faCheck} /> Accept
+                                </button>
+                                <button className="Verify-reject" onClick={() => handleVerifyStatus('REJECTED')}>
+                                    <FontAwesomeIcon icon={faTimes} /> Reject
+                                </button>
+                                <button className="Verify-reassign" onClick={() => handleVerifyStatus('REASSIGNED')}>
+                                    <FontAwesomeIcon icon={faRedo} /> Reassign
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         {/* {task.submissionStatus && (
@@ -101,23 +121,7 @@ export default function Submissions() {
                 )}
         </section>
     )} */}
-    {/* {isOwner && task.state === 'submitted' && (
-                            <div className={"TaskDetailPage-verificationCard"}>
-                                <h3>Verification Required</h3>
-                                <p>This work was submitted by <strong>{task.responsibleMemberName}</strong>. Review the details and decide.</p>
-                                <div className="Verification-actions">
-                                    <button className="Verify-accept" onClick={() => handleVerifyStatus('ACCEPTED')}>
-                                        <FontAwesomeIcon icon={faCheck} /> Accept
-                                    </button>
-                                    <button className="Verify-reject" onClick={() => handleVerifyStatus('REJECTED')}>
-                                        <FontAwesomeIcon icon={faTimes} /> Reject
-                                    </button>
-                                    <button className="Verify-reassign" onClick={() => handleVerifyStatus('REASSIGNED')}>
-                                        <FontAwesomeIcon icon={faRedo} /> Reassign
-                                    </button>
-                                </div>
-                            </div>
-                        )} */}
+    
     </>
   )
 }
