@@ -427,6 +427,15 @@
   color: var(--text-secondary);
 }
 
+.TaskDetailPage-verification{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-top: 15px;
+}
+
 @media (max-width:620px) {
   .separator{
     display: none;

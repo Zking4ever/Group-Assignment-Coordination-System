@@ -168,6 +168,10 @@
   color: var(--warning-color);
   background: #fef3c7;
 }
+.AssignmentDetailPage-submitted{
+  color: rgb(113, 224, 113);
+  background-color: rgba(144, 238, 144, 0.285);
+}
 
 .AssignmentDetailPage-done {
   color: var(--success-color);

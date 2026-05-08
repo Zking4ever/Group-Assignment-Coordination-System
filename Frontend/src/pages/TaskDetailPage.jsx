@@ -2,7 +2,7 @@ import '../assets/css/TaskDetailPage.css';
 import React, { useState, useEffect, useRef } from 'react'
 import { Panel,Group, Separator } from 'react-resizable-panels'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getTaskDetail, updateTask, submitTask, verifyTaskSubmission, getAssignmentDetail, recordWorkTime } from '@services/Service'
+import { getTaskDetail, updateTask, submitTask, getAssignmentDetail, recordWorkTime } from '@services/Service'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faCheckCircle, faClock, faUserCircle, faExclamationCircle, faFileUpload, faLink, faFileAlt, faTimes, faCheck, faRedo, faPlay, faPause,faGripLines,faGripLinesVertical, faFolder,faFilePdf,faStop } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
@@ -16,7 +16,7 @@ function TaskDetailPage() {
     const [assignment, setAssignment] = useState(null);
     const [loading, setLoading] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
-    const [timeLeft, setTimeLeft] = useState(20);
+    const [timeLeft, setTimeLeft] = useState(null);
     const [hasWorked,setHasWorked] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -127,18 +127,6 @@ function TaskDetailPage() {
         }
     };
 
-    const handleVerifyStatus = async (status) => {
-        const feedback = prompt(`Enter feedback for ${status}:`) || "";
-        try {
-            const { response } = await verifyTaskSubmission(taskId, status, feedback);
-            if (response.ok) {
-                toast.success(`Task ${status.toLowerCase()} successfully`);
-                loadTask();
-            }
-        } catch (err) {
-            toast.error("Failed to verify submission");
-        }
-    };
 
     if (loading) return <div className={"TaskDetailPage-loading"}>Loading task details...</div>;
     if (!task) return <div className={"TaskDetailPage-error"}>Task not found</div>;
@@ -194,7 +182,9 @@ function TaskDetailPage() {
 
                     {isResponsible && (task.state === 'submitted') && (
                         <div className={"TaskDetailPage-verification"}>
-                            <div className={"TaskDetailPage-sectionTitle"}><FontAwesomeIcon icon={faUserCircle} />Submission under review</div>
+                            {/* lets change the icon to marked [right symbol] */}
+                            <FontAwesomeIcon icon={faCheck} style={{color:'lightgreen'}}/> 
+                            <div className={"TaskDetailPage-sectionTitle"} style={{color:'lightgreen',fontWeight:'bold',fontSize:20}}>Submitted</div>
                             <p>Your submission is being reviewed by the assignment owner. You will receive feedback once it's evaluated.</p>
                         </div>
                     )}

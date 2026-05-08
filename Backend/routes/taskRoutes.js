@@ -28,6 +28,15 @@ router.get('/detail/:taskId',(req,res)=>{
   const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId);
   res.json(task);
 });
+router.get('/submissions/:taskId',(req,res)=>{
+  const { taskId } = req.params;
+  try{
+    const submissions = db.prepare('SELECT tasks.taskName, tasks.responsibleMemberId as submitter, tasks.state as status, submissions.id, submissions.submissionReport as report ,submissions.submissionFile as file ,submissions.submissionLink as link,submissions.date FROM submissions JOIN tasks ON tasks.id = submissions.taskId WHERE taskId =?').all(taskId);
+    res.json(submissions);
+  }catch(err){
+    res.status(400).json({ error: err.message });
+  }
+});
 
 router.post('/', (req, res) => {
   const { taskName, taskDescription, responsibleMember, startDate, deadLine, parentAssignment, state } = req.body;
@@ -50,23 +59,6 @@ router.post('/:id/save-session', (req, res) => {
     db.prepare('INSERT INTO WorkSessionRecord (id, userId, taskId, workStartTime) VALUES (?, ?, ?, ?)')
       .run(uuidv4(), userId, id, workStartTime);
     res.json({ message: 'Work Session Ended', workStartTime });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-router.post('/:id/record-expiry', (req, res) => {
-  const { id } = req.params;
-  const { userId } = req.body;
-  try {
-    const task = db.prepare('SELECT parentAssignmentId FROM tasks WHERE id = ?').get(id);
-    const assignment = db.prepare('SELECT groupId FROM assignments WHERE id = ?').get(task.parentAssignmentId);
-
-    const notifId = uuidv4();
-    const message = `Task work session expired for user ${userId}`;
-    db.prepare('INSERT INTO notifications (id, groupId, userId, type, message) VALUES (?, ?, ?, ?, ?)')
-      .run(notifId, assignment.groupId, userId, 'SESSION_EXPIRED', message);
-    res.json({ message: 'Expiry recorded' });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -96,24 +88,16 @@ router.patch('/:id', (req, res) => {
   }
 });
 
-router.delete('/:id', (req, res) => {
-  const { id } = req.params;
-  try {
-    db.prepare('DELETE FROM tasks WHERE id = ?').run(id);
-    res.json({ message: 'Task deleted' });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
 
-router.post('/:id/submit', upload.single('submissionFile'), (req, res) => {
+router.post('/:id/submit', upload.single('file'), (req, res) => {
   const { id } = req.params;
   const { submissionReport, submissionLink } = req.body;
   const submissionFile = req.file ? `/uploads/${req.file.filename}` : null;
+  const date = new Date().toISOString();
 
   try {
-    db.prepare('INSERT INTO submissions (id, taskId, submissionReport, submissionFile, submissionLink, submissionStatus) VALUES (?, ?, ?, ?, ?, ?)')
-      .run( uuidv4(), id, submissionReport, submissionFile, submissionLink, 'submitted');
+    db.prepare('INSERT INTO submissions (id, taskId,  submissionReport, submissionFile, submissionLink, submissionStatus, date) VALUES (?, ?, ?, ?, ?, ?, ?)')
+      .run( uuidv4(), id, submissionReport, submissionFile, submissionLink, 'submitted',date);
     db.prepare('UPDATE tasks SET state = ? WHERE id = ?').run('submitted',id);
     res.json({ message: 'Work submitted for verification', fileUrl: submissionFile });
   } catch (err) {
@@ -178,5 +162,16 @@ router.post('/breakdown/ai', async (req, res) => {
     res.status(500).json({ error: "Failed to generate AI breakdown: " + err.message });
   }
 });
+
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+  try {
+    db.prepare('DELETE FROM tasks WHERE id = ?').run(id);
+    res.json({ message: 'Task deleted' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 
 module.exports = router;

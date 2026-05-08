@@ -55,8 +55,7 @@ db.exec(`
     parentAssignmentId TEXT,
     state TEXT,
     FOREIGN KEY (responsibleMemberId) REFERENCES users(id),
-    FOREIGN KEY (parentAssignmentId) REFERENCES assignments(id),
-    FOREIGN KEY (workingUserId) REFERENCES users(id)
+    FOREIGN KEY (parentAssignmentId) REFERENCES assignments(id)
   );
 
   CREATE TABLE IF NOT EXISTS WorkSessionRecord (
@@ -71,9 +70,11 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS Submissions (
     id TEXT PRIMARY KEY,
     taskId TEXT,
+    assignmentId TEXT,
     submissionReport TEXT,
     submissionFile TEXT,
     submissionLink TEXT,
+    date DATETIME DEFAULT CURRENT_TIMESTAMP,
     submissionStatus TEXT DEFAULT 'submitted',
     FOREIGN KEY (taskId) REFERENCES tasks(id)
   );

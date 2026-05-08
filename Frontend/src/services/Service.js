@@ -180,6 +180,10 @@ export const getTaskDetail = async (taskId) => {
   const response = await fetch(`${BASE_URL}/task/detail/${taskId}`);
   return await response.json();
 }
+export const getTaskSubmissions = async (taskId) => {
+  const response = await fetch(`${BASE_URL}/task/submissions/${taskId}`);
+  return await response.json();
+}
 
 export const getAssignmentTasks = async (assignmentId) => {
   const response = await fetch(`${BASE_URL}/task/${assignmentId}`);

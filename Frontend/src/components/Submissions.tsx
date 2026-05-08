@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getTaskSubmissions } from "../services/Service";
+import { useParams } from "react-router-dom";
 
 interface Submission {
     taskName: string;
@@ -12,7 +14,7 @@ export default function Submissions() {
     // and then user could see submitted one navigation
 
 
-
+    const {taskId} = useParams();
     const [submissions, setSubmissions] = useState([
         {
             taskName:"Building the frontend UI in figma",
@@ -33,6 +35,14 @@ export default function Submissions() {
             submitter:"User C",
         },
     ]);
+    const load = async()=>{
+        const submissions = await getTaskSubmissions(taskId);
+        console.log(submissions);
+    }
+
+    useEffect(()=>{
+        load();
+    },[taskId])
 
     const [selected, setSelected] = useState(null as Submission | null);
     
