@@ -93,6 +93,7 @@
   outline: none;
   background: #e8eaed;
   border-bottom-color: var(--primary-color);
+  color: gray;
 }
 .TaskCreate-titleInput::placeholder {
   color: var( --text-primary);

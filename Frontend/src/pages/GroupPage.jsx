@@ -68,12 +68,6 @@ function GroupPage() {
                     Assignments
                 </button>
                 <button
-                    className={`${"GroupPage-tab"} ${activeTab === 'stream' ? "GroupPage-active" : ''}`}
-                    onClick={() => setActiveTab('stream')}
-                >
-                    Messages
-                </button>
-                <button
                     className={`${"GroupPage-tab"} ${activeTab === 'people' ? "GroupPage-active" : ''}`}
                     onClick={() => setActiveTab('people')}
                 >
@@ -82,25 +76,6 @@ function GroupPage() {
             </div>
 
             <div className={"GroupPage-tabContent"}>
-                {activeTab === 'stream' && <div className={"GroupPage-stream"}>
-                    <div className={"GroupPage-announcementBox"}>
-                        <div className={"GroupPage-avatar"}>
-                            {currentUser?.firstName?.[0]}
-                        </div>
-                        <span className='inputPlaceholder'>Announce something to your group</span>
-                    </div>
-                    <div className={"GroupPage-updates"}>
-                        <div className={"GroupPage-updateCard"}>
-                            <div className={"GroupPage-updateIcon"}>
-                                <FontAwesomeIcon icon={faClipboardList} />
-                            </div>
-                            <div className={"GroupPage-updateText"}>
-                                <p>Welcome to <strong>{group?.groupName || 'the group'}</strong>!</p>
-                                <span className={"GroupPage-date"}>Just now</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>}
                 {activeTab === 'assignment' && <AssignmentList groupId={groupId} isOwner={isOwner} />}
                 {activeTab === 'people' && <MemberList groupId={groupId} />}
             </div>

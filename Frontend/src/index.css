@@ -1,12 +1,8 @@
 :root {
   --primary-color: #6366f1;
-  /* Indigo 500 */
   --primary-hover: #4f46e5;
-  /* Indigo 600 */
   --primary-light: #e0e7ff;
-  /* Indigo 100 */
-  --secondary-color: #ec4899;
-  /* Pink 500 */
+  --secondary-color: #1f33ca;
 
   --bg-color: #f9fafb;
   /* Gray 50 */
@@ -40,14 +36,9 @@
 
 [data-theme="dark"] {
   --primary-color: #818cf8;
-  /* Indigo 400 */
   --primary-hover: #6366f1;
-  /* Indigo 500 */
   --primary-light: #3730a3;
-  /* Indigo 800 */
-  --secondary-color: #f472b6;
-  /* Pink 400 */
-
+  --secondary-color: #1f33ca;
   --bg-color: #03060d;
   /* Slate 900 */
   --surface-color: #07080b;

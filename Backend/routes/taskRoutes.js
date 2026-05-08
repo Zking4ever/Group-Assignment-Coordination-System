@@ -41,16 +41,15 @@ router.post('/', (req, res) => {
   }
 });
 
-router.patch('/:id/start-work', (req, res) => {
+router.post('/:id/save-session', (req, res) => {
   const { id } = req.params;
   const { userId } = req.body;
-  const workStartTime = new Date().toISOString();
-  const workExpiryTime = new Date(Date.now() + 20 * 60 * 1000).toISOString(); // 20 mins
+  const workStartTime = new Date(Date.now() - 20 * 60 * 1000).toISOString();
 
   try {
-    db.prepare('UPDATE tasks SET workingUserId = ?, workStartTime = ?, workExpiryTime = ?, state = ? WHERE id = ?')
-      .run(userId, workStartTime, workExpiryTime, 'working', id);
-    res.json({ message: 'Work timer started', workExpiryTime });
+    db.prepare('INSERT INTO WorkSessionRecord (id, userId, taskId, workStartTime) VALUES (?, ?, ?, ?)')
+      .run(uuidv4(), userId, id, workStartTime);
+    res.json({ message: 'Work Session Ended', workStartTime });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -107,16 +106,18 @@ router.delete('/:id', (req, res) => {
   }
 });
 
-router.patch('/:id/submit-work', upload.single('submissionFile'), (req, res) => {
+router.post('/:id/submit', upload.single('submissionFile'), (req, res) => {
   const { id } = req.params;
   const { submissionReport, submissionLink } = req.body;
   const submissionFile = req.file ? `/uploads/${req.file.filename}` : null;
 
   try {
-    db.prepare('UPDATE tasks SET submissionReport = ?, submissionFile = ?, submissionLink = ?, submissionStatus = ?, state = ?, workingUserId = NULL, workEndTime = ? WHERE id = ?')
-      .run(submissionReport, submissionFile, submissionLink, 'submitted', 'submitted', new Date().toISOString(), id);
+    db.prepare('INSERT INTO submissions (id, taskId, submissionReport, submissionFile, submissionLink, submissionStatus) VALUES (?, ?, ?, ?, ?, ?)')
+      .run( uuidv4(), id, submissionReport, submissionFile, submissionLink, 'submitted');
+    db.prepare('UPDATE tasks SET state = ? WHERE id = ?').run('submitted',id);
     res.json({ message: 'Work submitted for verification', fileUrl: submissionFile });
   } catch (err) {
+    console.log(err)
     res.status(400).json({ error: err.message });
   }
 });

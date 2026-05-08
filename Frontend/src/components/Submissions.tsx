@@ -33,8 +33,21 @@ export default function Submissions() {
             submitter:"User C",
         },
     ]);
-    const [selected, setSelected] = useState(null as Submission | null);
 
+    const [selected, setSelected] = useState(null as Submission | null);
+    
+    //     const handleVerifyStatus = async (status) => {
+    //     const feedback = prompt(`Enter feedback for ${status}:`) || "";
+    //     try {
+    //         const { response } = await verifyTaskSubmission(taskId, status, feedback);
+    //         if (response.ok) {
+    //             toast.success(`Task ${status.toLowerCase()} successfully`);
+    //             loadTask();
+    //         }
+    //     } catch (err) {
+    //         toast.error("Failed to verify submission");
+    //     }
+    // };
   return (
     <>
         <div className="submission header">

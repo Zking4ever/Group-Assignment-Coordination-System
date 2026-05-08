@@ -2,9 +2,9 @@ import '../assets/css/TaskDetailPage.css';
 import React, { useState, useEffect, useRef } from 'react'
 import { Panel,Group, Separator } from 'react-resizable-panels'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getTaskDetail, updateTask, startTaskWork, submitTaskWork, verifyTaskSubmission, getAssignmentDetail, recordTimeExpiry } from '@services/Service'
+import { getTaskDetail, updateTask, submitTask, verifyTaskSubmission, getAssignmentDetail, recordWorkTime } from '@services/Service'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faCheckCircle, faClock, faUserCircle, faExclamationCircle, faFileUpload, faLink, faFileAlt, faTimes, faCheck, faRedo, faPlay, faPause,faGripLines,faGripLinesVertical, faFolder,faFilePdf } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCheckCircle, faClock, faUserCircle, faExclamationCircle, faFileUpload, faLink, faFileAlt, faTimes, faCheck, faRedo, faPlay, faPause,faGripLines,faGripLinesVertical, faFolder,faFilePdf,faStop } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import { formatRelativeDeadline } from '../utils/timeUtils';
 import Submissions from '../components/Submissions';
@@ -16,7 +16,8 @@ function TaskDetailPage() {
     const [assignment, setAssignment] = useState(null);
     const [loading, setLoading] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
-    const [timeLeft, setTimeLeft] = useState(0);
+    const [timeLeft, setTimeLeft] = useState(20);
+    const [hasWorked,setHasWorked] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [width,setWidth] = useState(null);
@@ -38,12 +39,6 @@ function TaskDetailPage() {
             const currentAss = await getAssignmentDetail(assignmentId);
             setAssignment(currentAss);
 
-            if (currentTask.state === 'working' && currentTask.workExpiryTime) {
-                const expiry = new Date(currentTask.workExpiryTime).getTime();
-                const now = new Date().getTime();
-                const remaining = Math.max(0, Math.floor((expiry - now) / 1000));
-                setTimeLeft(remaining);
-            }
         } catch (error) {
             console.error(error);
         } finally {
@@ -73,7 +68,6 @@ function TaskDetailPage() {
         return () => clearInterval(timerRef.current);
     }, [timeLeft, task?.state, isPaused]);
 
-
     useEffect(()=>{
         setWidth(window.innerWidth>620? 'large':'small');
         window.addEventListener('resize',()=>{
@@ -85,29 +79,33 @@ function TaskDetailPage() {
         })
     })
 
+    const handleStart = async () => {
+        task.state = 'working';
+        timerRef.current = 20*60; //20m;
+        setTimeLeft(20 * 60);
+    };
+
+    const handleStop = async () => {
+        task.state = 'stopped';
+        setTimeLeft(20 * 60);
+        timerRef.current = 20 * 60;
+        loadTask();
+    }
+
     const handleSessionEnd = async () => {
-        await recordTimeExpiry(taskId, currentUser.id);
+        await recordWorkTime(taskId, currentUser.id);
+        setHasWorked(true);
         toast("Work session expired. Progress recorded.", { icon: '⏰' });
 
         loadTask(); // Refresh to see state change from server if any
     };
 
-    const handleStartWork = async () => {
-        try {
-            const response = await startTaskWork(taskId, currentUser.id);
-            if (response.ok) {
-                toast.success("Work timer started! You have 20 minutes.");
-                loadTask();
-            } else {
-                toast.error("Failed to start work");
-            }
-        } catch (err) {
-            toast.error("Error starting work");
-        }
-    };
-
     const handleSubmitWork = async (e) => {
         e.preventDefault();
+        // if(!hasWorked){
+        //     toast.error("You need at least to work one session to submit");
+        //     return;
+        // }
         setIsSubmitting(true);
         const formData = new FormData();
         formData.append("report", report);
@@ -115,7 +113,7 @@ function TaskDetailPage() {
         if (file) formData.append("file", file);
 
         try {
-            const response = await submitTaskWork(taskId, formData);
+            const response = await submitTask(taskId, formData);
             if (response.ok) {
                 toast.success("Work submitted for verification!");
                 loadTask();
@@ -154,11 +152,7 @@ function TaskDetailPage() {
         return `${m}:${s < 10 ? '0' : ''}${s}`;
     };
     
-
     return (
-
-        
-
         <div className={"TaskDetailPage-page"}>
             <Group orientation={(width === 'large') ? 'horizontal' : 'vertical'} className={"TaskDetailPage-content"}>
                 <Panel minSize={300} className={"TaskDetailPage-mainCol"}>
@@ -176,34 +170,34 @@ function TaskDetailPage() {
                         </div>
                     </header>
                     <section className={"TaskDetailPage-description"}>
-                        <div className={"TaskDetailPage-sectionTitle"}>
-                            <FontAwesomeIcon icon={faExclamationCircle} />
-                            Instructions
+                        <div className={"TaskDetailPage-container"}>
+                            <div className={"TaskDetailPage-sectionTitle"}><FontAwesomeIcon icon={faExclamationCircle} />Instructions</div>
+                            <div>
+                                {(task.state === 'yet' || task.state === 'REJECTED' || task.state === 'stopped') && isResponsible && (
+                                    <button className={"TaskDetailPage-primaryBtn"} onClick={ () => handleStart() }>
+                                        <FontAwesomeIcon icon={faPlay} /> Start working (20min)
+                                    </button>
+                                )}
+                                {task.state === 'working' && isResponsible && (
+                                    <div className="Timer-display">
+                                        <div className="Timer-countdown">{formatTime(timeLeft)}</div>
+                                        <div style={{display:'flex'}}>
+                                            <button className="TaskDetailPage-primaryBtn" onClick={() => setIsPaused(!isPaused)}><FontAwesomeIcon icon={isPaused ? faPlay : faPause} /></button>
+                                            <button className="TaskDetailPage-primaryBtn" onClick={() => handleStop()}><FontAwesomeIcon icon={faStop} /></button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <p>{task.taskDescription || "No instructions provided."}</p>
                     </section>
-                    <div className={"TaskDetailPage-actions"}>
-                        {(task.state === 'yet' || task.state === 'REJECTED') && isResponsible && (
-                            <button className={"TaskDetailPage-primaryBtn"} onClick={handleStartWork}>
-                                <FontAwesomeIcon icon={faClock} /> Start working (20min)
-                            </button>
-                        )}
-                        {task.state === 'working' && isResponsible && (
-                            <div className="Timer-display">
-                                <div className="Timer-countdown">{formatTime(timeLeft)}</div>
-                                <p>Time remaining to record activity</p>
-                                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                                    <button className="TaskDetailPage-primaryBtn" onClick={() => setIsPaused(!isPaused)}>
-                                        <FontAwesomeIcon icon={isPaused ? faPlay : faPause} /> {isPaused ? 'Resume' : 'Pause'}
-                                    </button>
-                                    <button className="TaskDetailPage-secondaryBtn" onClick={() => loadTask()}>
-                                        <FontAwesomeIcon icon={faTimes} /> Stop
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
 
+                    {isResponsible && (task.state === 'submitted') && (
+                        <div className={"TaskDetailPage-verification"}>
+                            <div className={"TaskDetailPage-sectionTitle"}><FontAwesomeIcon icon={faUserCircle} />Submission under review</div>
+                            <p>Your submission is being reviewed by the assignment owner. You will receive feedback once it's evaluated.</p>
+                        </div>
+                    )}
                     {isResponsible && (task.state === 'working' || task.state === 'REJECTED' || task.state === 'yet') && (
                         <section className={"TaskDetailPage-submissionForm"}>
                             <div className={"TaskDetailPage-sectionTitle"}>
@@ -248,7 +242,7 @@ function TaskDetailPage() {
                 <Separator className='separator vertical'>
                     <FontAwesomeIcon icon={faGripLinesVertical} size="lg" />  
                 </Separator>
-                <Panel minSize={(width=='large' ? 350 : 0)} defaultSize={(width=='large' ? 200 : 0)} className={"TaskDetailPage-sideCol"}>
+                <Panel minSize={(width=='large' ? 350 : 0)} defaultSize={(width=='large' ? 520 : 0)} className={"TaskDetailPage-sideCol"}>
                     <Group orientation="vertical">
                         <Panel className={"TaskDetailPage-taskfile"} onClick={()=>setFileInFocus(!fileInFocus)}>
                             <input type="checkbox" id="CheckBox" checked={fileInFocus}/>
@@ -260,6 +254,7 @@ function TaskDetailPage() {
                                     <li>Enhanced AI integration for real-time collaboration</li>
                                     <li>Improved file management and version control</li>
                                     <li>Streamlined submission process with automated grading</li>
+                                    <li>Chatting with users, track changes, notifications integration</li>
                                 </ul>
                                  
                                 <span>Stay updated on our latest developments!</span>

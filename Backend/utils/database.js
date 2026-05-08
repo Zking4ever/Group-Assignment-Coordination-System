@@ -54,16 +54,28 @@ db.exec(`
     deadLine TEXT,
     parentAssignmentId TEXT,
     state TEXT,
-    workingUserId TEXT,
-    workStartTime TEXT,
-    workExpiryTime TEXT,
-    submissionReport TEXT,
-    submissionFile TEXT,
-    submissionLink TEXT,
-    submissionStatus TEXT DEFAULT 'PENDING',
     FOREIGN KEY (responsibleMemberId) REFERENCES users(id),
     FOREIGN KEY (parentAssignmentId) REFERENCES assignments(id),
     FOREIGN KEY (workingUserId) REFERENCES users(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS WorkSessionRecord (
+    id TEXT PRIMARY KEY,
+    taskId TEXT,
+    userId TEXT,
+    workStartTime TEXT,
+    FOREIGN KEY (taskId) REFERENCES tasks(id),
+    FOREIGN KEY (userId) REFERENCES users(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS Submissions (
+    id TEXT PRIMARY KEY,
+    taskId TEXT,
+    submissionReport TEXT,
+    submissionFile TEXT,
+    submissionLink TEXT,
+    submissionStatus TEXT DEFAULT 'submitted',
+    FOREIGN KEY (taskId) REFERENCES tasks(id)
   );
 
   CREATE TABLE IF NOT EXISTS notifications (

@@ -197,25 +197,18 @@ export const updateTask = async (taskId, updatedTask) => {
   });
 };
 
-export const startTaskWork = async (taskId, userId) => {
-  return await fetch(`${BASE_URL}/task/${taskId}/start-work`, {
-    method: "PATCH",
+
+export const recordWorkTime = async (taskId, userId) => {
+  return await fetch(`${BASE_URL}/task/${taskId}/save-session`, {
+    method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userId })
   });
 };
 
-export const recordTimeExpiry = async (taskId, userId) => {
-  return await fetch(`${BASE_URL}/task/${taskId}/record-expiry`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId })
-  });
-};
-
-export const submitTaskWork = async (taskId, formData) => {
-  return await fetch(`${BASE_URL}/task/${taskId}/submit-work`, {
-    method: "PATCH",
+export const submitTask = async (taskId, formData) => {
+  return await fetch(`${BASE_URL}/task/${taskId}/submit`, {
+    method: "POST",
     body: formData
   });
 };

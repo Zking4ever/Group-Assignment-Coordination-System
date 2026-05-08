@@ -147,7 +147,7 @@
   color: var(--text-secondary);
 }
 
-@media (max-width: 400px) {
+@media (max-width: 500px) {
   .GroupPage-groupPage {
     transform: translateY(-140px);
     padding: 0;
