@@ -18,10 +18,6 @@ interface Submission {
 
 export default function Submissions() {
 
-    //prepare an end point to get assignment submissions in here
-    // and then user could see submitted one navigation
-
-
     const {assignmentId} = useParams();
     const [assignment,setAssignment] = useState(null);
     const [currentUser,setCurrentUser] = useState(null);
@@ -37,6 +33,8 @@ export default function Submissions() {
         
         const currentAss = await getAssignmentDetail(assignmentId);
         setAssignment(currentAss);
+        
+        setSelected(null);
     }
 
     const getSubmitter = async()=>{

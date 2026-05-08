@@ -97,10 +97,10 @@ function TaskDetailPage() {
 
     const handleSubmitWork = async (e) => {
         e.preventDefault();
-        // if(!hasWorked){
-        //     toast.error("You need at least to work one session to submit");
-        //     return;
-        // }
+        if(!hasWorked){
+            toast.error("You need at least to work one session to submit");
+            return;
+        }
         setIsSubmitting(true);
         const formData = new FormData();
         formData.append("report", report);
@@ -156,7 +156,7 @@ function TaskDetailPage() {
                         <div className={"TaskDetailPage-container"}>
                             <div className={"TaskDetailPage-sectionTitle"}><FontAwesomeIcon icon={faExclamationCircle} />Instructions</div>
                             <div>
-                                {(task.state === 'yet' || task.state === 'REJECTED' || task.state === 'stopped') && isResponsible && (
+                                {(task.state === 'yet' || task.state === 'rejected' || task.state === 'stopped') && isResponsible && (
                                     <button className={"TaskDetailPage-primaryBtn"} onClick={ () => handleStart() }>
                                         <FontAwesomeIcon icon={faPlay} /> Start working (20min)
                                     </button>
@@ -189,7 +189,12 @@ function TaskDetailPage() {
                             <p> The task has been completed and received final approval </p>
                         </div>
                     )}
-                    {isResponsible && (task.state === 'working' || task.state === 'REJECTED' || task.state === 'yet') && (
+                    {isResponsible && (task.state === 'rejected') && (
+                        <div className="TaskDetailPage-sectionTitle" style={{color:'red'}}>
+                            Due to incomplition or some issues your work was not approved
+                        </div>
+                    )}
+                    {isResponsible && (task.state === 'working' || task.state === 'rejected' || task.state === 'yet') && (
                         <section className={"TaskDetailPage-submissionForm"}>
                             <div className={"TaskDetailPage-sectionTitle"}>
                                 <FontAwesomeIcon icon={faFileUpload} />

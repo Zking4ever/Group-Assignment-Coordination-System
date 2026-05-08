@@ -104,14 +104,17 @@ router.patch('/:id/verify-submission', (req, res) => {
   try {
     let newState = 'completed';
     if (status === 'REJECTED') {
-      newState = 'yet'; 
+      newState = 'rejected'; 
     }
 
-    db.prepare('UPDATE tasks SET submissionStatus = ?, state = ? WHERE id = ?')
-      .run(status, newState, id);
+    db.prepare('UPDATE tasks SET state = ? WHERE id = ?')
+      .run(newState, id);
+    db.prepare('UPDATE Submissions SET submissionStatus = ? WHERE taskId = ?')
+      .run(newState, id);
 
     res.json({ message: `Submission ${status.toLowerCase()}`, newState });
   } catch (err) {
+    console.log(err);
     res.status(400).json({ error: err.message });
   }
 });

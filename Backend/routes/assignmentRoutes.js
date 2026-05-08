@@ -19,7 +19,7 @@ router.get('/detail/:assignmentId', (req, res) => {
 router.get('/submissions/:assignmentId',(req,res)=>{
   const { assignmentId } = req.params;
   try{
-    const submissions = db.prepare('SELECT tasks.taskName, tasks.responsibleMemberId as submitter, tasks.state as status, submissions.id, submissions.submissionReport as report ,submissions.submissionFile as file ,submissions.submissionLink as link,submissions.date FROM submissions JOIN tasks ON tasks.id = submissions.taskId WHERE assignmentId =?').all(assignmentId);
+    const submissions = db.prepare('SELECT tasks.id, tasks.taskName, tasks.responsibleMemberId as submitter, tasks.state as status, submissions.submissionReport as report ,submissions.submissionFile as file ,submissions.submissionLink as link,submissions.date FROM submissions JOIN tasks ON tasks.id = submissions.taskId WHERE assignmentId =?').all(assignmentId);
     res.json(submissions);
   }catch(err){
     res.status(400).json({ error: err.message });
