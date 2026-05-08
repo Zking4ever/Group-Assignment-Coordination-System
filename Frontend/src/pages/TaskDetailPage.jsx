@@ -4,7 +4,7 @@ import { Panel,Group, Separator } from 'react-resizable-panels'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getTaskDetail, updateTask, startTaskWork, submitTaskWork, verifyTaskSubmission, getAssignmentDetail, recordTimeExpiry } from '@services/Service'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faCheckCircle, faClock, faUserCircle, faExclamationCircle, faFileUpload, faLink, faFileAlt, faTimes, faCheck, faRedo, faPlay,faGripLines,faGripLinesVertical, faFolder,faFilePdf } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCheckCircle, faClock, faUserCircle, faExclamationCircle, faFileUpload, faLink, faFileAlt, faTimes, faCheck, faRedo, faPlay, faPause,faGripLines,faGripLinesVertical, faFolder,faFilePdf } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import { formatRelativeDeadline } from '../utils/timeUtils';
 import Submissions from '../components/Submissions';
@@ -18,6 +18,8 @@ function TaskDetailPage() {
     const [currentUser, setCurrentUser] = useState(null);
     const [timeLeft, setTimeLeft] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [width,setWidth] = useState(null);
 
     // Submission form state
     const [report, setReport] = useState("");
@@ -70,6 +72,18 @@ function TaskDetailPage() {
         }
         return () => clearInterval(timerRef.current);
     }, [timeLeft, task?.state, isPaused]);
+
+
+    useEffect(()=>{
+        setWidth(window.innerWidth>620? 'large':'small');
+        window.addEventListener('resize',()=>{
+            setWidth(window.innerWidth>620? 'large':'small');
+        })
+
+        return () => window.removeEventListener('resize',()=>{
+            setWidth(window.innerWidth>620? 'large':'small');
+        })
+    })
 
     const handleSessionEnd = async () => {
         await recordTimeExpiry(taskId, currentUser.id);
@@ -131,7 +145,7 @@ function TaskDetailPage() {
     if (loading) return <div className={"TaskDetailPage-loading"}>Loading task details...</div>;
     if (!task) return <div className={"TaskDetailPage-error"}>Task not found</div>;
 
-    const isResponsible = task.responsibleMember === currentUser?.id;
+    const isResponsible = task.responsibleMemberId === currentUser?.id;
     const isOwner = assignment?.creatorId === currentUser?.id;
 
     const formatTime = (seconds) => {
@@ -143,30 +157,10 @@ function TaskDetailPage() {
 
     return (
 
-        // <div className={"TaskDetailPage-actions"}>
-        //                         {(task.state === 'yet' || task.state === 'REJECTED') && isResponsible && (
-        //                             <button className={"TaskDetailPage-primaryBtn"} onClick={handleStartWork}>
-        //                                 <FontAwesomeIcon icon={faClock} /> Start working (20min)
-        //                             </button>
-        //                         )}
-        //                         {task.state === 'working' && isResponsible && (
-        //                             <div className="Timer-display">
-        //                                 <div className="Timer-countdown">{formatTime(timeLeft)}</div>
-        //                                 <p>Time remaining to record activity</p>
-        //                                 <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-        //                                     <button className="TaskDetailPage-primaryBtn" onClick={() => setIsPaused(!isPaused)}>
-        //                                         <FontAwesomeIcon icon={isPaused ? faPlay : faPause} /> {isPaused ? 'Resume' : 'Pause'}
-        //                                     </button>
-        //                                     <button className="TaskDetailPage-secondaryBtn" onClick={() => loadTask()}>
-        //                                         <FontAwesomeIcon icon={faTimes} /> Stop
-        //                                     </button>
-        //                                 </div>
-        //                             </div>
-        //                         )}
-        //                     </div>
+        
 
         <div className={"TaskDetailPage-page"}>
-            <Group orientation="horizontal" className={"TaskDetailPage-content"}>
+            <Group orientation={(width === 'large') ? 'horizontal' : 'vertical'} className={"TaskDetailPage-content"}>
                 <Panel minSize={300} className={"TaskDetailPage-mainCol"}>
                     <header className={"TaskDetailPage-header"}>
                         <button className={"TaskDetailPage-backBtn"} onClick={() => navigate(-1)}>
@@ -188,6 +182,27 @@ function TaskDetailPage() {
                         </div>
                         <p>{task.taskDescription || "No instructions provided."}</p>
                     </section>
+                    <div className={"TaskDetailPage-actions"}>
+                        {(task.state === 'yet' || task.state === 'REJECTED') && isResponsible && (
+                            <button className={"TaskDetailPage-primaryBtn"} onClick={handleStartWork}>
+                                <FontAwesomeIcon icon={faClock} /> Start working (20min)
+                            </button>
+                        )}
+                        {task.state === 'working' && isResponsible && (
+                            <div className="Timer-display">
+                                <div className="Timer-countdown">{formatTime(timeLeft)}</div>
+                                <p>Time remaining to record activity</p>
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                                    <button className="TaskDetailPage-primaryBtn" onClick={() => setIsPaused(!isPaused)}>
+                                        <FontAwesomeIcon icon={isPaused ? faPlay : faPause} /> {isPaused ? 'Resume' : 'Pause'}
+                                    </button>
+                                    <button className="TaskDetailPage-secondaryBtn" onClick={() => loadTask()}>
+                                        <FontAwesomeIcon icon={faTimes} /> Stop
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
                     {isResponsible && (task.state === 'working' || task.state === 'REJECTED' || task.state === 'yet') && (
                         <section className={"TaskDetailPage-submissionForm"}>
@@ -233,7 +248,7 @@ function TaskDetailPage() {
                 <Separator className='separator vertical'>
                     <FontAwesomeIcon icon={faGripLinesVertical} size="lg" />  
                 </Separator>
-                <Panel minSize={200} className={"TaskDetailPage-sideCol"}>
+                <Panel minSize={(width=='large' ? 350 : 0)} defaultSize={(width=='large' ? 200 : 0)} className={"TaskDetailPage-sideCol"}>
                     <Group orientation="vertical">
                         <Panel className={"TaskDetailPage-taskfile"} onClick={()=>setFileInFocus(!fileInFocus)}>
                             <input type="checkbox" id="CheckBox" checked={fileInFocus}/>
@@ -278,6 +293,11 @@ function TaskDetailPage() {
                     </Group>
                 </Panel>
             </Group>
+            {(width === 'small') && (
+                <div>
+                    <Submissions />
+                </div>
+            )}
         </div>
     );
 }
